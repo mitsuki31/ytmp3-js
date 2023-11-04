@@ -12,9 +12,12 @@ const fs = require('fs'),           // File system module
 
 
 function normalizeYtMusicUrl(url) {
-    if (!url || typeof url !== 'string') 
-        throw new Error(
-            `Invalid YouTube Music URL: ${url}`);
+    if (!url || (typeof url !== 'string' || url instanceof URL)) {
+        throw new Error(`Invalid YouTube Music URL: ${url}`);
+    }
+    
+    // Regular expression pattern of YouTube Music URL
+    const ytMusicUrlPattern = /^http(s?)?:\/\/music?.+\/watch\?v=.+/;
     
     // Test that the given URL is valid
     if (typeof url === 'string') url = (new URL(url)).href;
@@ -22,12 +25,12 @@ function normalizeYtMusicUrl(url) {
     
     // Replace 'music' string between URL and replace it
     // to make the URL refers to original YouTube.
-    if (/^http(s?)?:\/\/music?.+\/watch\?v=.+/.test(url)) {
+    if (ytMusicUrlPattern.test(url)) {
         url = url.replace('music.', 'www.');
     }
     
     // Trim to the right if the URL has '&si=' (YT Music only)
-    if (/^http(s?)?:\/\/.+\?v=.+&[si]+=?/) {
+    if (/^http(s?)?:\/\/.+\?v=.+&si=?/) {
         url = url.replace(/&si=.+/, '');
     }
     
