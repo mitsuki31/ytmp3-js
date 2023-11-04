@@ -87,16 +87,17 @@ function normalizeYtMusicUrl(url) {
             });
             
             // The file name format
-            const filename = path.join('download',
-                `${authorVideo} - ${titleVideo}.m4a`);
-            const outStream = fs.createWriteStream(filename);
+            const filename = `${authorVideo} - ${titleVideo}.m4a`;
+            const outStream = fs.createWriteStream(
+                path.join('download', filename));
             
             console.log(`Processing... '${titleVideo}' (${ytdl.getVideoID(url)})`);
             // Start downloading the audio and save to file
             ytdl.downloadFromInfo(info, { format: format })
                 .pipe(outStream);
             outStream.on('finish', () => {
-                console.log(`Finished: '${filename}' [${Date.now()}]`);
+                console.log(`Finished: '${filename}' [${
+                    (new Date()).toISOString()}]`);
             });
         });
     });
