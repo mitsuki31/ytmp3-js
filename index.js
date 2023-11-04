@@ -10,7 +10,26 @@ const fs = require('fs'),           // File system module
       path = require('path'),       // Path module
       ytdl = require('ytdl-core');  // Youtube Downloader module
 
-
+/**
+ * Normalizes a YouTube Music URL to its original YouTube format.
+ *
+ * This function takes a YouTube Music URL, validates it, and
+ * converts it to the original YouTube format if applicable.
+ *
+ * @param   {string | URL} url - The YouTube Music URL to be normalized.
+ * @returns {string} The normalized YouTube URL.
+ * @throws  {Error} Throws an error if the input URL is invalid or
+ *                  neither of a string nor an instance of URL.
+ *
+ * @example
+ * const ytMusicUrl = 'https://music.youtube.com/watch?v=exampleVideoId&si=someValue';
+ * const normalizedUrl = normalizeYtMusicUrl(ytMusicUrl);
+ * // normalizedUrl is now 'https://www.youtube.com/watch?v=exampleVideoId'
+ *
+ * @public
+ * @author  Ryuu Mitsuki
+ * @since   0.1.0
+ */
 function normalizeYtMusicUrl(url) {
     if (!url || (typeof url !== 'string' || url instanceof URL)) {
         throw new Error(`Invalid YouTube Music URL: ${url}`);
