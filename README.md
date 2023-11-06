@@ -65,7 +65,7 @@ This project utilizes the following libraries and APIs:
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
 ## License
-This project is licensed under MIT License. For more details, see [LICENSE](https://github.com/mitsuki31/ytmp3-js/blob/master/README.md) file.
+This project is licensed under MIT License. For more details, see [LICENSE](https://github.com/mitsuki31/ytmp3-js/blob/master/LICENSE) file.
 
 
 [ytdl-core]: https://www.npmjs.com/package/ytdl-core
