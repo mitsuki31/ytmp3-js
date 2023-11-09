@@ -5,6 +5,8 @@
  * @since  0.1.0
  */
 
+'use strict';
+
 const fs = require('fs'),           // File system module
       os = require('os'),           // OS module
       path = require('path'),       // Path module
