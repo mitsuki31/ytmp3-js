@@ -62,6 +62,9 @@ function normalizeYtMusicUrl(url) {
     const urlsFile = path.resolve(inputFile);
     console.log('File:', urlsFile);
     
+    // All illegal characters for file names
+    const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
+    
     await fs.readFile(urlsFile, 'utf8', (err, contents) => {
         if (err) throw err;
         if (contents === '') throw new Error('File is empty, no URL found');
@@ -80,7 +83,7 @@ function normalizeYtMusicUrl(url) {
             const info = await ytdl.getInfo(url);
             const authorVideo = info.videoDetails.author.name
                                     .replace(/\s-\s.+/, ''),
-                  titleVideo = info.videoDetails.title;
+                  titleVideo = info.videoDetails.title.replace(illegalCharRegex, '_');
             
             // Filter the audio and create new audio format
             const format = ytdl.chooseFormat(info.formats, {
