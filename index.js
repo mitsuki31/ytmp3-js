@@ -89,7 +89,7 @@ function normalizeYtMusicUrl(url) {
             });
             
             // The file name format
-            const filename = `${authorVideo} - ${titleVideo}.m4a`;
+            const filename = `${titleVideo}.m4a`;
             const outStream = fs.createWriteStream(
                 path.join('download', filename));
             
