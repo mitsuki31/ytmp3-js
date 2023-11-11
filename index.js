@@ -12,6 +12,8 @@ const fs = require('fs'),           // File system module
       path = require('path'),       // Path module
       ytdl = require('ytdl-core');  // Youtube Downloader module
 
+const { convertToMp3 } = require('./lib/acodecs-cvt');
+
 /**
  * Normalizes a YouTube Music URL to its original YouTube format.
  *
@@ -91,18 +93,19 @@ function normalizeYtMusicUrl(url) {
                 filter: 'audioonly'  // Filter audio only
             });
             
-            // The file name format
-            const filename = `${titleVideo}.m4a`;
-            const outStream = fs.createWriteStream(
-                path.join('download', filename));
+            const filename = path.join('download', `${titleVideo}.m4a`);
+            const outStream = fs.createWriteStream(filename);
             
             console.log(`Processing... '${titleVideo}' (${ytdl.getVideoID(url)})`);
             // Start downloading the audio and save to file
-            ytdl.downloadFromInfo(info, { format: format })
+            await ytdl.downloadFromInfo(info, { format: format })
                 .pipe(outStream);
             outStream.on('finish', () => {
-                console.log(`Finished: '${filename}' [${
+                console.log(`Finished: '${path.basename(filename)}' [${
                     (new Date()).toISOString()}]`);
+                
+                // Convert to MP3
+                convertToMp3(filename);
             });
         });
     });
