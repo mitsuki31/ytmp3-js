@@ -60,6 +60,24 @@ function normalizeYtMusicUrl(url) {
     return url;
 }
 
+function getVideosInfo(...urls) {
+    return new Promise(async (resolve, reject) => {
+        let videosInfo = [];
+        
+        try {
+            await Promise.all(urls.map(async (url) => {
+                ytdl.validateURL(url);               // Validate the URL
+                videosInfo.push(await ytdl.getInfo(url));  // Get the video info
+            }));
+        } catch (error) {
+            reject(error);
+        }
+        // Return the list representing the videos information
+        resolve(videosInfo);
+    });
+}
+
+
 (async function (inputFile) {
     const urlsFile = path.resolve(inputFile);
     console.log('File:', urlsFile);
