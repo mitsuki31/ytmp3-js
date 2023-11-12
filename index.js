@@ -5,10 +5,14 @@
  * @since  0.1.0
  */
 
+'use strict';
+
 const fs = require('fs'),           // File system module
       os = require('os'),           // OS module
       path = require('path'),       // Path module
       ytdl = require('ytdl-core');  // Youtube Downloader module
+
+const { convertToMp3 } = require('./lib/acodecs-cvt');
 
 /**
  * Normalizes a YouTube Music URL to its original YouTube format.
@@ -60,6 +64,9 @@ function normalizeYtMusicUrl(url) {
     const urlsFile = path.resolve(inputFile);
     console.log('File:', urlsFile);
     
+    // All illegal characters for file names
+    const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
+    
     await fs.readFile(urlsFile, 'utf8', (err, contents) => {
         if (err) throw err;
         if (contents === '') throw new Error('File is empty, no URL found');
@@ -78,7 +85,7 @@ function normalizeYtMusicUrl(url) {
             const info = await ytdl.getInfo(url);
             const authorVideo = info.videoDetails.author.name
                                     .replace(/\s-\s.+/, ''),
-                  titleVideo = info.videoDetails.title;
+                  titleVideo = info.videoDetails.title.replace(illegalCharRegex, '_');
             
             // Filter the audio and create new audio format
             const format = ytdl.chooseFormat(info.formats, {
@@ -86,18 +93,19 @@ function normalizeYtMusicUrl(url) {
                 filter: 'audioonly'  // Filter audio only
             });
             
-            // The file name format
-            const filename = `${authorVideo} - ${titleVideo}.m4a`;
-            const outStream = fs.createWriteStream(
-                path.join('download', filename));
+            const filename = path.join('download', `${titleVideo}.m4a`);
+            const outStream = fs.createWriteStream(filename);
             
             console.log(`Processing... '${titleVideo}' (${ytdl.getVideoID(url)})`);
             // Start downloading the audio and save to file
-            ytdl.downloadFromInfo(info, { format: format })
+            await ytdl.downloadFromInfo(info, { format: format })
                 .pipe(outStream);
             outStream.on('finish', () => {
-                console.log(`Finished: '${filename}' [${
+                console.log(`Finished: '${path.basename(filename)}' [${
                     (new Date()).toISOString()}]`);
+                
+                // Convert to MP3
+                convertToMp3(filename);
             });
         });
     });
