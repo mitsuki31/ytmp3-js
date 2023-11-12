@@ -11,20 +11,7 @@ All downloaded audio files are saved in `download` directory, relative from proj
 
 ## ⛔ Limitations
 
-One of the limitations of this project is that it downloads audio files in M4A format
-instead of the desired MP3 codec. And the other limitations is the download queries should not
-exceed 15 queries (URLs) at the same process. Additionally, it is not stable and might have issues during usage.
-
-### How can I get the audio with MP3 codec?
-
-To get the desired audio codec we need some third-party software like `ffmpeg`.
-Here's an example how to convert audio of M4A codec to MP3 codec using `ffmpeg`.
-
-```bash
-ffmpeg -i 'Artist Name - Song Title.m4a' 'Artist Name - Song Title.mp3'
-```
-
-For more details, see `man ffmpeg` or refer to [FFmpeg Homepage](https://www.ffmpeg.org/).
+The download queries should not exceed 15 queries (URLs) at the same process. Additionally, it is not stable and might have issues during usage.
 
 ## Usage
 
@@ -41,6 +28,7 @@ Example of input file:
 
 ```
 https://m.youtube.com/watch?v=<VIDEO_ID>
+https://youtu.be/<VIDEO_ID>
 https://www.youtube.com/watch?v=<VIDEO_ID>
 https://music.youtube.com/watch?v=<VIDEO_ID>
 ```
@@ -49,6 +37,9 @@ In example above, each URL has a different pattern:
 
 - `https://m.youtube.com`  
   This YouTube URL is commonly found in the YouTube mobile app. The `m` before youtube is an abbreviation of **mobile**.
+
+- `https://youtu.be`
+  Same as above, it's commonly found in the YouTube mobile app, but the new one.
 
 - `https://www.youtube.com`  
   This YouTube URL is globally used to determine YouTube URLs and supports both mobile and desktop platforms. The `www` itself is an abbreviation of **World Wide Web**.
@@ -60,7 +51,11 @@ In example above, each URL has a different pattern:
 
 This project utilizes the following libraries and APIs:
 
-- [ytdl-core]: A JavaScript library for downloading YouTube videos.
+- [ytdl-core] - A JavaScript library for downloading YouTube videos.
+- [fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
+> **Note**
+> Make sure that you have [`ffmpeg`](https://ffmpeg.org) installed on your system.
+> This also including all necessary encoding libraries like `libmp3lame`.
 
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
@@ -69,3 +64,4 @@ This project is licensed under MIT License. For more details, see [LICENSE](http
 
 
 [ytdl-core]: https://www.npmjs.com/package/ytdl-core
+[fluent-ffmpeg]: https://www.npmjs.com/package/fluent-ffmpeg
