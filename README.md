@@ -38,7 +38,7 @@ In example above, each URL has a different pattern:
 - `https://m.youtube.com`  
   This YouTube URL is commonly found in the YouTube mobile app. The `m` before youtube is an abbreviation of **mobile**.
 
-- `https://youtu.be`
+- `https://youtu.be`  
   Same as above, it's commonly found in the YouTube mobile app, but the new one.
 
 - `https://www.youtube.com`  
