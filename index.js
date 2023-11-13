@@ -103,53 +103,113 @@ function argumentParser(args) {
 }
 
 
-(async function (inputFile) {
+(function (inputFile) {
     const urlsFile = path.resolve(inputFile);
-    console.log('File:', urlsFile);
+    console.log(`Input File: ${path.basename(urlsFile)}`);
     
     // All illegal characters for file names
     const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
     
-    await fs.readFile(urlsFile, 'utf8', (err, contents) => {
-        if (err) throw err;
-        if (contents === '') throw new Error('File is empty, no URL found');
-        
-        const urls = contents.toString().split(os.EOL)  // Stringify and then split
-                             .map((url) => normalizeYtMusicUrl(url))
-                             .slice(0, 15);
-        //console.log(urls);  // DEBUG: Log the URLs to console output
-        
-        urls.forEach(async (url) => {
-            // Validate all URLs
-            ytdl.validateURL(url);
+    fs.promises.readFile(urlsFile, 'utf8')
+        .then((contents) => {
+            if (contents.toString() === '') throw new Error('File is empty, no URL found');
             
-            console.log(`Retrieving... '${ytdl.getVideoID(url)}'`);
-            // Retrieve the video info
-            const info = await ytdl.getInfo(url);
-            const authorVideo = info.videoDetails.author.name
-                                    .replace(/\s-\s.+/, ''),
-                  titleVideo = info.videoDetails.title.replace(illegalCharRegex, '_');
+            const urls = contents.toString().split(os.EOL)  // Stringify and then split
+                                 .map((url) => normalizeYtMusicUrl(url))
+                                 .slice(0, 15);
             
-            // Filter the audio and create new audio format
-            const format = ytdl.chooseFormat(info.formats, {
-                quality: '140',      // This itag refers to 'mp4a' codec
-                filter: 'audioonly'  // Filter audio only
+            return new Promise((resolve, reject) => {
+                let downloadFiles = [];  // Store all downloaded files
+                getVideosInfo(...urls)
+                    .then((data) => {
+                        const parsedData = [];
+                        for (const videoInfo of data) {
+                            // Append the parsed data
+                            parsedData.push({
+                                videoInfo,
+                                format: ytdl.chooseFormat(videoInfo.formats, {
+                                    quality: 140,
+                                    filter: 'audioonly'
+                                }),
+                                title: videoInfo.videoDetails.title.replace(illegalCharRegex, '_'),
+                                author: videoInfo.videoDetails.author.name,
+                                videoUrl: videoInfo.videoDetails.video_url,
+                                videoId: videoInfo.videoDetails.videoId,
+                                viewers: videoInfo.videoDetails.viewCount
+                            });
+                        }
+                        
+                        return parsedData;
+                    })
+                    .then(async (parsedData) => {
+                        // Store path to the error logs during downloading
+                        const dlErrorLog = path.resolve(
+                            __dirname, 'tmp', `dlError-${
+                                (new Date()).toISOString().split('.')[0]}.log`);
+                        parsedData.forEach((data) => {
+                            // Extract necessary members
+                            const { format, videoInfo } = data;
+                            
+                            // Create output path and the write stream
+                            const outFile = path.join('download', `${data.title}.m4a`),
+                                  outFileBase = path.basename(outFile),
+                                  outStream = fs.createWriteStream(outFile, { autoClose: true });
+                            
+                            // Create the output directory asynchronously, if not exist
+                            if (!fs.existsSync(path.dirname(outFile))) {
+                                fs.mkdirSync(path.dirname(outFile), { recursive: true });
+                            }
+                            
+                            console.log(`[INFO] Downloading '${data.title}'...`);
+                            console.log('     ', {
+                                author: data.author,
+                                viewers: parseInt(data.viewers, 10).toLocaleString('en')
+                            });
+                            ytdl.downloadFromInfo(videoInfo, { format: format })
+                                .on('progress', createDownloadProgress)
+                                .on('end', () => {
+                                    console.log(`[DONE] Download finished: ${outFileBase}`);
+                                })
+                                .on('error', (err) => {
+                                    console.error(`[ERROR] Download error: ${outFileBase}`);
+                                    if (!fs.existsSync(path.dirname(dlErrorLog))) {
+                                        fs.mkdirSync(path.dirname(dlErrorLog, { recursive: true }));
+                                    }
+                                    const dlErrorLogStream = fs.createWriteStream(
+                                        dlErrorLog, { flags: 'a+', flush: true }
+                                    );
+                                    
+                                    dlErrorLogStream.write(`[ERROR] ${err.message}${os.EOL}`);
+                                    dlErrorLogStream.write(`   Title: ${data.title}${os.EOL}`);
+                                    dlErrorLogStream.write(`   Author: ${data.author}${os.EOL}`);
+                                    dlErrorLogStream.write(`   URL: ${data.videoUrl}${os.EOL}`);
+                                    reject(err);
+                                })
+                                .pipe(outStream);
+                            
+                            outStream
+                                .on('finish', () => {
+                                    console.log(`\n[DONE] Written successfully.\n`);
+                                    downloadFiles.push(outFile);
+                                    
+                                    // Return all downloaded audio files
+                                    if (downloadFiles.length === urls.length) resolve(downloadFiles);
+                                })
+                                .on('error', (err) => {
+                                    console.error(`[ERROR] Unable to write to output file: ${outFile}\n`);
+                                    reject(err);
+                                });
+                        });
+                    })
+                    .catch((err) => reject(err));
             });
-            
-            const filename = path.join('download', `${titleVideo}.m4a`);
-            const outStream = fs.createWriteStream(filename);
-            
-            console.log(`Processing... '${titleVideo}' (${ytdl.getVideoID(url)})`);
-            // Start downloading the audio and save to file
-            await ytdl.downloadFromInfo(info, { format: format })
-                .pipe(outStream);
-            outStream.on('finish', () => {
-                console.log(`Finished: '${path.basename(filename)}' [${
-                    (new Date()).toISOString()}]`);
-                
-                // Convert to MP3
-                convertToMp3(filename);
-            });
+        })
+        .then((data) => {
+            console.log('Downloaded:', data, '\n');
+            // Convert the audio file to MP3 after download process finished
+            data.forEach((file) => convertToMp3(file));
+        })
+        .catch((err) => {
+            console.error(err);
         });
-    });
 })(argumentParser(process.argv.slice(2)));
