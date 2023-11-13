@@ -279,7 +279,7 @@ function batchDownload(inputFile) {
                             
                             outStream
                                 .on('finish', () => {
-                                    console.log(`\n[DONE] Written successfully.\n`);
+                                    console.log(`[DONE] Written successfully.\n`);
                                     downloadFiles.push(outFile);
                                     
                                     // Return all downloaded audio files
@@ -305,5 +305,13 @@ function batchDownload(inputFile) {
 }
 
 if (require.main === module) {
-    batchDownload(argumentParser(process.argv.slice(2)));
+    let input = argumentParser(process.argv.slice(2));
+    try {
+        // This will throw URIError if the input URL are invalid
+        input = (new URL(input)).href;  // Simple URL validation
+        console.log('[INFO] URL input detected!');
+        singleDownload(input);
+    } catch (error) {
+        batchDownload(input);
+    }
 }
