@@ -103,7 +103,7 @@ function argumentParser(args) {
 }
 
 
-(function (inputFile) {
+function batchDownload(inputFile) {
     const urlsFile = path.resolve(inputFile);
     console.log(`Input File: ${path.basename(urlsFile)}`);
     
@@ -212,4 +212,8 @@ function argumentParser(args) {
         .catch((err) => {
             console.error(err);
         });
-})(argumentParser(process.argv.slice(2)));
+}
+
+if (require.main === module) {
+    batchDownload(argumentParser(process.argv.slice(2)));
+}
