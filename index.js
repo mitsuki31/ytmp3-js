@@ -105,7 +105,7 @@ function argumentParser(args) {
 
 function batchDownload(inputFile) {
     const urlsFile = path.resolve(inputFile);
-    console.log(`Input File: ${path.basename(urlsFile)}`);
+    console.log(`[INFO] Input File: ${path.basename(urlsFile)}`);
     
     // All illegal characters for file names
     const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
@@ -114,9 +114,20 @@ function batchDownload(inputFile) {
         .then((contents) => {
             if (contents.toString() === '') throw new Error('File is empty, no URL found');
             
-            const urls = contents.toString().split(os.EOL)  // Stringify and then split
-                                 .map((url) => normalizeYtMusicUrl(url))
-                                 .slice(0, 15);
+            /*
+             * To prevent potential timeout errors during video information retrieval or audio file downloads,
+             * we limit batch downloads to 15 URLs. This limitation is designed to accommodate users with 
+             * lower connection speeds.
+             *
+             * To download additional audio files beyond the first 15, users should manually remove 
+             * the successfully downloaded URLs from the list.
+             */
+            contents = contents.toString().split(os.EOL);
+            if (contents.length > 15) {
+                console.warn('[WARNING] Maximum batch download cannot exceed than 15 URLs!');
+            }
+            const urls = contents.map((url) => normalizeYtMusicUrl(url))
+                                 .slice(0, 15);  // Maximum batch: 15 URLs
             
             return new Promise((resolve, reject) => {
                 let downloadFiles = [];  // Store all downloaded files
