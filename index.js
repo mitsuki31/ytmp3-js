@@ -77,6 +77,10 @@ function getVideosInfo(...urls) {
     });
 }
 
+function createDownloadProgress(chunk, bytesDownloaded, totalBytes) {
+    const percentage = Math.max(0, Math.floor(bytesDownloaded / totalBytes * 100));
+    process.stdout.write(`[INFO] Download progress: ${percentage}%\r`);
+}
 
 (async function (inputFile) {
     const urlsFile = path.resolve(inputFile);
