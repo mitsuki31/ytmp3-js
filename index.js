@@ -82,6 +82,27 @@ function createDownloadProgress(chunk, bytesDownloaded, totalBytes) {
     process.stdout.write(`[INFO] Download progress: ${percentage}%\r`);
 }
 
+function argumentParser(args) {
+    let inFile;
+    if (args.length === 0) {
+        // If no argument specified, then search for 'downloads.txt' file
+        if (fs.existsSync(path.resolve('downloads.txt'))) {
+            inFile = 'downloads.txt';
+            console.log("'downloads.txt' are found.");
+        } else {
+            console.error(
+                new Error(`[ERROR] No argument specified and 'downloads.txt' not exist`)
+            );
+            console.error('[ERROR] ytmp3 exited with code 1');
+            process.exit(1);
+        }
+    } else {
+        inFile = args[0];  // Get first argument
+    }
+    return inFile;
+}
+
+
 (async function (inputFile) {
     const urlsFile = path.resolve(inputFile);
     console.log('File:', urlsFile);
@@ -131,9 +152,4 @@ function createDownloadProgress(chunk, bytesDownloaded, totalBytes) {
             });
         });
     });
-})((function () {
-    // Get the command line arguments
-    const args = process.argv.slice(2);
-    if (args.length === 0) throw new Error('No input file specified');
-    return args[0];  // Return the first argument
-})()).catch((err) => console.error(err));
+})(argumentParser(process.argv.slice(2)));
