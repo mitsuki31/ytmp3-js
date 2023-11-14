@@ -53,7 +53,7 @@ This project utilizes the following libraries and APIs:
 
 - [ytdl-core] - A JavaScript library for downloading YouTube videos.
 - [fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
-> **Note**
+> **Note**  
 > Make sure that you have [`ffmpeg`](https://ffmpeg.org) installed on your system.
 > This also including all necessary encoding libraries like `libmp3lame`.
 
