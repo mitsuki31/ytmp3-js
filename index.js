@@ -66,7 +66,7 @@ function getVideosInfo(...urls) {
         
         try {
             await Promise.all(urls.map(async (url) => {
-                ytdl.validateURL(url);               // Validate the URL
+                ytdl.validateURL(url);                     // Validate the URL
                 videosInfo.push(await ytdl.getInfo(url));  // Get the video info
             }));
         } catch (error) {
@@ -102,6 +102,85 @@ function argumentParser(args) {
     return inFile;
 }
 
+
+function singleDownload(inputUrl) {
+    console.log(`[INFO] Input URL: ${inputUrl}`);
+    
+    const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
+    
+    // Validate the given URL
+    ytdl.validateURL(normalizeYtMusicUrl(inputUrl));
+    const videosDataPromise = getVideosInfo(inputUrl)
+        .then((data) => {
+            const videoInfo = data[0];
+            return {
+                videoInfo,
+                format: ytdl.chooseFormat(videoInfo.formats, {
+                    quality: 140,
+                    filter: 'audioonly'
+                }),
+                title: videoInfo.videoDetails.title.replace(illegalCharRegex, '_'),
+                author: videoInfo.videoDetails.author.name,
+                videoUrl: videoInfo.videoDetails.video_url,
+                videoId: videoInfo.videoDetails.videoId,
+                viewers: videoInfo.videoDetails.viewCount
+            };
+        });
+    
+    videosDataPromise.then((parsedData) => {
+        // Create output path and the write stream
+        const outFile = path.join('download', `${parsedData.title}.m4a`),
+              outFileBase = path.basename(outFile),
+              outStream = fs.createWriteStream(outFile);
+        
+        const dlErrorLog = path.resolve(
+            __dirname, 'tmp', `dlError-${(new Date()).toISOString().split('.')[0]}.log`);
+        
+        // Create the output directory asynchronously, if not exist
+        if (!fs.existsSync(path.dirname(outFile))) {
+            fs.mkdirSync(path.dirname(outFile), { recursive: true });
+        }
+        
+        console.log(`[INFO] Downloading '${parsedData.title}'...`);
+        console.log('     ', {
+            author: parsedData.author,
+            viewers: parseInt(parsedData.viewers, 10).toLocaleString('en')
+        });
+        ytdl.downloadFromInfo(parsedData.videoInfo, { format: parsedData.format })
+            .on('progress', createDownloadProgress)
+            .on('end', () => {
+                console.log(`[DONE] Download finished: ${outFileBase}`);
+            })
+            .on('error', (err) => {
+                console.error(`[ERROR] Download error: ${outFileBase}`);
+                if (!fs.existsSync(path.dirname(dlErrorLog))) {
+                    fs.mkdirSync(path.dirname(dlErrorLog, { recursive: true }));
+                }
+                const dlErrorLogStream = fs.createWriteStream(
+                    dlErrorLog, { flags: 'a+', flush: true }
+                );
+                
+                dlErrorLogStream.write(`[ERROR] ${err.message}${os.EOL}`);
+                dlErrorLogStream.write(`   Title: ${parsedData.title}${os.EOL}`);
+                dlErrorLogStream.write(`   Author: ${parsedData.author}${os.EOL}`);
+                dlErrorLogStream.write(`   URL: ${parsedData.videoUrl}${os.EOL}`);
+                console.error(err);
+            })
+            .pipe(outStream);
+        
+        outStream
+            .on('finish', () => {
+                console.log(`[DONE] Written successfully.\n`);
+                convertToMp3(outFile);  // Convert to MP3
+            })
+            .on('error', (err) => {
+                console.error(`[ERROR] Unable to write to output file: ${outFile}\n`);
+                console.error(err);
+                process.exit(1);
+            });
+    })
+    .catch((err) => console.error(err));
+}
 
 function batchDownload(inputFile) {
     const urlsFile = path.resolve(inputFile);
@@ -200,7 +279,7 @@ function batchDownload(inputFile) {
                             
                             outStream
                                 .on('finish', () => {
-                                    console.log(`\n[DONE] Written successfully.\n`);
+                                    console.log(`[DONE] Written successfully.\n`);
                                     downloadFiles.push(outFile);
                                     
                                     // Return all downloaded audio files
@@ -226,5 +305,13 @@ function batchDownload(inputFile) {
 }
 
 if (require.main === module) {
-    batchDownload(argumentParser(process.argv.slice(2)));
+    let input = argumentParser(process.argv.slice(2));
+    try {
+        // This will throw URIError if the input URL are invalid
+        input = (new URL(input)).href;  // Simple URL validation
+        console.log('[INFO] URL input detected!');
+        singleDownload(input);
+    } catch (error) {
+        batchDownload(input);
+    }
 }
