@@ -61,20 +61,19 @@ function normalizeYtMusicUrl(url) {
 }
 
 function getVideosInfo(...urls) {
-    return new Promise(async (resolve, reject) => {
-        let videosInfo = [];
-        
+    const promises = urls.map((url) => {
         try {
-            await Promise.all(urls.map(async (url) => {
-                ytdl.validateURL(url);                     // Validate the URL
-                videosInfo.push(await ytdl.getInfo(url));  // Get the video info
-            }));
+            ytdl.validateURL(url);     // Validate the URL
+            return ytdl.getInfo(url);  // Return the promise for video info retrieval
         } catch (error) {
-            reject(error);
+            // Reject the promise if validation or video info retrieval fails
+            return Promise.reject(error);
         }
-        // Return the list representing the videos information
-        resolve(videosInfo);
     });
+
+    return Promise.all(promises)
+        .then((videosInfo) => videosInfo)
+        .catch((error) => Promise.reject(error));
 }
 
 function createDownloadProgress(chunk, bytesDownloaded, totalBytes) {
