@@ -1,11 +1,11 @@
 {
   "name": "ytmp3-js",
   "version": "0.1.0",
-  "description": "YouTube to MP3 downloader in JavaScript",
+  "description": "YouTube to MP3 downloader in Node.js",
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint ."
   },
   "author": {
     "name": "Ryuu Mitsuki",
@@ -15,5 +15,8 @@
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "ytdl-core": "^4.11.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0"
   }
 }

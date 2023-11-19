@@ -1,0 +1,5 @@
+# Ignore installed dependencies
+node_modules/
+
+# ESLint configuration file
+.eslintrc*
