@@ -53,7 +53,7 @@ function normalizeYtMusicUrl(url) {
     }
     
     // Trim to the right if the URL has '&si=' (YT Music only)
-    if (/^http(s?)?:\/\/.+\?v=.+&si=?/) {
+    if (/^http(s?)?:\/\/.+\?v=.+&si=?/.test(url)) {
         url = url.replace(/&si=.+/, '');
     }
     
@@ -77,7 +77,8 @@ function getVideosInfo(...urls) {
 }
 
 function createDownloadProgress(chunk, bytesDownloaded, totalBytes) {
-    const percentage = Math.max(0, Math.floor(bytesDownloaded / totalBytes * 100));
+    const percentage = Math.max(0,
+        Math.floor(bytesDownloaded / totalBytes * 100));
     process.stdout.write(`[INFO] Download progress: ${percentage}%\r`);
 }
 
@@ -90,7 +91,7 @@ function argumentParser(args) {
             console.log("'downloads.txt' are found.");
         } else {
             console.error(
-                new Error(`[ERROR] No argument specified and 'downloads.txt' not exist`)
+                new Error('[ERROR] No argument specified and \'downloads.txt\' not exist')
             );
             console.error('[ERROR] ytmp3 exited with code 1');
             process.exit(1);
@@ -105,7 +106,7 @@ function argumentParser(args) {
 function singleDownload(inputUrl) {
     console.log(`[INFO] Input URL: ${inputUrl}`);
     
-    const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
+    const illegalCharRegex = /[<>:"/\\|?*]/g;
     
     // Validate the given URL
     ytdl.validateURL(normalizeYtMusicUrl(inputUrl));
@@ -133,7 +134,8 @@ function singleDownload(inputUrl) {
               outStream = fs.createWriteStream(outFile);
         
         const dlErrorLog = path.resolve(
-            __dirname, 'tmp', `dlError-${(new Date()).toISOString().split('.')[0]}.log`);
+            __dirname, 'tmp', `dlError-${(new Date()).toISOString().split('.')[0]}.log`
+        );
         
         // Create the output directory asynchronously, if not exist
         if (!fs.existsSync(path.dirname(outFile))) {
@@ -141,11 +143,14 @@ function singleDownload(inputUrl) {
         }
         
         console.log(`[INFO] Downloading '${parsedData.title}'...`);
-        console.log('     ', {
+        console.log({
             author: parsedData.author,
+            videoUrl: parsedData.videoUrl,
             viewers: parseInt(parsedData.viewers, 10).toLocaleString('en')
         });
-        ytdl.downloadFromInfo(parsedData.videoInfo, { format: parsedData.format })
+        ytdl.downloadFromInfo(parsedData.videoInfo, {
+            format: parsedData.format
+        })
             .on('progress', createDownloadProgress)
             .on('end', () => {
                 console.log(`[DONE] Download finished: ${outFileBase}`);
@@ -159,26 +164,31 @@ function singleDownload(inputUrl) {
                     dlErrorLog, { flags: 'a+', flush: true }
                 );
                 
-                dlErrorLogStream.write(`[ERROR] ${err.message}${os.EOL}`);
-                dlErrorLogStream.write(`   Title: ${parsedData.title}${os.EOL}`);
-                dlErrorLogStream.write(`   Author: ${parsedData.author}${os.EOL}`);
-                dlErrorLogStream.write(`   URL: ${parsedData.videoUrl}${os.EOL}`);
+                dlErrorLogStream.write(
+                    `[ERROR] ${err.message}${os.EOL}`);
+                dlErrorLogStream.write(
+                    `   Title: ${parsedData.title}${os.EOL}`);
+                dlErrorLogStream.write(
+                    `   Author: ${parsedData.author}${os.EOL}`);
+                dlErrorLogStream.write(
+                    `   URL: ${parsedData.videoUrl}${os.EOL}`);
                 console.error(err);
             })
             .pipe(outStream);
         
         outStream
             .on('finish', () => {
-                console.log(`[DONE] Written successfully.\n`);
+                console.log('[DONE] Written successfully.\n');
                 convertToMp3(outFile);  // Convert to MP3
             })
             .on('error', (err) => {
-                console.error(`[ERROR] Unable to write to output file: ${outFile}\n`);
+                console.error(
+                    `[ERROR] Unable to write to output file: ${outFile}\n`);
                 console.error(err);
                 process.exit(1);
             });
     })
-    .catch((err) => console.error(err));
+        .catch((err) => console.error(err));
 }
 
 function batchDownload(inputFile) {
@@ -186,7 +196,7 @@ function batchDownload(inputFile) {
     console.log(`[INFO] Input File: ${path.basename(urlsFile)}`);
     
     // All illegal characters for file names
-    const illegalCharRegex = /[<>:"\/\\|?*\x00-\x1F]/g;
+    const illegalCharRegex = /[<>:"/\\|?*]/g;
     
     fs.promises.readFile(urlsFile, 'utf8')
         .then((contents) => {
@@ -205,10 +215,10 @@ function batchDownload(inputFile) {
                 console.warn('[WARNING] Maximum batch download cannot exceed than 15 URLs!');
             }
             const urls = contents.map((url) => normalizeYtMusicUrl(url))
-                                 .slice(0, 15);  // Maximum batch: 15 URLs
+                .slice(0, 15);  // Maximum batch: 15 URLs
             
             return new Promise((resolve, reject) => {
-                let downloadFiles = [];  // Store all downloaded files
+                const downloadFiles = [];  // Store all downloaded files
                 getVideosInfo(...urls)
                     .then((data) => {
                         const parsedData = [];
@@ -220,7 +230,8 @@ function batchDownload(inputFile) {
                                     quality: 140,
                                     filter: 'audioonly'
                                 }),
-                                title: videoInfo.videoDetails.title.replace(illegalCharRegex, '_'),
+                                title: videoInfo.videoDetails.title.replace(
+                                    illegalCharRegex, '_'),
                                 author: videoInfo.videoDetails.author.name,
                                 videoUrl: videoInfo.videoDetails.video_url,
                                 videoId: videoInfo.videoDetails.videoId,
@@ -242,50 +253,65 @@ function batchDownload(inputFile) {
                             // Create output path and the write stream
                             const outFile = path.join('download', `${data.title}.m4a`),
                                   outFileBase = path.basename(outFile),
-                                  outStream = fs.createWriteStream(outFile, { autoClose: true });
+                                  outStream = fs.createWriteStream(outFile);
                             
                             // Create the output directory asynchronously, if not exist
                             if (!fs.existsSync(path.dirname(outFile))) {
-                                fs.mkdirSync(path.dirname(outFile), { recursive: true });
+                                fs.mkdirSync(path.dirname(outFile), {
+                                    recursive: true
+                                });
                             }
                             
                             console.log(`[INFO] Downloading '${data.title}'...`);
-                            console.log('     ', {
+                            console.log({
                                 author: data.author,
+                                videoUrl: data.videoUrl,
                                 viewers: parseInt(data.viewers, 10).toLocaleString('en')
                             });
                             ytdl.downloadFromInfo(videoInfo, { format: format })
                                 .on('progress', createDownloadProgress)
                                 .on('end', () => {
-                                    console.log(`[DONE] Download finished: ${outFileBase}`);
+                                    console.log(
+                                        `[DONE] Download finished: ${outFileBase}`);
                                 })
                                 .on('error', (err) => {
-                                    console.error(`[ERROR] Download error: ${outFileBase}`);
+                                    console.error(
+                                        `[ERROR] Download error: ${outFileBase}`);
                                     if (!fs.existsSync(path.dirname(dlErrorLog))) {
-                                        fs.mkdirSync(path.dirname(dlErrorLog, { recursive: true }));
+                                        fs.mkdirSync(path.dirname(dlErrorLog, {
+                                            recursive: true
+                                        }));
                                     }
                                     const dlErrorLogStream = fs.createWriteStream(
                                         dlErrorLog, { flags: 'a+', flush: true }
                                     );
                                     
-                                    dlErrorLogStream.write(`[ERROR] ${err.message}${os.EOL}`);
-                                    dlErrorLogStream.write(`   Title: ${data.title}${os.EOL}`);
-                                    dlErrorLogStream.write(`   Author: ${data.author}${os.EOL}`);
-                                    dlErrorLogStream.write(`   URL: ${data.videoUrl}${os.EOL}`);
+                                    dlErrorLogStream.write(
+                                        `[ERROR] ${err.message}${os.EOL}`);
+                                    dlErrorLogStream.write(
+                                        `   Title: ${data.title}${os.EOL}`);
+                                    dlErrorLogStream.write(
+                                        `   Author: ${data.author}${os.EOL}`);
+                                    dlErrorLogStream.write(
+                                        `   URL: ${data.videoUrl}${os.EOL}`);
                                     reject(err);
                                 })
                                 .pipe(outStream);
                             
                             outStream
                                 .on('finish', () => {
-                                    console.log(`[DONE] Written successfully.\n`);
+                                    console.log('[DONE] Written successfully.\n');
                                     downloadFiles.push(outFile);
                                     
                                     // Return all downloaded audio files
-                                    if (downloadFiles.length === urls.length) resolve(downloadFiles);
+                                    if (downloadFiles.length === urls.length) {
+                                        resolve(downloadFiles);
+                                    }
                                 })
                                 .on('error', (err) => {
-                                    console.error(`[ERROR] Unable to write to output file: ${outFile}\n`);
+                                    console.error(
+                                        `[ERROR] Unable to write to output file: ${
+                                            outFile}\n`);
                                     reject(err);
                                 });
                         });
