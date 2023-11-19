@@ -1,6 +1,6 @@
 {
   "name": "ytmp3-js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "YouTube to MP3 downloader in Node.js",
   "private": true,
   "main": "index.js",
