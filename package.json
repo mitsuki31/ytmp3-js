@@ -1,22 +1,50 @@
 {
   "name": "ytmp3-js",
   "version": "0.2.0",
-  "description": "YouTube to MP3 downloader in Node.js",
-  "private": true,
+  "title": "YTMP3",
+  "description": "Simple YouTube Audio Downloader",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "lib/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
   "scripts": {
+    "docs": "jsdoc -c jsdoc.config.js",
     "lint": "eslint ."
   },
-  "author": {
-    "name": "Ryuu Mitsuki",
-    "url": "https://github.com/mitsuki31"
-  },
+  "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitsuki31/ytmp3-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mitsuki31/ytmp3-js/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://ko-fi.com/dhefam31"
+  },
   "dependencies": {
     "fluent-ffmpeg": "^2.1.3",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
-    "eslint": "^8.54.0"
-  }
+    "eslint": "^8.54.0",
+    "jsdoc": "^4.0.3"
+  },
+  "keywords": [
+    "javascript",
+    "nodejs",
+    "library",
+    "ytdl",
+    "youtube",
+    "youtubedl"
+  ]
 }
