@@ -134,3 +134,6 @@ dist
 download/
 
 downloads.txt
+
+# Generated documentations
+docs/
