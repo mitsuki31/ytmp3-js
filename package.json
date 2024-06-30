@@ -1,6 +1,6 @@
 {
   "name": "ytmp3-js",
-  "version": "0.2.0",
+  "version": "1.0.0-beta",
   "title": "YTMP3",
   "description": "Simple YouTube Audio Downloader",
   "main": "index.js",
