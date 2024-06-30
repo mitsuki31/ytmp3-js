@@ -13,7 +13,12 @@
 const fs = require('fs');      // File system module
 const path = require('path');  // Path module
 
-const { log } = require('./lib/utils');
+const {
+  defaultOptions: defaultAudioConvOptions,
+  checkFfmpeg,
+  convertAudio,
+} = require('./lib/audioconv');
+const { logger: log } = require('./lib/utils');
 const ytmp3 = require('./lib/ytmp3');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
@@ -56,6 +61,21 @@ function getInput() {
   }
   return DEFAULT_BATCH_FILE;
 }
+
+module.exports = Object.freeze({
+  // :: ytmp3 (Core)
+  name: ytmp3.name,
+  version: ytmp3.version,
+  singleDownload: ytmp3.singleDownload,
+  batchDownload: ytmp3.batchDownload,
+  getVideosInfo: ytmp3.getVideosInfo,
+  // :: audioconv
+  defaultAudioConvOptions,
+  checkFfmpeg,
+  convertAudio,
+});
+
+
 
 if (require.main === module) {
   const input = getInput();
