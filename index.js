@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Main module for **YTMP3** project to download YouTube videos as audio files using CLI.
  *
@@ -55,7 +57,8 @@ function getInput() {
   log.info('\x1b[2mNo URL and batch file specified, using default batch file\x1b[0m');
   if (!fs.existsSync(DEFAULT_BATCH_FILE)) {
     log.error(
-      `Default batch file named \x1b[93m${DEFAULT_BATCH_FILE}\x1b[0m does not exist`);
+      `Default batch file named \x1b[93m${
+        path.basename(DEFAULT_BATCH_FILE)}\x1b[0m does not exist`);
     log.error('Aborted');
     process.exit(1);
   }

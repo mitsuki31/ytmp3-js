@@ -4,6 +4,9 @@
   "title": "YTMP3",
   "description": "Simple YouTube Audio Downloader",
   "main": "index.js",
+  "bin": {
+    "ytmp3": "./index.js"
+  },
   "files": [
     "index.js",
     "lib/*",
