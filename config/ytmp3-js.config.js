@@ -25,6 +25,8 @@
  * @since  1.0.0
  */
 
+'use strict';
+
 const path = require('node:path');
 
 module.exports = {
