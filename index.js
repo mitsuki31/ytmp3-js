@@ -22,6 +22,10 @@ const {
 } = require('./lib/audioconv');
 const { logger: log } = require('./lib/utils');
 const ytmp3 = require('./lib/ytmp3');
+const {
+  downloadOptions,
+  audioConverterOptions
+} = require('./config/ytmp3-js.config');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
 
@@ -83,15 +87,18 @@ module.exports = Object.freeze({
 if (require.main === module) {
   const input = getInput();
 
+  // Assign the `audioConverterOptions` to `downloadOptions`
+  Object.assign(downloadOptions, { converterOptions: audioConverterOptions });
+
   if (input instanceof URL) {
     log.info('URL input detected!');
-    ytmp3.singleDownload(input);
+    ytmp3.singleDownload(input, downloadOptions);
   } else {
     if (input !== DEFAULT_BATCH_FILE && !fs.existsSync(input)) {
       log.error(`Batch file named \x1b[93m${input}\x1b[0m does not exist`);
       log.error('Aborted');
       process.exit(1);
     }
-    ytmp3.batchDownload(input);
+    ytmp3.batchDownload(input, downloadOptions);
   }
 }

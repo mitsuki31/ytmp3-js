@@ -11,7 +11,7 @@ module.exports = {
   recurseDepth: 2,
   plugins: [ 'plugins/markdown' ],
   source: {
-    include: [ 'lib' ],
+    include: [ 'lib', 'config' ],
     exclude: [ 'docs', 'node_modules' ],
     includePattern: /.+\.[tj]s(doc|x)?$/,
     excludePattern: /(^|\/|\\)_/
