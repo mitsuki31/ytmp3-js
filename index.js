@@ -10,6 +10,18 @@
  * @since     0.1.0
  */
 
+/**
+ * @typedef {Object} YTMP3_Config
+ * @property {module:ytmp3~DownloadOptions} downloadOptions
+ *           Options related to the download process.
+ * @property {module:audioconv~AudioConverterOptions} [audioConverterOptions]
+ *           Options related to the audio conversion process, if not defined in
+ *           `downloadOptions`.
+ *
+ * @global
+ * @since  1.0.0
+ */
+
 'use strict';
 
 const fs = require('fs');      // File system module
@@ -48,45 +60,66 @@ const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
 
 
 /**
- * Gets the input argument from the command line arguments.
+ * Resolves the configuration for YTMP3-JS from a given config object and file.
  *
- * If the first argument is a valid URL, the function returns the URL.
- * Otherwise, if the first argument is a batch file path, the function
- * returns the file path.
+ * This function takes a configuration object typically sourced from a config file
+ * (e.g., `ytmp3-js.config.js`) and ensures that it adheres to the expected structure
+ * and types. It specifically resolves the download options and the audio converter
+ * options, providing fallbacks and handling type checks.
  *
- * @returns {URL | string} - The input argument from the command line;
- *                     either a `URL` object or a batch file path.
+ * @param {Object} params - The parameters for the function.
+ * @param {Object} params.config - The configuration object to be resolved.
+ * @param {string} params.file - The file path from which the config object was sourced,
+ *                               used for error reporting.
  *
- * @throws {Error} If no batch file is specified.
+ * @returns {Object} The resolved download options.
+ *
+ * @throws {TypeError} If `downloadOptions` or `downloadOptions.converterOptions`
+ *                     (also can be `audioConverterOptions`) are not objects.
  *
  * @private
- * @since   0.2.0
+ * @since   1.0.0
  */
-function getInput() {
-  const args = process.argv.slice(2);  // Get all arguments except the first two
+function resolveConfig({ config, file }) {
+  if (!config || (Array.isArray(config) || typeof config !== 'object')) return {};
 
-  if (args.length) {
-    try {
-      // Attempt to parse the first argument as a URL
-      // if failed, then the input it may be a batch file
-      return new URL(args[0]);
-    } catch (error) {
-      return args[0];
-    }
+  let { downloadOptions } = config;
+  let audioConverterOptions, acOptionsFrom;
+  if (downloadOptions.converterOptions) {
+    acOptionsFrom = 'downloadOptions.converterOptions';
+    audioConverterOptions = downloadOptions.converterOptions;
+  } else {
+    acOptionsFrom = 'audioConverterOptions';
+    audioConverterOptions = config.audioConverterOptions;  // May be undefined
   }
 
-  // If no argument is specified, then return the default batch file path
-  log.info('\x1b[2mNo URL and batch file specified, using default batch file\x1b[0m');
-  if (!fs.existsSync(DEFAULT_BATCH_FILE)) {
-    log.error(
-      `Default batch file named \x1b[93m${
-        path.basename(DEFAULT_BATCH_FILE)}\x1b[0m does not exist`);
-    log.error('Aborted');
-    process.exit(1);
+  // Checker
+  if (downloadOptions
+      && (Array.isArray(downloadOptions) || typeof downloadOptions !== 'object')) {
+    throw new TypeError(
+      `Expected an object for \`downloadOptions\` at file: ${file}`);
+  } else if (audioConverterOptions
+      && (Array.isArray(audioConverterOptions)
+        || typeof audioConverterOptions !== 'object')) {
+    throw new TypeError(
+      `Expected an object for \`${acOptionsFrom}\` at file: ${file}`);
   }
-  return DEFAULT_BATCH_FILE;
+
+  // Resolve the download options
+  downloadOptions = ytmp3.resolveDlOptions({ downloadOptions });
+  // Resolve the audio converter options, but all unspecified options will
+  // fallback to undefined value instead their default value
+  audioConverterOptions = !audioConverterOptions
+    ? undefined : resolveACOptions(audioConverterOptions, false);
+
+  // Assign the `audioConverterOptions` to `downloadOptions`
+  if (!audioConverterOptions) {
+    Object.assign(downloadOptions, {
+      converterOptions: audioConverterOptions
+    });
+  }
+  return downloadOptions;
 }
-
 
 /**
  * Initializes the argument parser for command-line options.
@@ -134,6 +167,13 @@ function initParser() {
     type: 'str',
     default: '.',
     dest: 'outDir'
+  });
+  // :: config
+  parser.add_argument('-c', '--config', {
+    metavar: 'FILE',
+    help: 'Path to configuration file containing `downloadOptions` object',
+    type: 'str',
+    dest: 'config'
   });
   // :: convertAudio
   parser.add_argument('-C', '--convertAudio', '--convert-audio', {
