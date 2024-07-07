@@ -207,6 +207,67 @@ function initParser() {
   return parser;
 }
 
+/**
+ * Filters and processes the provided options object for use in the download and conversion process.
+ *
+ * @param {Object} params - The parameters object.
+ * @param {Object} params.options - The options object containing various configuration
+ *                                  settings from command-line argument parser.
+ *
+ * @returns {Object} A frozen object with the filtered and processed options.
+ *
+ * @description
+ * This function performs the following steps:
+ * 1. Validates the `options` object to ensure it is not null, an array, or a non-object.
+ * 2. Creates a deep copy of the `options` object to avoid mutating the original input.
+ * 3. Extracts the `quiet` property from the copied options and deletes it from the object to
+ *    prevent conflicts with other functions.
+ * 4. Constructs a new object containing the processed options for download and conversion,
+ *    including:
+ *    - `url`: The URL(s) to be processed.
+ *    - `batchFile`: The path to the batch file containing YouTube URLs.
+ *    - `version`: The version information.
+ *    - `copyright`: The copyright information.
+ *    - `downloadOptions`: The options related to the download process, resolved using
+ *      {@link module:ytmp3~resolveDlOptions `ytmp3.resolveDlOptions`} and
+ *      {@link module:audioconv~resolveOptions `audioconv.resolveOptions`} (for the
+ *      audio conversion options).
+ *      - `converterOptions`: The options related to audio conversion.
+ *      - `quiet`: A boolean flag to suppress log messages and progress information
+ *        based on the value of `quiet`.
+ *
+ * The returned object is frozen to prevent further modifications.
+ *
+ * @private
+ * @since   1.0.0
+ */
+function filterOptions({ options }) {
+  if (!options || (Array.isArray(options) || typeof options !== 'object')) return {};
+
+  // Deep copy the options
+  const optionsCopy = JSON.parse(JSON.stringify(options));
+
+  // We need to extract the quiet option first and delete it
+  // if not, `audioconv.resolveOptions()` function will throw an error
+  const { quiet } = optionsCopy;
+  delete optionsCopy.quiet;
+
+  return Object.freeze({
+    url: optionsCopy.URL,
+    batchFile: optionsCopy.file,
+    version: optionsCopy.version,
+    copyright: optionsCopy.copyright,
+    downloadOptions: {
+      ...(ytmp3.resolveDlOptions({ downloadOptions: optionsCopy })),
+      converterOptions: {
+        ...(resolveACOptions(optionsCopy, false)),
+        quiet: (quiet >= 2) ? true : false
+      },
+      quiet: (quiet >= 1) ? true : false
+    }
+  });
+}
+
 module.exports = Object.freeze({
   // :: ytmp3 (Core)
   name: ytmp3.name,
