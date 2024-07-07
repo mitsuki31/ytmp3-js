@@ -14,20 +14,37 @@
 
 const fs = require('fs');      // File system module
 const path = require('path');  // Path module
+const { ArgumentParser } = require('argparse');
 
 const {
   defaultOptions: defaultAudioConvOptions,
+  resolveOptions: resolveACOptions,
   checkFfmpeg,
   convertAudio,
 } = require('./lib/audioconv');
 const { logger: log } = require('./lib/utils');
 const ytmp3 = require('./lib/ytmp3');
-const {
-  downloadOptions,
-  audioConverterOptions
-} = require('./config/ytmp3-js.config');
+const config = require('./config/ytmp3-js.config');
+const pkg = require('./package.json');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
+const author = {
+  name: pkg.author.split(' <')[0],
+  email: /<(\w+@[a-z0-9\.]+)>/m.exec(pkg.author)[1],
+  website: /\((https?:\/\/.+)\)/m.exec(pkg.author)[1]
+};
+
+const __version__ = (() => {
+  let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
+  rel = (rel && rel.length !== 0)
+    ? rel.charAt(0).toUpperCase() + rel.substr(1)  // Capitalize first letter
+    : 'Stable';
+  return `\x1b[1m[${pkg.name.toUpperCase()}] v${ver} \x1b[2m${rel}\x1b[0m\n`;
+})();
+
+const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
+  new Date().getFullYear()} ${author.name} (${author.website})\n`;
+
 
 /**
  * Gets the input argument from the command line arguments.
@@ -67,6 +84,127 @@ function getInput() {
     process.exit(1);
   }
   return DEFAULT_BATCH_FILE;
+}
+
+
+/**
+ * Initializes the argument parser for command-line options.
+ *
+ * @returns {argparse.ArgumentParser} The `ArgumentParser` instance.
+ *
+ * @private
+ * @since   1.0.0
+ */
+function initParser() {
+  const parser = new ArgumentParser({
+    prog: pkg.title
+      ? pkg.title.toLowerCase()
+      : (pkg.name ? pkg.name.replace('-js', '') : 'ytmp3'),
+    description: pkg.description,
+    epilog: `Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).`,
+    /// eslint-disable-next-line camelcase
+    add_help: false  // Use custom help argument
+  });
+
+  // ==== Download Options ==== //
+  // :: URL
+  parser.add_argument('URL', {
+    help: 'The YouTube URL(s) to download. Supports multiple URLs',
+    type: 'str',
+    nargs: '*'  // Support multiple URLs
+  });
+  // :: cwd
+  parser.add_argument('--cwd', {
+    metavar: 'DIR',
+    help: "Set the current working directory (default: current directory)",
+    type: 'str',
+    default: '.'
+  });
+  // :: FILE
+  parser.add_argument('-f', '--file', '--batch', {
+    help: 'Path to a file containing a list of YouTube URLs for batch downloading',
+    type: 'str',
+    dest: 'file'
+  });
+  // :: outDir
+  parser.add_argument('-o', '--outDir', '--out-dir', {
+    metavar: 'DIR',
+    help: "Specify the output directory for downloaded files (default: current directory)",
+    type: 'str',
+    default: '.',
+    dest: 'outDir'
+  });
+  // :: convertAudio
+  parser.add_argument('-C', '--convertAudio', '--convert-audio', {
+    help: 'Enable audio conversion to a specific format (requires FFmpeg)',
+    action: 'store_true',
+    dest: 'convertAudio'
+  });
+
+  // ==== Audio Converter Options ==== //
+  // :: format
+  parser.add_argument('--format', {
+    metavar: 'FMT',
+    help: 'Convert the audio to the specified format. Requires `--convertAudio`',
+    type: 'str',
+  });
+  // :: codec
+  parser.add_argument('--codec', '--encoding', {
+    metavar: 'CODEC',
+    help: 'Specify the codec for the converted audio. Requires `--convertAudio`',
+    dest: 'codec'
+  });
+  // :: bitrate
+  parser.add_argument('--bitrate', {
+    metavar: 'N',
+    help: 'Set the bitrate for the converted audio in kbps. Requires `--convertAudio`',
+    type: 'str'
+  });
+  // :: frequency
+  parser.add_argument('--freq', '--frequency', {
+    metavar: 'N',
+    help: 'Set the audio sampling frequency for the converted audio in Hertz. Requires `--convertAudio`',
+    type: 'int',
+    dest: 'frequency'
+  });
+  // :: channels
+  parser.add_argument('--channels', {
+    metavar: 'N',
+    help: 'Specify the audio channels for the converted audio. Requires `--convertAudio`',
+    type: 'int'
+  });
+  // :: deleteOld
+  parser.add_argument('--deleteOld', '--delete-old', '--overwrite', {
+    help: 'Delete the old file after audio conversion is done. Requires `--convertAudio`',
+    action: 'store_true',
+    dest: 'deleteOld'
+  });
+  // :: quiet
+  parser.add_argument('-q', '--quiet', {
+    help: 'Suppress output messages. Use `-qq` to also suppress audio conversion progress',
+    action: 'count',
+    default: 0  // Set the default to ensure it is always number
+  });
+
+  // ==== Other Options ==== //
+  // :: help
+  parser.add_argument('-h', '-?', '--help', {
+    help: 'Show this help message and exit',
+    action: 'help'
+  });
+  // :: version
+  parser.add_argument('-V', '--version', {
+    help: 'Show the version. Use `-VV` to show all dependencies version',
+    action: 'count',
+    default: 0
+  });
+  // :: copyright
+  parser.add_argument('--copyright', {
+    help: 'Show the copyright information',
+    action: 'store_true'
+  });
+
+  return parser;
 }
 
 module.exports = Object.freeze({
