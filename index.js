@@ -30,11 +30,12 @@ const pkg = require('./package.json');
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
 const author = {
   name: pkg.author.split(' <')[0],
-  email: /<(\w+@[a-z0-9\.]+)>/m.exec(pkg.author)[1],
+  email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
   website: /\((https?:\/\/.+)\)/m.exec(pkg.author)[1]
 };
 
 const __version__ = (() => {
+  // eslint-disable-next-line prefer-const
   let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
   rel = (rel && rel.length !== 0)
     ? rel.charAt(0).toUpperCase() + rel.substr(1)  // Capitalize first letter
@@ -102,7 +103,7 @@ function initParser() {
       : (pkg.name ? pkg.name.replace('-js', '') : 'ytmp3'),
     description: pkg.description,
     epilog: `Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).`,
-    /// eslint-disable-next-line camelcase
+    // eslint-disable-next-line camelcase
     add_help: false  // Use custom help argument
   });
 
@@ -116,7 +117,7 @@ function initParser() {
   // :: cwd
   parser.add_argument('--cwd', {
     metavar: 'DIR',
-    help: "Set the current working directory (default: current directory)",
+    help: 'Set the current working directory (default: current directory)',
     type: 'str',
     default: '.'
   });
@@ -129,7 +130,7 @@ function initParser() {
   // :: outDir
   parser.add_argument('-o', '--outDir', '--out-dir', {
     metavar: 'DIR',
-    help: "Specify the output directory for downloaded files (default: current directory)",
+    help: 'Specify the output directory for downloaded files (default: current directory)',
     type: 'str',
     default: '.',
     dest: 'outDir'
