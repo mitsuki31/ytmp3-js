@@ -309,6 +309,83 @@ function filterOptions({ options }) {
   });
 }
 
+
+/**
+ * Main function.
+ * @private
+ * @since   1.0.0
+ */
+async function main() {
+  const {
+    url,
+    batchFile,
+    version,
+    copyright,
+    downloadOptions
+  } = filterOptions({
+    options: initParser().parse_args()
+  });
+
+  // Version
+  if (version === 1) {
+    process.stdout.write(__version__);
+    return;
+  } else if (version >= 2) {
+    // If got '-VV' or '--version --version', then verbosely print this module
+    // version and all dependencies' version
+    const deps = Object.keys(pkg.dependencies);
+    process.stdout.write(__version__);
+    for (const dep of deps) {
+      process.stdout.write(`\x1b[1m  ${
+        ((deps.indexOf(dep) !== deps.length - 1) ? '├── ' : '└── ')
+      }${dep} :: v${require(dep + '/package.json').version}\x1b[0m\n`);
+    }
+    return;
+  }
+  // Copyright
+  if (copyright) {
+    process.stdout.write(__copyright__);
+    return;
+  }
+
+  let downloadSucceed = false;
+  try {
+    if (!url && !batchFile) {
+      const defaultBatchFileBase = path.basename(DEFAULT_BATCH_FILE);
+      log.info(`\x1b[2mNo URL and batch file specified, searching \x1b[93m${
+        defaultBatchFileBase}\x1b[0m\x1b[2m ...\x1b[0m`);
+      if (!fs.existsSync(DEFAULT_BATCH_FILE)) {
+        log.error(`Cannot find \x1b[93m${
+          defaultBatchFileBase}\x1b[0m at current directory`);
+        log.error('Aborted');
+        process.exit(1);
+      }
+      log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
+      downloadSucceed = !!await ytmp3.batchDownload(DEFAULT_BATCH_FILE, downloadOptions);
+    } else if (!url && batchFile) {
+      log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
+      downloadSucceed = !!await ytmp3.batchDownload(batchFile, downloadOptions);
+    } else if (url && !batchFile) {
+      if (Array.isArray(url) && url.length > 1) {
+        log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
+        console.log(url);  // FIXME
+        // TODO: Add support for multiple downloads
+      } else {
+        log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
+        downloadSucceed = !!await ytmp3.singleDownload(url[0], downloadOptions);
+      }
+    }
+  } catch (dlErr) {
+    log.error(dlErr.message);
+    process.exit(1);
+  }
+
+  if (downloadSucceed) {
+    log.info(`Downloaded files saved at \x1b[93m${downloadOptions.outDir}\x1b[0m`);
+  }
+}
+
+
 module.exports = Object.freeze({
   // :: ytmp3 (Core)
   name: ytmp3.name,
@@ -323,22 +400,6 @@ module.exports = Object.freeze({
 });
 
 
-
 if (require.main === module) {
-  const input = getInput();
-
-  // Assign the `audioConverterOptions` to `downloadOptions`
-  Object.assign(downloadOptions, { converterOptions: audioConverterOptions });
-
-  if (input instanceof URL) {
-    log.info('URL input detected!');
-    ytmp3.singleDownload(input, downloadOptions);
-  } else {
-    if (input !== DEFAULT_BATCH_FILE && !fs.existsSync(input)) {
-      log.error(`Batch file named \x1b[93m${input}\x1b[0m does not exist`);
-      log.error('Aborted');
-      process.exit(1);
-    }
-    ytmp3.batchDownload(input, downloadOptions);
-  }
+  main();
 }
