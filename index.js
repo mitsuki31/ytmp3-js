@@ -58,69 +58,6 @@ const __version__ = (() => {
 const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
   new Date().getFullYear()} ${author.name} (${author.website})\n`;
 
-
-/**
- * Resolves the configuration for YTMP3-JS from a given config object and file.
- *
- * This function takes a configuration object typically sourced from a config file
- * (e.g., `ytmp3-js.config.js`) and ensures that it adheres to the expected structure
- * and types. It specifically resolves the download options and the audio converter
- * options, providing fallbacks and handling type checks.
- *
- * @param {Object} params - The parameters for the function.
- * @param {Object} params.config - The configuration object to be resolved.
- * @param {string} params.file - The file path from which the config object was sourced,
- *                               used for error reporting.
- *
- * @returns {Object} The resolved download options.
- *
- * @throws {TypeError} If `downloadOptions` or `downloadOptions.converterOptions`
- *                     (also can be `audioConverterOptions`) are not objects.
- *
- * @private
- * @since   1.0.0
- */
-function resolveConfig({ config, file }) {
-  if (!config || (Array.isArray(config) || typeof config !== 'object')) return {};
-
-  let { downloadOptions } = config;
-  let audioConverterOptions, acOptionsFrom;
-  if (downloadOptions.converterOptions) {
-    acOptionsFrom = 'downloadOptions.converterOptions';
-    audioConverterOptions = downloadOptions.converterOptions;
-  } else {
-    acOptionsFrom = 'audioConverterOptions';
-    audioConverterOptions = config.audioConverterOptions;  // May be undefined
-  }
-
-  // Checker
-  if (downloadOptions
-      && (Array.isArray(downloadOptions) || typeof downloadOptions !== 'object')) {
-    throw new TypeError(
-      `Expected an object for \`downloadOptions\` at file: ${file}`);
-  } else if (audioConverterOptions
-      && (Array.isArray(audioConverterOptions)
-        || typeof audioConverterOptions !== 'object')) {
-    throw new TypeError(
-      `Expected an object for \`${acOptionsFrom}\` at file: ${file}`);
-  }
-
-  // Resolve the download options
-  downloadOptions = ytmp3.resolveDlOptions({ downloadOptions });
-  // Resolve the audio converter options, but all unspecified options will
-  // fallback to undefined value instead their default value
-  audioConverterOptions = !audioConverterOptions
-    ? undefined : resolveACOptions(audioConverterOptions, false);
-
-  // Assign the `audioConverterOptions` to `downloadOptions`
-  if (!audioConverterOptions) {
-    Object.assign(downloadOptions, {
-      converterOptions: audioConverterOptions
-    });
-  }
-  return downloadOptions;
-}
-
 /**
  * Initializes the argument parser for command-line options.
  *
