@@ -11,15 +11,18 @@
  */
 
 /**
- * @typedef {Object} YTMP3_Config
- * @property {module:ytmp3~DownloadOptions} downloadOptions
- *           Options related to the download process.
- * @property {module:audioconv~AudioConverterOptions} [audioConverterOptions]
- *           Options related to the audio conversion process, if not defined in
- *           `downloadOptions`.
+ * A type definition for the filtered options object, which is returned from {@link filterOptions} function.
  *
- * @global
- * @since  1.0.0
+ * @typedef  {Object} FilteredOptions
+ * @property {string} url - The URL(s) to be processed.
+ * @property {string} batchFile - The path to the batch file containing YouTube URLs.
+ * @property {number} version - A number counter to show the version. 1 shows this module version only, 2 shows all dependencies' version.
+ * @property {boolean} copyright - A boolean flag to show the copyright information.
+ * @property {boolean} printConfig - A boolean flag to show the currently used configuration and exit. Useful for debugging.
+ * @property {DownloadOptions} downloadOptions - The options related to the download process.
+ *
+ * @private
+ * @since   1.0.0
  */
 
 'use strict';
@@ -34,9 +37,9 @@ const {
   checkFfmpeg,
   convertAudio,
 } = require('./lib/audioconv');
-const { logger: log } = require('./lib/utils');
+const { logger: log, dropNullAndUndefined } = require('./lib/utils');
+const { importConfig } = require('./lib/config');
 const ytmp3 = require('./lib/ytmp3');
-const config = require('./config/ytmp3-js.config');
 const pkg = require('./package.json');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
@@ -192,7 +195,7 @@ function initParser() {
  * @param {Object} params.options - The options object containing various configuration
  *                                  settings from command-line argument parser.
  *
- * @returns {Object} A frozen object with the filtered and processed options.
+ * @returns {FilteredOptions} A frozen object with the filtered and processed options.
  *
  * @description
  * This function performs the following steps:
@@ -219,7 +222,7 @@ function initParser() {
  * @private
  * @since   1.0.0
  */
-function filterOptions({ options }) {
+async function filterOptions({ options }) {
   if (!options || (Array.isArray(options) || typeof options !== 'object')) return {};
 
   // Deep copy the options
@@ -230,18 +233,34 @@ function filterOptions({ options }) {
   const { quiet } = optionsCopy;
   delete optionsCopy.quiet;
 
+  // Extract and resolve the download options from configuration file if given
+  const dlOptionsFromConfig = optionsCopy.config
+    ? await /* may an ES module */ importConfig(optionsCopy.config)
+    : {};
+  const acOptionsFromConfig = dlOptionsFromConfig.converterOptions || {};
+  delete optionsCopy.config;  // No longer needed
+  delete dlOptionsFromConfig.converterOptions;  // No longer needed
+
   return Object.freeze({
     url: optionsCopy.URL,
     batchFile: optionsCopy.file,
     version: optionsCopy.version,
     copyright: optionsCopy.copyright,
     downloadOptions: {
-      ...(ytmp3.resolveDlOptions({ downloadOptions: optionsCopy })),
+      ...ytmp3.resolveDlOptions({ downloadOptions: {
+        // Download options from config file can be overriden with download
+        // options from the command-line
+        ...dlOptionsFromConfig || {},
+        ...(ytmp3.resolveDlOptions({ downloadOptions: optionsCopy }))
+      }}),
       converterOptions: {
-        ...(resolveACOptions(optionsCopy, false)),
-        quiet: (quiet >= 2) ? true : false
+        ...resolveACOptions({
+          ...dropNullAndUndefined(acOptionsFromConfig),
+          ...dropNullAndUndefined(optionsCopy)
+        }, false), 
+        quiet: quiet >= 2
       },
-      quiet: (quiet >= 1) ? true : false
+      quiet: quiet >= 1
     }
   });
 }
@@ -258,8 +277,8 @@ async function main() {
     batchFile,
     version,
     copyright,
-    downloadOptions
-  } = filterOptions({
+    downloadOptions,
+  } = await filterOptions({
     options: initParser().parse_args()
   });
 
