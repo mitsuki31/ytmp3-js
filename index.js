@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Main module for **YTMP3** project to download YouTube videos as audio files using CLI.
+ * @file Main module for **YTMP3** project to download YouTube videos as audio files using CLI.
  *
+ * @requires  lib/audioconv
  * @requires  lib/utils
  * @requires  lib/ytmp3
  * @author    Ryuu Mitsuki (https://github.com/mitsuki31)
@@ -318,7 +319,7 @@ async function main() {
 
   let downloadSucceed = false;
   try {
-    if (!url && !batchFile) {
+    if ((!url || (url && !url.length)) && !batchFile) {
       const defaultBatchFileBase = path.basename(DEFAULT_BATCH_FILE);
       log.info(`\x1b[2mNo URL and batch file specified, searching \x1b[93m${
         defaultBatchFileBase}\x1b[0m\x1b[2m ...\x1b[0m`);
@@ -330,14 +331,16 @@ async function main() {
       }
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(DEFAULT_BATCH_FILE, downloadOptions);
-    } else if (!url && batchFile) {
+    } else if ((!url || (url && !url.length)) && batchFile) {
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(batchFile, downloadOptions);
-    } else if (url && !batchFile) {
+    } else if (url.length && !batchFile) {
       if (Array.isArray(url) && url.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
         console.log(url);  // FIXME
         // TODO: Add support for multiple downloads
+        log.warn('Currently multiple downloads from URLs are not suppported');
+        process.exit(0);
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
         downloadSucceed = !!await ytmp3.singleDownload(url[0], downloadOptions);
@@ -345,6 +348,7 @@ async function main() {
     }
   } catch (dlErr) {
     log.error(dlErr.message);
+    console.error(dlErr.stack);
     process.exit(1);
   }
 
