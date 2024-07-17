@@ -184,6 +184,11 @@ function initParser() {
     help: 'Show the copyright information',
     action: 'store_true'
   });
+  parser.add_argument('--print-config', {
+    help: 'Show currently used configuration and exit. Useful for debugging',
+    action: 'store_true',
+    dest: 'printConfig'
+  });
 
   return parser;
 }
@@ -246,6 +251,7 @@ async function filterOptions({ options }) {
     batchFile: optionsCopy.file,
     version: optionsCopy.version,
     copyright: optionsCopy.copyright,
+    printConfig: optionsCopy.printConfig,
     downloadOptions: {
       ...ytmp3.resolveDlOptions({ downloadOptions: {
         // Download options from config file can be overriden with download
@@ -278,6 +284,7 @@ async function main() {
     version,
     copyright,
     downloadOptions,
+    printConfig
   } = await filterOptions({
     options: initParser().parse_args()
   });
@@ -301,6 +308,11 @@ async function main() {
   // Copyright
   if (copyright) {
     process.stdout.write(__copyright__);
+    return;
+  }
+  // Print configuration
+  if (printConfig) {
+    console.log(downloadOptions);
     return;
   }
 
