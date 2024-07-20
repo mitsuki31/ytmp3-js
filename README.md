@@ -1,46 +1,84 @@
 # YTMP3-JS
 
-**YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single video or multiple videos, utilizing the [`ytdl-core`][ytdl-core] module. The library also converts these audio files into MP3 format.
+**YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
 
-This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file.
+This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.
 
-All downloaded audio files are saved in the `download` directory, which is relative to the project's root directory. If the [FFmpeg][ffmpeg] library is installed on your system, these files are automatically converted to MP3 format.
+All downloaded audio files are saved in the current directory (default behavior, can be overriden with `-o` CLI option), which is relative to the project's root directory. If the [FFmpeg][ffmpeg] library is installed on your system, these files are optionally converted to MP3 format (use the `-C` option to enable the audio conversion behavior).
 
 > [!WARNING]  
 > This project uses [`fluent-ffmpeg`][fluent-ffmpeg] to convert audio files to the desired codec, specifically MP3. Therefore, it requires the [`ffmpeg`][ffmpeg] library and its binaries to be installed on your system, along with any necessary encoding libraries such as `libmp3lame` for MP3 conversion.
 >
-> However, don't worry if your system does not have [`ffmpeg`][ffmpeg] installed. The download process will not fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in AAC (Advanced Audio Coding) format with a `.m4a` extension.
+> However, don't worry if your system does not have [`ffmpeg`][ffmpeg] installed. The download process will not fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in [AAC (Advanced Audio Coding)](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format with a `.m4a` extension.
 
-## CLI Usage
+## Getting Started
 
-### Install Requirements Dependencies
+### Installation
+
 ```bash
-npm install
+npm i -g ytmp3-js
 ```
+
+If you've downloaded package from the release asset, you may use local installation like this:
+```bash
+npm i -g /path/to/ytmp3-js.<VERSION>.tgz
+```
+
+### Command Usage
+```bash
+ytmp3 [options] [[URL ...] | [-f <FILE>]]
+```
+
+### Example Usage
+
+```bash
+ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
+```
+
+In above example, the code is trying to download audio from a single URL and convert it to [FLAC codec](https://en.wikipedia.org/wiki/FLAC) with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to `/home/Music` directory.
+
+### Options
+
+#### Download Options
+
+| Option Name | Accepts | Description |
+| ----------- | :--: | ----------- |
+| `--cwd` | `string` | Set the current working directory to specified directory, used to resolve the `outDir` path. Defaults to the current directory. |
+| `-f` \| `--file` \| `--batch` | `string` | Path to a file containing a list of YouTube URLs for batch downloading. |
+| `-c` \| `--config` | `string` | Path to a configuration file containing the `downloadOptions` object to configure both the download options and audio converter options. |
+| `-o` \| `--outDir` \| `--out-dir` | `string` | Specify the output directory for downloaded files. Defaults to the current directory. |
+| `-C` \| `--convertAudio` \| `--convert-audio` | - | Enable audio conversion to a specific format (requires [FFmpeg](https://ffmpeg.org)). |
+| `-q` \| `--quiet`  | - | Suppress all output messages. Use it twice (`-qq`) to also suppress the audio conversion progress. |
 
 > [!NOTE]  
-> If you do not want to install development dependencies (i.e., `devDependencies`). Set the `NODE_ENV` to `production` first.
-> ```bash
-> NODE_ENV=production npm install
-> ```
+> When using the `-c` or `--config` option to specify a configuration file, any changes made to specific options on the command line
+> will override the corresponding options in the configuration file. This means that the modified options in the configuration file
+> will be overridden with the values set from the command line.
 
-### Download Audio
-```bash
-node . [URL | FILE]
-```
+#### Audio Converter Options
+
+| Option Name | Accepts | Description |
+| ----------- | :--: | ----------- |
+| `--format` | `string` | Convert the audio to the specified format. |
+| `--codec` \| `--encoding` | `string` | Specify the codec for the converted audio. |
+| `--bitrate` | `int` \| `string` | Set the bitrate for the converted audio in kbps. |
+| `--freq` \| `--frequency` | `int` | Set the audio sampling frequency for the converted audio in Hertz (Hz). |
+| `--channels` | `int` | Specify the audio channels for the converted audio. |
+| `--deleteOld` \| `--delete-old` \| `--overwrite` | - | Delete the old audio file after the audio conversion is done. |
 
 > [!NOTE]  
-> Passing an empty batch file will lead to error.
->
-> If no argument provided it will defaults to search the `downloads.txt` file in the project's root directory and parse the file. Otherwise, if not exist, abort the process forcily.
+> All audio converter options above requires the audio conversion behavior to be enabled first -- enable it using `-C` or `--convertAudio` option --
+> otherwise, the specified values from these options will be ignored.
 
-Example of batch file format:
-```txt
-https://m.youtube.com/watch?v=<VIDEO_ID>
-https://youtu.be/<VIDEO_ID>
-https://www.youtube.com/watch?v=<VIDEO_ID>
-https://music.youtube.com/watch?v=<VIDEO_ID>
-```
+#### Miscellaneous Options
+
+| Option Name | Description |
+| ----------- | ----------- |
+| `-h` \| `-?` \| `--help` | Display the help message and exit. |
+| `-V` \| `--version` | Display the module version and exit. Use it twice (`-VV`) to also display all dependencies' version (not including `devDependencies`). |
+| `--copyright` | Display the copyright information and exit. |
+| `--print-config` | Display the configuration options that being used and exit. Very useful for debugging. |
+
 
 ## APIs
 
@@ -50,9 +88,9 @@ async function singleDownload(inputUrl: string | URL): Promise<string>
 ```
 
 <details>
-<summary>Details</summary>
+<summary>API Details</summary>
 
-Downloads audio from a single YouTube URL and saves it to the output directory.
+Downloads audio from a single YouTube URL and saves it to the output directory (change the output directory with `-o` or `--outDir` option).
 
 #### Parameters
 
@@ -75,9 +113,9 @@ async function batchDownload(inputFile: string): Promise<string[]>
 ```
 
 <details>
-<summary>Details</summary>
+<summary>API Details</summary>
 
-Downloads audio from a file containing YouTube URLs and saves them to the output directory.
+Downloads audio from a file containing YouTube URLs and saves them to the output directory (change the output directory with `-o` or `--outDir` option).
 
 #### Parameters
 
@@ -96,11 +134,11 @@ A promise that resolves to an array of strings representing the successfully dow
 
 ### `getVideosInfo`
 ```ts
-async function getVideosInfo(...urls: ...(string | URL)): Promise<import('ytdl-core').videoInfo[]>
+async function getVideosInfo(...urls: ...(string | URL)): Promise<import('@distube/ytdl-core').videoInfo[]>
 ```
 
 <details>
-<summary>Details</summary>
+<summary>API Details</summary>
 
 Retrieves information for multiple YouTube videos sequentially.
 
@@ -115,7 +153,7 @@ This function accepts multiple YouTube URLs and retrieves information for each v
 #### Returns
 
 A promise that resolves to an array of video information objects.  
-**Type:** `Promise<import('ytdl-core').videoInfo[]>`
+**Type:** `Promise<import('@distube/ytdl-core').videoInfo[]>`
 
 </details>
 
@@ -127,7 +165,7 @@ async function checkFfmpeg(verbose?: boolean = false): Promise<boolean>
 ```
 
 <details>
-<summary>Details</summary>
+<summary>API Details</summary>
 
 Checks whether the `ffmpeg` binary is installed on system or not.
 
@@ -156,7 +194,7 @@ async function convertAudio(
 ```
 
 <details>
-<summary>Details</summary>
+<summary>API Details</summary>
 
 Converts an audio file to a specified format using the given options.
 
@@ -175,7 +213,7 @@ If the `ffmpeg` is not installed on the system, this function will aborts immedi
 
 ---
 
-## API Usage
+### API Usage
 
 Download audio from a single YouTube URL:
 ```js
@@ -225,15 +263,24 @@ const urls = [
 
 This project utilizes the following libraries and APIs:
 
-- [ytdl-core] - A JavaScript library for downloading YouTube videos.
+- **(Outdated)** [`ytdl-core`] - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.
+- [`@distube/ytdl-core`] - DisTube fork of `ytdl-core`. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.
 - [fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
 
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
+## Contribution
+
+Any contributions to this project are welcome :D
+
 ## License
+
 This project is licensed under MIT License. For more details, see [LICENSE](https://github.com/mitsuki31/ytmp3-js/blob/master/LICENSE) file.
 
 
-[ytdl-core]: https://www.npmjs.com/package/ytdl-core
+<!-- Links -->
+
+[`ytdl-core`]: https://www.npmjs.com/package/ytdl-core
+[`@distube/ytdl-core`]: https://www.npmjs.com/package/@distube/ytdl-core
 [fluent-ffmpeg]: https://www.npmjs.com/package/fluent-ffmpeg
 [ffmpeg]: https://ffmpeg.org
