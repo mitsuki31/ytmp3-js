@@ -1,29 +1,27 @@
-name: Lint
+name: ESLint
 
 on:
   push:
+    paths: [ "**/*.{cjs,mjs,js}" ]
   pull_request:
     branches: [ "master" ]
 
 jobs:
   build:
-    name: Ubuntu / ${{ matrix.node-ver }}
+    name: Ubuntu / Node.js (20.x)
     runs-on: ubuntu-latest
     env:
       NODE_ENV: development
-    strategy:
-      matrix:
-        node-ver: [16.x, 18.x, 20.x, latest]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup Node.js / v${{ matrix.node-ver }}
-      uses: actions/setup-node@v3
+    - name: Setup Node.js / 20.x
+      uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-ver }}
+        node-version: 20.x
         cache: 'npm'
-    - name: Install dependencies
-      run: npm install
+    - name: Clean install the project
+      run: npm ci
     - name: Lint the project
       run: npm run lint
