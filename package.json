@@ -2,7 +2,7 @@
   "name": "ytmp3-js",
   "version": "1.0.0-beta",
   "title": "YTMP3",
-  "description": "Simple YouTube Audio Downloader",
+  "description": "A Node.js library offers an easy and uncomplicated method for downloading YouTube audio",
   "main": "index.js",
   "bin": {
     "ytmp3": "./index.js"
@@ -49,6 +49,7 @@
     "library",
     "ytdl",
     "youtube",
-    "youtubedl"
+    "youtubedl",
+    "ytmp3"
   ]
 }
