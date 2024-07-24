@@ -15,7 +15,7 @@
  * A type definition for the filtered options object, which is returned from {@link filterOptions} function.
  *
  * @typedef  {Object} FilteredOptions
- * @property {string} url - The URL(s) to be processed.
+ * @property {string} urls - A list of URLs to be processed.
  * @property {string} batchFile - The path to the batch file containing YouTube URLs.
  * @property {number} version - A number counter to show the version. 1 shows this module version only, 2 shows all dependencies' version.
  * @property {boolean} copyright - A boolean flag to show the copyright information.
@@ -30,7 +30,14 @@
 
 const fs = require('fs');      // File system module
 const path = require('path');  // Path module
+const { EOL } = require('os');
+const { promisify } = require('util');
 const { ArgumentParser } = require('argparse');
+const {
+  getTempPath,
+  createTempPath: _createTempPath
+} = require('@mitsuki31/temppath');
+const createTempPath = promisify(_createTempPath);
 
 const {
   defaultOptions: defaultAudioConvOptions,
@@ -44,6 +51,10 @@ const ytmp3 = require('./lib/ytmp3');
 const pkg = require('./package.json');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
+// Windows: "C:\Users\...\AppData\Local\Temp\ytmp3-js"
+// Linux: "/home/usr/tmp/ytmp3-js"
+// Termux Android: "/data/data/com.termux/files/usr/tmp/ytmp3-js"
+const TEMPDIR = path.join(path.dirname(getTempPath()), 'ytmp3-js');
 const author = {
   name: pkg.author.split(' <')[0],
   email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
@@ -54,13 +65,16 @@ const __version__ = (() => {
   // eslint-disable-next-line prefer-const
   let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
   rel = (rel && rel.length !== 0)
-    ? rel.charAt(0).toUpperCase() + rel.substr(1)  // Capitalize first letter
+    ? rel.charAt(0).toUpperCase() + rel.substring(1)  // Capitalize first letter
     : 'Stable';
   return `\x1b[1m[${pkg.name.toUpperCase()}] v${ver} \x1b[2m${rel}\x1b[0m\n`;
 })();
 
 const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
   new Date().getFullYear()} ${author.name} (${author.website})\n`;
+
+/** Store the file path of cached multiple download URLs. */
+let multipleDlCache = null;
 
 /**
  * Initializes the argument parser for command-line options.
@@ -240,15 +254,19 @@ async function filterOptions({ options }) {
   delete optionsCopy.quiet;
 
   // Extract and resolve the download options from configuration file if given
-  const dlOptionsFromConfig = optionsCopy.config
-    ? await /* may an ES module */ importConfig(optionsCopy.config)
+  let dlOptionsFromConfig = optionsCopy.config
+    ? importConfig(optionsCopy.config)
     : {};
+  // Await the download options if it is a promise
+  if (dlOptionsFromConfig instanceof Promise) {
+    dlOptionsFromConfig = await dlOptionsFromConfig;
+  }
   const acOptionsFromConfig = dlOptionsFromConfig.converterOptions || {};
   delete optionsCopy.config;  // No longer needed
   delete dlOptionsFromConfig.converterOptions;  // No longer needed
 
   return Object.freeze({
-    url: optionsCopy.URL,
+    urls: optionsCopy.URL,
     batchFile: optionsCopy.file,
     version: optionsCopy.version,
     copyright: optionsCopy.copyright,
@@ -272,6 +290,47 @@ async function filterOptions({ options }) {
   });
 }
 
+/**
+ * Creates a cache file for URLs to be downloaded.
+ *
+ * This function creates a temporary file in the system's temporary directory
+ * containing a list of URLs to be downloaded using the
+ * {@link module:ytmp3~batchDownload `ytmp3.batchDownload`} function.
+ *
+ * @param {string[]} urls - URLs to be written to cache file
+ * @returns {Promise<string>} The path to the cache file for later deletion
+ */
+async function createCache(urls) {
+  const cache = await createTempPath(TEMPDIR, {
+    asFile: true,
+    ext: 'dl',
+    maxLen: 20
+  });
+  // Create write stream for cache file
+  const cacheStream = fs.createWriteStream(cache);
+
+  // Write URLs to cache
+  urls.forEach(url => cacheStream.write(`${url}${EOL}`));
+
+  // Close the write stream
+  cacheStream.end();
+  return cache;
+}
+
+/**
+ * Deletes the cache file if it exists
+ *
+ * @returns {Promise<boolean>} `true` if the cache file is deleted successfully
+ */
+async function deleteCache() {
+  if (!multipleDlCache) return false;
+  if (fs.existsSync(multipleDlCache)) {
+    // Delete the parent directory of the cache file
+    await fs.promises.rm(path.dirname(multipleDlCache), { recursive: true, force: true });
+  }
+  return true;
+}
+
 
 /**
  * Main function.
@@ -280,7 +339,7 @@ async function filterOptions({ options }) {
  */
 async function main() {
   const {
-    url,
+    urls,
     batchFile,
     version,
     copyright,
@@ -319,7 +378,7 @@ async function main() {
 
   let downloadSucceed = false;
   try {
-    if ((!url || (url && !url.length)) && !batchFile) {
+    if ((!urls || (urls && !urls.length)) && !batchFile) {
       const defaultBatchFileBase = path.basename(DEFAULT_BATCH_FILE);
       log.info(`\x1b[2mNo URL and batch file specified, searching \x1b[93m${
         defaultBatchFileBase}\x1b[0m\x1b[2m ...\x1b[0m`);
@@ -331,22 +390,24 @@ async function main() {
       }
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(DEFAULT_BATCH_FILE, downloadOptions);
-    } else if ((!url || (url && !url.length)) && batchFile) {
+    } else if ((!urls || (urls && !urls.length)) && batchFile) {
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(batchFile, downloadOptions);
-    } else if (url.length && !batchFile) {
-      if (Array.isArray(url) && url.length > 1) {
+    } else if (urls.length && !batchFile) {
+      if (Array.isArray(urls) && urls.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
-        console.log(url);  // FIXME
-        // TODO: Add support for multiple downloads
-        log.warn('Currently multiple downloads from URLs are not suppported');
-        process.exit(0);
+        multipleDlCache = await createCache(urls);
+        downloadSucceed = !!await ytmp3.batchDownload(multipleDlCache, downloadOptions);
+        await deleteCache();
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
-        downloadSucceed = !!await ytmp3.singleDownload(url[0], downloadOptions);
+        downloadSucceed = !!await ytmp3.singleDownload(urls[0], downloadOptions);
       }
     }
   } catch (dlErr) {
+    // Prevent the cache file still exists when an error occurs
+    await deleteCache();
+
     log.error(dlErr.message);
     console.error(dlErr.stack);
     process.exit(1);
