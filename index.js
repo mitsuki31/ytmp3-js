@@ -30,7 +30,14 @@
 
 const fs = require('fs');      // File system module
 const path = require('path');  // Path module
+const { EOL } = require('os');
+const { promisify } = require('util');
 const { ArgumentParser } = require('argparse');
+const {
+  getTempPath,
+  createTempPath: _createTempPath
+} = require('@mitsuki31/temppath');
+const createTempPath = promisify(_createTempPath);
 
 const {
   defaultOptions: defaultAudioConvOptions,
@@ -44,6 +51,10 @@ const ytmp3 = require('./lib/ytmp3');
 const pkg = require('./package.json');
 
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
+// Windows: "C:\Users\...\AppData\Local\Temp\ytmp3-js"
+// Linux: "/home/usr/tmp/ytmp3-js"
+// Termux Android: "/data/data/com.termux/files/usr/tmp/ytmp3-js"
+const TEMPDIR = path.join(path.dirname(getTempPath()), 'ytmp3-js');
 const author = {
   name: pkg.author.split(' <')[0],
   email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
@@ -61,6 +72,9 @@ const __version__ = (() => {
 
 const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
   new Date().getFullYear()} ${author.name} (${author.website})\n`;
+
+/** Store the file path of cached multiple download URLs. */
+let multipleDlCache = null;
 
 /**
  * Initializes the argument parser for command-line options.
@@ -270,6 +284,47 @@ async function filterOptions({ options }) {
       quiet: quiet >= 1
     }
   });
+}
+
+/**
+ * Creates a cache file for URLs to be downloaded.
+ *
+ * This function creates a temporary file in the system's temporary directory
+ * containing a list of URLs to be downloaded using the
+ * {@link module:ytmp3~batchDownload `ytmp3.batchDownload`} function.
+ *
+ * @param {string[]} urls - URLs to be written to cache file
+ * @returns {Promise<string>} The path to the cache file for later deletion
+ */
+async function createCache(urls) {
+  const cache = await createTempPath(TEMPDIR, {
+    asFile: true,
+    ext: 'dl',
+    maxLen: 20
+  });
+  // Create write stream for cache file
+  const cacheStream = fs.createWriteStream(cache);
+
+  // Write URLs to cache
+  urls.forEach(url => cacheStream.write(`${url}${EOL}`));
+
+  // Close the write stream
+  cacheStream.end();
+  return cache;
+}
+
+/**
+ * Deletes the cache file if it exists
+ *
+ * @returns {Promise<boolean>} `true` if the cache file is deleted successfully
+ */
+async function deleteCache() {
+  if (!multipleDlCache) return false;
+  if (fs.existsSync(multipleDlCache)) {
+    // Delete the parent directory of the cache file
+    await fs.promises.rm(path.dirname(multipleDlCache), { recursive: true, force: true });
+  }
+  return true;
 }
 
 
