@@ -65,7 +65,7 @@ const __version__ = (() => {
   // eslint-disable-next-line prefer-const
   let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
   rel = (rel && rel.length !== 0)
-    ? rel.charAt(0).toUpperCase() + rel.substr(1)  // Capitalize first letter
+    ? rel.charAt(0).toUpperCase() + rel.substring(1)  // Capitalize first letter
     : 'Stable';
   return `\x1b[1m[${pkg.name.toUpperCase()}] v${ver} \x1b[2m${rel}\x1b[0m\n`;
 })();
@@ -254,9 +254,13 @@ async function filterOptions({ options }) {
   delete optionsCopy.quiet;
 
   // Extract and resolve the download options from configuration file if given
-  const dlOptionsFromConfig = optionsCopy.config
-    ? await /* may an ES module */ importConfig(optionsCopy.config)
+  let dlOptionsFromConfig = optionsCopy.config
+    ? importConfig(optionsCopy.config)
     : {};
+  // Await the download options if it is a promise
+  if (dlOptionsFromConfig instanceof Promise) {
+    dlOptionsFromConfig = await dlOptionsFromConfig;
+  }
   const acOptionsFromConfig = dlOptionsFromConfig.converterOptions || {};
   delete optionsCopy.config;  // No longer needed
   delete dlOptionsFromConfig.converterOptions;  // No longer needed
