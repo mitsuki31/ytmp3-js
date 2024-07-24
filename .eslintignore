@@ -9,3 +9,5 @@ jsdoc.*
 
 # Ignore generated documentation
 docs/
+
+config/example
