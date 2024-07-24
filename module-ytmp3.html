@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Module: ytmp3</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: ytmp3</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Core library for <strong>YTMP3</strong> project.</p>
+<p>This module contains the core functionality for <strong>YTMP3</strong> project.
+It utilizes the <a href="https://www.npmjs.com/package/@distube/ytdl-core">@distube/ytdl-core</a> (to download YouTube videos) and
+<a href="https://www.npmjs.com/package/fluent-ffmpeg">fluent-ffmpeg</a> (to convert audio formats) libraries.</p>
+<p>This module provides APIs to easily download YouTube videos (also supports YouTube Music) and convert them to MP3 format.
+The output MP3 files are stored in the specified output directory named <code>download</code> relatively to the project's root directory.</p>
+<p>You can download a single YouTube video or a bunch of YouTube videos from a file as audio files and convert them to MP3 format.
+If you want to download a single YouTube video, please use the <a href="module-ytmp3.html#~singleDownload"><code><code>singleDownload</code></code></a> function.
+Or if you want to download a bunch of YouTube videos, first you need to store all YouTube URLs in a file and then use the
+<a href="module-ytmp3.html#~batchDownload"><code><code>batchDownload</code></code></a> function to download them by passing the path of the file.</p></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+    <dt class="tag-version">Version:</dt>
+    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Ryuu Mitsuki (https://github.com/mitsuki31)</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+    <dt class="tag-license">License:</dt>
+    <dd class="tag-license"><ul class="dummy"><li>MIT</li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            <h3>Examples</h3>
+            
+        <p class="code-caption"> Download a single YouTube video </p>
+    
+    <pre class="prettyprint"><code>const ytmp3 = require('ytmp3-js');
+ytmp3.singleDownload('https://www.youtube.com/watch?v=&lt;VIDEO_ID>')
+  .then(outputFile => console.log('Download complete:', outputFile))
+  .catch(err => console.error('Download failed:', err));</code></pre>
+
+        <p class="code-caption"> Download a batch of YouTube videos </p>
+    
+    <pre class="prettyprint"><code>const ytmp3 = require('ytmp3-js');
+ytmp3.batchDownload('./urls.txt')
+  .then(outputFiles => {
+    for (const outFile of outputFiles) {
+      console.log('Download complete:', outFile);
+    }
+  })
+  .catch(err => console.error('Download failed:', err));</code></pre>
+
+        
+    
+    </div>
+
+    
+
+    
+        <h3 class="subsection-title">Requires</h3>
+
+        <ul>
+            <li><a href="module-audioconv.html">module:audioconv</a></li>
+        
+            <li><a href="module-utils.html">module:utils</a></li>
+        
+            <li><a href="module-yt-urlfmt.html">module:yt-urlfmt</a></li>
+        </ul>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~VERSION"><span class="type-signature">(inner, constant) </span>VERSION<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The library version.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>1.0.0</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line124">line 124</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~batchDownload"><span class="type-signature">(async, inner) </span>batchDownload<span class="signature">(inputFile<span class="signature-attributes">non-null</span>, downloadOptions<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;string>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Downloads audio from a file containing YouTube URLs and saves them to the output directory.</p>
+<p>This function is similar to <a href="module-ytmp3.html#~singleDownload"><code><code>singleDownload</code></code></a> but accepts
+a file containing a list of YouTube URLs as input. If the given file is empty or does not exist,
+an error will be thrown.</p>
+<p>As of version 1.0.0, this function has been enhanced and made more robust, aiming at the download process.
+Previously, it only downloaded the first 15 URLs from the given file. Now, it downloads all of them sequentially.
+The function can now handle an unlimited number of URLs, downloading them one by one (also known as,
+sequential download) instead of all at once. Additionally, the download progress bar has been reworked
+to display more precise and colorful information in the terminal, providing users with better insights
+into the download process, and also more better and improved errors handling.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inputFile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The path to the file containing YouTube URLs.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>downloadOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+|
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options to configure the download process. If not specified, it will automatically uses default options.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line618">line 618</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the file does not exist or is empty, and if there is an error
+occurs during download process.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves to an array of strings representing the
+successfully downloaded files or rejects if an error occurs.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array.&lt;string>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>batchDownload('/path/to/urls.txt')
+  .then(outFiles => console.log(outFiles))
+  .catch(err => console.error('Download failed:', err));</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~getVideosInfo"><span class="type-signature">(async, inner) </span>getVideosInfo<span class="signature">(&hellip;urls)</span><span class="type-signature"> &rarr; {Promise.&lt;Array.&lt;ytdl.videoInfo>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Retrieves information for multiple YouTube videos sequentially.</p>
+<p>This function accepts multiple YouTube URLs and retrieves information for each
+video sequentially. It processes each URL one by one, ensuring that the next
+URL is processed only after the previous one is complete.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>urls</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The YouTube video URLs to fetch information
+for. Each URL can be either a string or a URL object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>0.2.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line331">line 331</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If any of the provided URLs are invalid, validated using
+<code>validateURL</code> function from <code>ytdl-core</code> module.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves to an array of video
+information objects.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array.&lt;ytdl.videoInfo>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const videoUrls = [
+  'https://www.youtube.com/watch?v=abcd1234',
+  'https://www.youtube.com/watch?v=wxyz5678'
+];
+
+getVideosInfo(...videoUrls).then(videoInfos => {
+  console.log(videoInfos);
+}).catch(error => {
+  console.error('Error fetching video info:', error);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~singleDownload"><span class="type-signature">(async, inner) </span>singleDownload<span class="signature">(inputUrl<span class="signature-attributes">non-null</span>, downloadOptions<span class="signature-attributes">opt, nullable</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;string>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Downloads audio from a single YouTube URL and saves it to the output directory.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inputUrl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The URL of the YouTube video to download audio from.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>downloadOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+|
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Options to configure the download process. If not specified, it will automatically uses default options.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line529">line 529</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If there is an error occurs during download process.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the input URL is not a string nor an instance of URL.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves a string representating
+the output file when the download completes
+or rejects if an error occurs.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;string></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>singleDownload('https://www.youtube.com/watch?v=&lt;VIDEO_ID>')
+  .then(outFile => console.log(outFile))
+  .catch(err => console.error('Download failed:', err));</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
