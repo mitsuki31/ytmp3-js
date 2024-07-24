@@ -15,7 +15,7 @@
  * A type definition for the filtered options object, which is returned from {@link filterOptions} function.
  *
  * @typedef  {Object} FilteredOptions
- * @property {string} url - The URL(s) to be processed.
+ * @property {string} urls - A list of URLs to be processed.
  * @property {string} batchFile - The path to the batch file containing YouTube URLs.
  * @property {number} version - A number counter to show the version. 1 shows this module version only, 2 shows all dependencies' version.
  * @property {boolean} copyright - A boolean flag to show the copyright information.
@@ -262,7 +262,7 @@ async function filterOptions({ options }) {
   delete dlOptionsFromConfig.converterOptions;  // No longer needed
 
   return Object.freeze({
-    url: optionsCopy.URL,
+    urls: optionsCopy.URL,
     batchFile: optionsCopy.file,
     version: optionsCopy.version,
     copyright: optionsCopy.copyright,
@@ -335,7 +335,7 @@ async function deleteCache() {
  */
 async function main() {
   const {
-    url,
+    urls,
     batchFile,
     version,
     copyright,
@@ -374,7 +374,7 @@ async function main() {
 
   let downloadSucceed = false;
   try {
-    if ((!url || (url && !url.length)) && !batchFile) {
+    if ((!urls || (urls && !urls.length)) && !batchFile) {
       const defaultBatchFileBase = path.basename(DEFAULT_BATCH_FILE);
       log.info(`\x1b[2mNo URL and batch file specified, searching \x1b[93m${
         defaultBatchFileBase}\x1b[0m\x1b[2m ...\x1b[0m`);
@@ -386,22 +386,24 @@ async function main() {
       }
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(DEFAULT_BATCH_FILE, downloadOptions);
-    } else if ((!url || (url && !url.length)) && batchFile) {
+    } else if ((!urls || (urls && !urls.length)) && batchFile) {
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!await ytmp3.batchDownload(batchFile, downloadOptions);
-    } else if (url.length && !batchFile) {
-      if (Array.isArray(url) && url.length > 1) {
+    } else if (urls.length && !batchFile) {
+      if (Array.isArray(urls) && urls.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
-        console.log(url);  // FIXME
-        // TODO: Add support for multiple downloads
-        log.warn('Currently multiple downloads from URLs are not suppported');
-        process.exit(0);
+        multipleDlCache = await createCache(urls);
+        downloadSucceed = !!await ytmp3.batchDownload(multipleDlCache, downloadOptions);
+        await deleteCache();
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
-        downloadSucceed = !!await ytmp3.singleDownload(url[0], downloadOptions);
+        downloadSucceed = !!await ytmp3.singleDownload(urls[0], downloadOptions);
       }
     }
   } catch (dlErr) {
+    // Prevent the cache file still exists when an error occurs
+    await deleteCache();
+
     log.error(dlErr.message);
     console.error(dlErr.stack);
     process.exit(1);
