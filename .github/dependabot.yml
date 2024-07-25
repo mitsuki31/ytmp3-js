@@ -8,7 +8,7 @@ updates:
     commit-message:
       # Prefix for commit message
       prefix: '[npm]'
-      prefix-dev: '[npm-dev]'
+      prefix-development: '[npm-dev]'
     assignees:
       - 'mitsuki31'
     reviewers:
