@@ -1,3 +1,5 @@
+/* global module:readonly */
+
 module.exports = {
   downloadOptions: {
     cwd: '.',
