@@ -23,6 +23,10 @@ module.exports = [
       'eol-last': [ 'error', 'always' ],
       eqeqeq: [ 'error', 'always' ],
       'prefer-const': [ 'warn' ],
+      'no-unused-vars': [ 'error', {
+        argsIgnorePattern: '^_+',
+        varsIgnorePattern: '^_+'
+      }],
       'max-len': [ 'warn', {
         code: 90,
         ignoreComments: true,
