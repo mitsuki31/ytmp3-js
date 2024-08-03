@@ -37,7 +37,6 @@ jobs:
         # Auto-merge all Dependabot PRs with patch updates
         if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
         id: merge_pr
-        needs: metadata
         uses: pascalgn/automerge-action@v0.16.3
         env:
           GITHUB_TOKEN: ${{ secrets.M31_PAT }}
@@ -45,7 +44,6 @@ jobs:
           MERGE_COMMIT_MESSAGE: 'pull-request-title'
 
       - name: Post-merge PR
-        needs: merge_pr
         if: ${{ steps.automerge.outputs.mergeResult == 'merged' }}
         run: >
           gh pr comment --body 'Auto merged PR'
