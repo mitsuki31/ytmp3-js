@@ -1,30 +1,53 @@
-name: Dependabot Auto-merge
+name: Auto-merge Dependabot PR
 on:
   pull_request:
 
-# Required to edit pull requests
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  build:
+  autoapprove:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'  # Only if the actor is Dependabot
+    if: ${{ github.actor == 'dependabot[bot]' }}
+
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
-      - name: Dependabot metadata
+      - name: Approve PR
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.M31_PAT }}
+          review-message: 'Auto approved PR'
+
+  automerge:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}  # Only if the actor is Dependabot
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Fetch Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v2
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Auto-merge Dependabot PR
+      - name: Merge PR
         # Auto-merge all Dependabot PRs with patch updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        # Approve and merge the PR
-        run: |
-          gh pr review --approve "$PR_URL"
-          gh pr comment --body "@dependabot merge"
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        id: merge_pr
+        needs: metadata
+        uses: pascalgn/automerge-action@v0.16.3
         env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.M31_PAT }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'pull-request-title'
+
+      - name: Post-merge PR
+        needs: merge_pr
+        if: ${{ steps.automerge.outputs.mergeResult == 'merged' }}
+        run: >
+          gh pr comment --body 'Auto merged PR'
+        env:
+          GITHUB_TOKEN: ${{ secrets.M31_PAT }}
