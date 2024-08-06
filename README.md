@@ -37,6 +37,9 @@ ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --
 
 In above example, the code is trying to download audio from a single URL and convert it to [FLAC codec](https://en.wikipedia.org/wiki/FLAC) with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to `/home/Music` directory.
 
+If you'd supplied only the `-C` (or `--convertAudio`) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior).
+But only if you've installed [FFmpeg][ffmpeg].
+
 ### Options
 
 #### Download Options
