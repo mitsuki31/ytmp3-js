@@ -1,6 +1,6 @@
 {
   "name": "ytmp3-js",
-  "version": "1.0.1-beta",
+  "version": "1.0.1",
   "title": "YTMP3",
   "description": "A Node.js library offers an easy and uncomplicated method for downloading YouTube audio",
   "main": "index.js",
@@ -33,6 +33,9 @@
   "funding": {
     "type": "individual",
     "url": "https://ko-fi.com/dhefam31"
+  },
+  "engines": {
+    "node": ">=16"
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.13.5",
