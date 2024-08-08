@@ -43,9 +43,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.M31_PAT }}
           MERGE_METHOD: 'squash'
+          MERGE_LABELS: ''
           MERGE_COMMIT_MESSAGE: 'pull-request-title-and-description'
-          MERGE_LABELS: 'bot'
-          MERGE_METHOD_LABEL_REQUIRED: true
           MERGE_RETRIES: 3
 
       - name: Post-merge PR
