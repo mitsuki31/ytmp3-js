@@ -29,6 +29,9 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Fetch Dependabot metadata
         id: meta
         uses: dependabot/fetch-metadata@v2
@@ -44,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.M31_PAT }}
           MERGE_METHOD: 'squash'
           MERGE_LABELS: ''
-          MERGE_COMMIT_MESSAGE: 'pull-request-title-and-description'
+          MERGE_COMMIT_MESSAGE: 'pull-request-title'
           MERGE_RETRIES: 3
 
       - name: Post-merge PR
