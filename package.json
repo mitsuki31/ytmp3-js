@@ -19,7 +19,15 @@
   },
   "scripts": {
     "docs": "jsdoc -c jsdoc.config.js",
-    "lint": "eslint ."
+    "lint": "npm run lint:prod && npm run lint:test",
+    "lint:prod": "eslint . -c eslint.config.js",
+    "lint:test": "eslint . -c eslint.config.test.js",
+    "test": "npm run test:unit && npm run test:irl",
+    "test:nyan": "mocha --recursive --reporter nyan",
+    "test:unit": "mocha test/unittest",
+    "test:nyan:unit": "mocha test/unittest --reporter nyan",
+    "test:irl": "mocha test/irl.test.mjs",
+    "coverage": "nyc --reporter lcov --reporter text npm test"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
@@ -27,6 +35,7 @@
     "type": "git",
     "url": "git+https://github.com/mitsuki31/ytmp3-js.git"
   },
+  "homepage": "https://mitsuki31.github.io/ytmp3-js",
   "bugs": {
     "url": "https://github.com/mitsuki31/ytmp3-js/issues"
   },
