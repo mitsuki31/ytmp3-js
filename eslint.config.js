@@ -16,7 +16,8 @@ module.exports = [
       'config/example/**.{mjs,js,json}',
       '**/test/',
       '**/coverage/',
-      'jsdoc.config.js'
+      'jsdoc.config.js',
+      'eslint.config.test.js'
     ]
   },
 
