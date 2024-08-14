@@ -11,6 +11,19 @@ All downloaded audio files are saved in the current directory (default behavior,
 >
 > However, don't worry if your system does not have [`ffmpeg`][ffmpeg] installed. The download process will not fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in [AAC (Advanced Audio Coding)](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format with a `.m4a` extension.
 
+## Features
+
+- Download a YouTube single audio or multiple audios and save them to your device with ease and uncomplicated command-line usage.
+- Support batch download using a file containing a list of YouTube URLs (per line).
+- Provide a simple and minimal Node.js library for programmatic use.
+- Easy and automatic conversion of downloaded audio files to specific encoding and format as per your preferences (requires FFmpeg).
+
+## Disadvantages
+
+- Unable to continue downloading bytes from the last downloaded bytes.
+- Doesn't support downloading a YouTube playlist.
+- The lack of APIs makes it difficult to integrate them into complex website or bot projects.
+
 ## Getting Started
 
 ### Installation
