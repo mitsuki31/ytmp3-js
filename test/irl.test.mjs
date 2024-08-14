@@ -3,11 +3,18 @@
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getTempPath } from '@mitsuki31/temppath';
+import { promisify } from 'node:util';
+import { EOL } from 'node:os';
+import {
+  getTempPath,
+  createTempPath as _createTempPath
+} from '@mitsuki31/temppath';
 
 import audioconv from '../lib/audioconv.js';
 import ytmp3 from '../lib/ytmp3.js';
 import utils from '../lib/utils.js';
+
+const createTempPath = promisify(_createTempPath);
 
 describe('IRL (In Real Life) Test', function () {
   console.log('\x1b[33mCAUTION! Data charge may apply.\x1b[0m');
@@ -47,6 +54,35 @@ describe('IRL (In Real Life) Test', function () {
         assert.ok(fs.existsSync(outputFiles[id].replace(/\.m4a$/, '.mp3')));
       });
     }
+  });
+
+  describe('Downloading some YouTube videos using batch download', function () {
+    let tempFile;
+
+    before(async function () {
+      tempFile = await createTempPath(path.join(utils.ROOTDIR, 'tmp'), {
+        maxLen: 28,
+        asFile: true,
+        ext: 'dl'
+      });
+
+      const tempFileStream = fs.createWriteStream(tempFile);
+      for (const id of videoIDs) {
+        tempFileStream.write(`https://youtu.be/${id}${EOL}`);
+      }
+      tempFileStream.end();
+    });
+
+    it('should succeed to download', async function () {
+      this.timeout(1000 * 60 * 15);  // Give 15 minutes
+      this.slow(1000 * 60 * 5);  // 5 minutes
+
+      await ytmp3.batchDownload(tempFile, {
+        outDir,
+        convertAudio: false,
+        quiet: true
+      });
+    });
   });
 
   after(function () {
