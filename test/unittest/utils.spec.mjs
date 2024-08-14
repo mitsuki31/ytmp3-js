@@ -7,6 +7,13 @@ import utils from '../../lib/utils.js';
 
 describe('module:utils', function () {
   const testMessages = {
+    logger: [
+      'test info message',
+      'test done message',
+      'test debug message',
+      'test warning message',
+      'test error message'
+    ],
     isNullOrUndefined: [
       'should return true if given argument is a nullable value'
     ],
@@ -19,13 +26,60 @@ describe('module:utils', function () {
       'should create the formatted progress bar'
     ],
     createDirIfNotExist: [
-      'should create a new directory if not exist',
+      'should create a new directory if not exist asynchronously',
+      'should reject if the given path is not a string'
+    ],
+    createDirIfNotExistSync: [
+      'should create a new directory if not exist synchronously',
       'should throw if the given path is not a string'
     ],
     dropNullAndUndefined: [
       'should return filtered object without null or undefined properties'
     ]
   };
+
+  describe('~logger', function () {
+    let consoleLog = null;
+    let consoleError = null;
+
+    before(function () {
+      consoleLog = console.log;
+      consoleError = console.error;
+      console.log = function () {};
+      console.error = function () {};
+    });
+
+    describe('#info', function () {
+      it(testMessages.logger[0], function () {
+        utils.logger.info('test');
+      });
+    });
+    describe('#done', function () {
+      it(testMessages.logger[1], function () {
+        utils.logger.done('test');
+      });
+    });
+    describe('#debug', function () {
+      it(testMessages.logger[2], function () {
+        utils.logger.debug('test');
+      });
+    });
+    describe('#warn', function () {
+      it(testMessages.logger[3], function () {
+        utils.logger.warn('test');
+      });
+    });
+    describe('#error', function () {
+      it(testMessages.logger[4], function () {
+        utils.logger.error('test');
+      });
+    });
+
+    after(function () {
+      console.log = consoleLog;
+      console.error = consoleError;
+    });
+  });
 
   describe('#isNullOrUndefined', function () {
     it(testMessages.isNullOrUndefined[0], function () {
@@ -83,21 +137,38 @@ describe('module:utils', function () {
     });
 
     it(testMessages.createDirIfNotExist[0], async function () {
-      if (!fs.existsSync(path.dirname(tempDir))) {
-        fs.mkdirSync(path.dirname(tempDir));
-      }
       await utils.createDirIfNotExist(tempDir);
     });
 
     it(testMessages.createDirIfNotExist[1], function () {
       return new Promise((resolve) => {
-        assert.rejects(utils.createDirIfNotExist([ 'foo' ]));
+        assert.rejects(utils.createDirIfNotExist([ 'foo' ]), TypeError);
         resolve();
       });
     });
 
     after(function () {
       // Do not forget to remove temporary directory created before
+      if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir);
+    });
+  });
+
+  describe('#createDirIfNotExistSync', function () {
+    let tempDir;
+    
+    before(function () {
+      tempDir = getTempPath('tmp', 20);
+    });
+
+    it(testMessages.createDirIfNotExistSync[0], function () {
+      utils.createDirIfNotExistSync(tempDir);
+    });
+
+    it(testMessages.createDirIfNotExistSync[1], function () {
+      assert.throws(() => utils.createDirIfNotExistSync(123), TypeError);
+    });
+
+    after(function () {
       if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir);
     });
   });
