@@ -54,21 +54,25 @@ describe('module:utils', function () {
         utils.logger.info('test');
       });
     });
+
     describe('#done', function () {
       it(testMessages.logger[1], function () {
         utils.logger.done('test');
       });
     });
+
     describe('#debug', function () {
       it(testMessages.logger[2], function () {
         utils.logger.debug('test');
       });
     });
+
     describe('#warn', function () {
       it(testMessages.logger[3], function () {
         utils.logger.warn('test');
       });
     });
+
     describe('#error', function () {
       it(testMessages.logger[4], function () {
         utils.logger.error('test');
@@ -133,7 +137,7 @@ describe('module:utils', function () {
     let tempDir;
 
     before(function () {
-      tempDir = getTempPath('tmp', 25);
+      tempDir = getTempPath(path.join(utils.ROOTDIR, 'tmp'), 25);
     });
 
     it(testMessages.createDirIfNotExist[0], async function () {
@@ -157,7 +161,7 @@ describe('module:utils', function () {
     let tempDir;
     
     before(function () {
-      tempDir = getTempPath('tmp', 20);
+      tempDir = getTempPath(path.join(utils.ROOTDIR, 'tmp'), 20);
     });
 
     it(testMessages.createDirIfNotExistSync[0], function () {
