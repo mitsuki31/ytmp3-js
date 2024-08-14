@@ -15,7 +15,8 @@ module.exports = [
       '**/coverage/',
       'config/example/**.{mjs,js,json}',
       'lib/',
-      'eslint.config.js'
+      'index.js',
+      'eslint.config.*'
     ]
   },
 
@@ -23,8 +24,7 @@ module.exports = [
 
   {
     files: [
-      '**/test/',
-      'eslint.config.test.js'
+      '**/test/'
     ],
     languageOptions: {
       ecmaVersion: 2021,
