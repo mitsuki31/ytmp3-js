@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 import audioconv from '../../lib/audioconv.js';
@@ -6,7 +7,8 @@ import audioconv from '../../lib/audioconv.js';
 describe('module:audioconv', function () {
   const testMessages = {
     checkFfmpeg: [
-      'check whether ffmpeg are installed on system'
+      'check whether ffmpeg are installed on system',
+      'should reject if FFMPEG_PATH environment variable is set to a directory'
     ],
     resolveOptions: [
       'should return default options if given argument is nullable value',
@@ -20,15 +22,36 @@ describe('module:audioconv', function () {
     try {
       const { status } = await spawn('ffmpeg -version', { shell: true });
       hasFfmpeg = !status;  // true if zero, false otherwise
-    // eslint-disable-next-line no-unused-vars
     } catch (_err) {
       hasFfmpeg = false;
     }
   });
 
   describe('#checkFfmpeg', function () {
+    this.slow(800);  // 0.8 seconds
+
+    let ffmpegPath;
+    let consoleLog = null;
+
+    before(function () {
+      ffmpegPath = process.env.FFMPEG_PATH || '';
+      consoleLog = console.log;
+      console.log = () => {};
+      process.env.FFMPEG_PATH = '';
+    });
+
     it(testMessages.checkFfmpeg[0], async function () {
-      assert.equal(await audioconv.checkFfmpeg(false), hasFfmpeg);
+      assert.equal(await audioconv.checkFfmpeg(true), hasFfmpeg);
+    });
+
+    it(testMessages.checkFfmpeg[1], async function () {
+      process.env.FFMPEG_PATH = path.resolve('.');
+      await assert.rejects(audioconv.checkFfmpeg(true), Error);
+    });
+
+    after(function () {
+      console.log = consoleLog;
+      process.env.FFMPEG_PATH = ffmpegPath;
     });
   });
 
