@@ -1,0 +1,10 @@
+{
+  "all": false,
+  "check-coverage": true,
+  "reporter": "text",
+  "report-dir": "./coverage",
+  "branches": 50,
+  "functions": 65,
+  "lines": 50,
+  "statements": 50
+}
