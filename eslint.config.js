@@ -1,12 +1,34 @@
+/**
+ * ESLint flat configuration for production environment.
+ */
+
 'use strict';
 
 const globals = require('globals');
 const js = require('@eslint/js');
+const mochaPlugin = require('eslint-plugin-mocha');
 
+/** @type {import('eslint').Linter.Config} */
 module.exports = [
+  {
+    ignores: [
+      '**/docs/',
+      'config/example/**.{mjs,js,json}',
+      '**/test/',
+      '**/coverage/',
+      'jsdoc.config.js'
+    ]
+  },
+
   js.configs.recommended,
+  mochaPlugin.configs.flat.recommended,
 
   {
+    files: [
+      'index.js',
+      'lib/**/*.js',
+      'eslint.config.js'
+    ],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'commonjs',
@@ -16,7 +38,7 @@ module.exports = [
       }
     },
     linterOptions: {
-      reportUnusedDisableDirectives: 'error'
+      reportUnusedDisableDirectives: true
     },
     rules: {
       strict: [ 'error', 'safe' ],
@@ -50,12 +72,6 @@ module.exports = [
       curly: [ 'error', 'multi-line', 'consistent' ],
       'no-else-return': ['error'],
       'default-param-last': ['error'],
-    },
-    ignores: [
-      'jsdoc.*',
-      'jsdoc.config.*',
-      'docs/**',
-      'config/example/**'
-    ]
+    }
   }
 ];
