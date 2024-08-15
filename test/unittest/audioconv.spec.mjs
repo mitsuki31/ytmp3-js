@@ -25,6 +25,13 @@ describe('module:audioconv', function () {
     } catch (_err) {
       hasFfmpeg = false;
     }
+
+    // Double check if ffmpeg is installed
+    if (process.platform === 'win32') {
+      hasFfmpeg = (hasFfmpeg === !(await spawn('where.exe ffmpeg', { shell: true }).status));
+    } else {
+      hasFfmpeg = (hasFfmpeg === !(await spawn('which ffmpeg', { shell: true }).status));
+    }
   });
 
   describe('#checkFfmpeg', function () {
@@ -115,7 +122,7 @@ describe('module:audioconv', function () {
         assert.notDeepStrictEqual(actual, expectedOptions[0]);
         assert.deepStrictEqual(actual, expectedOptions[2]);
       });
-      actualOptions.toReversed().forEach((actual1) => {
+      [...actualOptions].reverse().forEach((actual1) => {
         actualOptions.forEach((actual2) => {
           assert.deepStrictEqual(actual1, actual2);
         });
