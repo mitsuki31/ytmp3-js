@@ -21,7 +21,7 @@ describe('module:audioconv', function () {
   before(async function () {
     try {
       const { status } = await spawn('ffmpeg -version', { shell: true });
-      hasFfmpeg = !status;  // true if zero, false otherwise
+      hasFfmpeg = (status === 0) ? true : false;  // Prevent return `true` if null or undefined
     } catch (_err) {
       hasFfmpeg = false;
     }
@@ -48,12 +48,12 @@ describe('module:audioconv', function () {
     });
 
     it(testMessages.checkFfmpeg[0], async function () {
-      assert.equal(await audioconv.checkFfmpeg(true), hasFfmpeg);
+      assert.equal(await audioconv.checkFfmpeg(false), hasFfmpeg);
     });
 
     it(testMessages.checkFfmpeg[1], async function () {
       process.env.FFMPEG_PATH = path.resolve('.');
-      await assert.rejects(audioconv.checkFfmpeg(true), Error);
+      await assert.rejects(audioconv.checkFfmpeg(false), Error);
     });
 
     after(function () {
