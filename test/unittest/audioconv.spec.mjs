@@ -104,7 +104,7 @@ describe('module:audioconv', function () {
         assert.deepStrictEqual(actual, expectedOptions[0]);
         assert.notDeepStrictEqual(actual, expectedOptions[2]);
       });
-      actualOptions.toReversed().forEach((actual1) => {
+      [...actualOptions].reverse().forEach((actual1) => {
         actualOptions.forEach((actual2) => {
           assert.deepStrictEqual(actual1, actual2);
         });
