@@ -4,8 +4,6 @@
  * @author  Ryuu Mitsuki (https://github.com/mitsuki31)
  */
 
-/* global module:readonly */
-
 'use strict';
 
 module.exports = {
