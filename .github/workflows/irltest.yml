@@ -1,0 +1,65 @@
+name: IRL Test
+
+on:
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '0 6,12,18,0 * * *'
+  workflow_dispatch:
+    inputs:
+      traceDeprecation:
+        description: 'Show stack traces on deprecations'
+        type: boolean
+        required: false
+      traceUncaught:
+        description: 'Show stack traces on behind uncaught exceptions'
+        type: boolean
+        required: false
+      traceWarnings:
+        description: 'Show stack traces on warnings'
+        type: boolean
+        required: false
+      traceExit:
+        description: 'Show stack traces when an environment exits'
+        type: boolean
+        required: false
+      tracePromises:
+        description: 'Show stack traces on promises'
+        type: boolean
+        required: false
+
+env:
+  TRACE_DEPRECATION: ${{ inputs.traceDeprecation && 'trace-deprecation' || '' }}
+  TRACE_UNCAUGHT: ${{ inputs.traceUncaught && 'trace-uncaught' || '' }}
+  TRACE_WARNINGS: ${{ inputs.traceWarnings && 'trace-warnings' || '' }}
+  TRACE_EXIT: ${{ inputs.traceExit && 'trace-exit' || '' }}
+  TRACE_PROMISES: ${{ inputs.tracePromises && 'trace-promise' || '' }}
+
+jobs:
+  irltest:
+    name: ${{ matrix.os }} / Node ${{ matrix.node-ver }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node-ver: [ 16.x, 18.x, 20.x ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Node.js / ${{ matrix.node-ver }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-ver }}
+        cache: 'npm'
+    - name: Clean install the project
+      run: npm ci
+    - name: Run IRL Test
+      run: >
+        npm run test:irl --
+          --node-option ${{ env.TRACE_DEPRECATION }}
+          --node-option ${{ env.TRACE_UNCAUGHT }}
+          --node-option ${{ env.TRACE_WARNINGS }}
+          --node-option ${{ env.TRACE_EXIT }}
+          --node-option ${{ env.TRACE_PROMISES }}
