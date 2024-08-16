@@ -73,6 +73,8 @@ describe('module:audioconv', function () {
 
     before(function () {
       expectedOptions.push({
+        inputOptions: [],
+        outputOptions: [],
         format: 'mp3',
         codec: 'libmp3lame',
         bitrate: 128,

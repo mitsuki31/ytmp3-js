@@ -31,6 +31,8 @@ describe('module:config', function () {
     convertAudio: true,
     quiet: false,
     converterOptions: {
+      inputOptions: undefined,
+      outputOptions: undefined,
       format: 'opus',
       codec: 'libopus',
       frequency: 12000,
