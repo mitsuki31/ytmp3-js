@@ -138,6 +138,36 @@ function initParser() {
   });
 
   // ==== Audio Converter Options ==== //
+  // :: inputOptions
+  parser.add_argument(
+    '--inputOptions',
+    '--input-options',
+    '--addInputOptions',
+    '--add-input-options',
+    '--inOpt',
+    {
+      metavar: 'OPT',
+      help: 'Add custom input options for audio conversion',
+      type: 'str',
+      dest: 'inputOptions',
+    }
+  );
+  // :: outputOptions
+  parser.add_argument(
+    '--outputOptions',
+    '--output-options',
+    '--addOption',
+    '--add-option',
+    '--addOutputOptions',
+    '--add-output-options',
+    '--outOpt',
+    {
+      metavar: 'OPT',
+      help: 'Add custom output options for audio conversion',
+      type: 'str',
+      dest: 'outputOptions',
+    }
+  );
   // :: format
   parser.add_argument('--format', {
     metavar: 'FMT',
