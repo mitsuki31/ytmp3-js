@@ -11,7 +11,8 @@
     "index.js",
     "lib/*",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "exports": {
     ".": "./index.js",
