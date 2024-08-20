@@ -1,5 +1,20 @@
 # YTMP3-JS
 
+<table>
+  <tr>
+    <th align="left"><b>ESLint</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img alt="ESLint" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg"></a></td>
+  </tr>
+  <tr>
+    <th align="left"><b>Unit Test</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img alt="Unit Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg"></a></td>
+  </tr>
+  <tr>
+    <th align="left"><b>IRL Test</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img alt="IRL Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg"></a></td>
+  </tr>
+</table>
+
 **YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
 
 This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.
@@ -32,6 +47,8 @@ All downloaded audio files are saved in the current directory (default behavior,
 npm i -g ytmp3-js
 ```
 
+---
+
 If you've downloaded package from the release asset, you may use local installation like this:
 ```bash
 npm i -g /path/to/ytmp3-js.<VERSION>.tgz
@@ -59,12 +76,12 @@ But only if you've installed [FFmpeg][ffmpeg].
 
 | Option Name | Accepts | Description |
 | ----------- | :--: | ----------- |
-| `--cwd` | `string` | Set the current working directory to specified directory, used to resolve the `outDir` path. Defaults to the current directory. |
-| `-f` \| `--file` \| `--batch` | `string` | Path to a file containing a list of YouTube URLs for batch downloading. |
-| `-c` \| `--config` | `string` | Path to a configuration file containing the `downloadOptions` object to configure both the download options and audio converter options. |
-| `-o` \| `--outDir` \| `--out-dir` | `string` | Specify the output directory for downloaded files. Defaults to the current directory. |
-| `-C` \| `--convertAudio` \| `--convert-audio` | - | Enable audio conversion to a specific format (requires [FFmpeg](https://ffmpeg.org)). |
-| `-q` \| `--quiet`  | - | Suppress all output messages. Use it twice (`-qq`) to also suppress the audio conversion progress. |
+| `--cwd` | `string` | Sets the current working directory to specified directory, used to resolve the `outDir` path. Defaults to the current directory. |
+| `-f` \| `--file` \| `--batch` | `string` | Specifies the path to a file containing a list of YouTube URLs for batch downloading. |
+| `-c` \| `--config` | `string` | Specifies the path to a configuration file containing the `downloadOptions` object to configure both the download options and audio converter options. |
+| `-o` \| `--outDir` \| `--out-dir` | `string` | Specifies the output directory for downloaded files. Defaults to the current directory. |
+| `-C` \| `--convertAudio` \| `--convert-audio` | - | Enables audio conversion behavior (requires [FFmpeg](https://ffmpeg.org)). |
+| `-q` \| `--quiet`  | - | Suppresses all output messages. Use it twice (`-qq`) to also suppresses the audio conversion progress. |
 
 > [!NOTE]  
 > When using the `-c` or `--config` option to specify a configuration file, any changes made to specific options on the command line
@@ -75,25 +92,45 @@ But only if you've installed [FFmpeg][ffmpeg].
 
 | Option Name | Accepts | Description |
 | ----------- | :--: | ----------- |
-| `--format` | `string` | Convert the audio to the specified format. |
-| `--codec` \| `--encoding` | `string` | Specify the codec for the converted audio. |
-| `--bitrate` | `int` \| `string` | Set the bitrate for the converted audio in kbps. |
-| `--freq` \| `--frequency` | `int` | Set the audio sampling frequency for the converted audio in Hertz (Hz). |
-| `--channels` | `int` | Specify the audio channels for the converted audio. |
-| `--deleteOld` \| `--delete-old` \| `--overwrite` | - | Delete the old audio file after the audio conversion is done. |
+| `--input-options` \| `--inputOptions` \| `--addInputOptions` \| `--add-input-options` \| `--inOpt` | `string` | Specifies custom FFmpeg input options for audio conversion. |
+| `--output-options` \| `--outputOptions` \| `--addOptions` \| `--add-options` \| `--addOutputOptions` \| `--add-output-options` \| `--outOpt` | `string` | Specifies custom FFmpeg output options for audio conversion. |
+| `--format` | `string` | Converts the audio to the specified format, also used for output file extension. |
+| `--codec` \| `--encoding` | `string` | Specifies the codec for the converted audio. |
+| `--bitrate` | `int` \| `string` | Sets the bitrate for the converted audio in kbps. |
+| `--freq` \| `--frequency` | `int` | Sets the audio sampling frequency for the converted audio in Hertz (Hz). |
+| `--channels` | `int` | Specifies the audio channels for the converted audio. |
+| `--deleteOld` \| `--delete-old` \| `--overwrite` | - | Deletes the old audio file after the audio conversion is done. |
 
 > [!NOTE]  
 > All audio converter options above requires the audio conversion behavior to be enabled first -- enable it using `-C` or `--convertAudio` option --
 > otherwise, the specified values from these options will be ignored.
+>
+> ---
+>
+> To customize FFmpeg with specific input and output options, use the `--input-options` and `--output-options` flags.
+> The options should be enclosed in either single or double quotes, with each option separated by a space.
+> For example:
+>
+> ```bash
+> ytmp3 <YT_URL> -C --output-options '-b:a 320k -ar 28000'
+> ```
+>
+> When using any of those input or output options, they will take precedence over other audio conversion options (e.g., `--bitrate`, `--frequency`, etc.).
+>
+> However, you can still specify the output format or file extension using the `--format` flag in combination with these options. For instance:
+>
+> ```bash
+> ytmp3 <URL> -o ~/Downloads -C --format opus --output-options "-acodec libopus -ar 28000"
+> ```
 
 #### Miscellaneous Options
 
 | Option Name | Description |
 | ----------- | ----------- |
-| `-h` \| `-?` \| `--help` | Display the help message and exit. |
-| `-V` \| `--version` | Display the module version and exit. Use it twice (`-VV`) to also display all dependencies' version (not including `devDependencies`). |
-| `--copyright` | Display the copyright information and exit. |
-| `--print-config` | Display the configuration options that being used and exit. Very useful for debugging. |
+| `-h` \| `-?` \| `--help` | Displays the help message and exit. |
+| `-V` \| `--version` | Displays the module version and exit. Use it twice (`-VV`) to also display all dependencies' version (not including `devDependencies`). |
+| `--copyright` | Displays the copyright information and exit. |
+| `--print-config` | Displays the configuration options that being used and exit. Very useful for debugging. |
 
 
 ## APIs
