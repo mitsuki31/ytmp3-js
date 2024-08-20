@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 import audioconv from '../../lib/audioconv.js';
 
@@ -18,19 +18,12 @@ describe('module:audioconv', function () {
   };
   let hasFfmpeg = false;
 
-  before(async function () {
+  before(function () {
     try {
-      const { status } = await spawn('ffmpeg -version', { shell: true });
-      hasFfmpeg = (status === 0) ? true : false;  // Prevent return `true` if null or undefined
+      const { status } = spawnSync('ffmpeg -version', { shell: true });
+      hasFfmpeg = (status === 0);  // Prevent return `true` if null or undefined
     } catch (_err) {
       hasFfmpeg = false;
-    }
-
-    // Double check if ffmpeg is installed
-    if (process.platform === 'win32') {
-      hasFfmpeg = (hasFfmpeg === !(await spawn('where.exe ffmpeg', { shell: true }).status));
-    } else {
-      hasFfmpeg = (hasFfmpeg === !(await spawn('which ffmpeg', { shell: true }).status));
     }
   });
 
@@ -39,25 +32,28 @@ describe('module:audioconv', function () {
 
     let ffmpegPath;
     let consoleLog = null;
+    let consoleError = null;
 
     before(function () {
       ffmpegPath = process.env.FFMPEG_PATH || '';
       consoleLog = console.log;
       console.log = () => {};
+      console.error = () => {};
       process.env.FFMPEG_PATH = '';
     });
 
     it(testMessages.checkFfmpeg[0], async function () {
-      assert.equal(await audioconv.checkFfmpeg(false), hasFfmpeg);
+      assert.equal(await audioconv.checkFfmpeg(true), hasFfmpeg);
     });
 
     it(testMessages.checkFfmpeg[1], async function () {
       process.env.FFMPEG_PATH = path.resolve('.');
-      await assert.rejects(audioconv.checkFfmpeg(false), Error);
+      await assert.rejects(audioconv.checkFfmpeg(true), Error);
     });
 
     after(function () {
       console.log = consoleLog;
+      console.error = consoleError;
       process.env.FFMPEG_PATH = ffmpegPath;
     });
   });
@@ -73,6 +69,8 @@ describe('module:audioconv', function () {
 
     before(function () {
       expectedOptions.push({
+        inputOptions: [],
+        outputOptions: [],
         format: 'mp3',
         codec: 'libmp3lame',
         bitrate: 128,
