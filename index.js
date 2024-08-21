@@ -47,6 +47,8 @@ const {
 } = require('./lib/audioconv');
 const { logger: log, dropNullAndUndefined } = require('./lib/utils');
 const { importConfig } = require('./lib/config');
+const URLUtils = require('./lib/url-utils');
+const error = require('./lib/error');
 const ytmp3 = require('./lib/ytmp3');
 const pkg = require('./package.json');
 
@@ -456,10 +458,18 @@ module.exports = Object.freeze({
   singleDownload: ytmp3.singleDownload,
   batchDownload: ytmp3.batchDownload,
   getVideosInfo: ytmp3.getVideosInfo,
+  // :: URLUtils
+  YTURLUtils: URLUtils,  // aliased to `YTURLUtils` for readability
+  extractVideoId: URLUtils.extractVideoId,
+  validateUrl: URLUtils.validateUrl,
+  validateId: URLUtils.validateId,
   // :: audioconv
   defaultAudioConvOptions,
   checkFfmpeg,
   convertAudio,
+  // :: error
+  IDExtractorError: error.IDExtractorError,
+  UnknownOptionError: error.UnknownOptionError
 });
 
 
