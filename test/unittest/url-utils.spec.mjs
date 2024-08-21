@@ -1,6 +1,8 @@
 import assert from 'node:assert';
 
 import URLUtils from '../../lib/url-utils.js';
+import error from '../../lib/error.js';
+const { IDExtractorError } = error;
 
 describe('module:url-utils', function () {
   describe('.URLUtils', function () {
@@ -53,7 +55,7 @@ describe('module:url-utils', function () {
 
       it(testMessages.extractVideoId[2], function () {
         assert.throws(() =>
-          URLUtils.extractVideoId('https://youtu.be/watch?v=abc'), 'IDExtractorError');
+          URLUtils.extractVideoId('https://youtu.be/watch?v=abc'), IDExtractorError);
       });
 
       it(testMessages.extractVideoId[3], function () {
