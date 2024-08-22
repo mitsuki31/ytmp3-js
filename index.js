@@ -455,6 +455,7 @@ module.exports = Object.freeze({
   // :: ytmp3 (Core)
   name: ytmp3.name,
   version: ytmp3.version,
+  version_info: ytmp3.VERSION_INFO,
   singleDownload: ytmp3.singleDownload,
   batchDownload: ytmp3.batchDownload,
   getVideosInfo: ytmp3.getVideosInfo,
