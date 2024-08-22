@@ -187,7 +187,9 @@ A promise that resolves to an array of strings representing the successfully dow
 
 ### `getVideosInfo`
 ```ts
-async function getVideosInfo(...urls: ...(string | URL)): Promise<import('@distube/ytdl-core').videoInfo[]>
+async function getVideosInfo(
+  ...urls: string | URL
+): Promise<import('@distube/ytdl-core').videoInfo[]>
 ```
 
 <details>
@@ -201,7 +203,7 @@ This function accepts multiple YouTube URLs and retrieves information for each v
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `urls` | `...(string \| URL)` | The YouTube video URLs to fetch information for. Each URL can be either a string or a URL object. |
+| `...urls` | `string \| URL` | The YouTube video URLs to fetch information for. Each URL can be either a string or a URL object. |
 
 #### Returns
 
@@ -232,7 +234,8 @@ First, it checks if the `FFMPEG_PATH` environment variable is set. If it is set,
 
 #### Returns
 
-A promise that resolves to a boolean value, `true` if the `ffmpeg` binary installed on system; otherwise, `false`.
+A promise that resolves to a boolean value, `true` if the `ffmpeg` binary installed on system; otherwise, `false`.  
+**Type:** `boolean`
 
 </details>
 
@@ -263,6 +266,87 @@ If the `ffmpeg` is not installed on the system, this function will aborts immedi
 | `options` | `ConvertAudioOptions \| undefined` | Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format. |
 
 </details>
+
+---
+
+### `extractVideoId`
+```ts
+function extractVideoId(url: string | URL): string
+```
+
+<details>
+<summary>API Details</summary>
+
+Extracts the YouTube video ID from given YouTube URL.
+
+The YouTube video ID have exactly 11 characters with allowed symbols are `A-Z`, `a-z`, `0-9`, `_`, and `-`.
+
+Allowed YouTube domains to extract:
+  - `www.youtube.com`
+  - `m.youtube.com`
+  - `youtube.com`
+  - `youtu.be`
+  - `music.youtube.com`
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `url` | `string \| URL` | The URL to evaluate. |
+
+#### Returns
+
+A string with 11 characters representing the video ID.  
+**Type:** `string`
+
+</details>
+
+---
+
+### `validateUrl`
+```ts
+function validateUrl(url: string | URL, withId?: boolean = true): boolean
+```
+
+<details>
+<summary>API Details</summary>
+
+Validates the given YouTube URL and optionally validates its video ID.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `url` | `string \| URL` | The URL to validate. |
+| `withId` | `boolean` | Whether to also validate the video ID within the URL. If `false`, the function will only validate the URL's domain name. Defaults to `true`. |
+
+#### Returns
+
+Returns `true` if the given URL is a valid YouTube URL; otherwise `false`.  
+**Type:** `boolean`
+
+</details>
+
+---
+
+### `validateId`
+```ts
+function validateId(id: string): boolean
+```
+
+<details>
+<summary>API Details</summary>
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `id` | `string` | The video ID to validate. |
+
+#### Returns
+
+Returns `true` if the given ID correctly represents the YouTube video ID; otherwise `false`.  
+**Type:** `boolean`
 
 ---
 
