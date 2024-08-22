@@ -453,8 +453,8 @@ async function main() {
 
 module.exports = Object.freeze({
   // :: ytmp3 (Core)
-  name: ytmp3.name,
-  version: ytmp3.version,
+  name: ytmp3.NAME,
+  version: ytmp3.VERSION,
   // eslint-disable-next-line camelcase
   version_info: ytmp3.VERSION_INFO,
   singleDownload: ytmp3.singleDownload,
