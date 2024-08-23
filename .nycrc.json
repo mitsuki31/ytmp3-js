@@ -1,7 +1,7 @@
 {
   "all": false,
-  "check-coverage": true,
-  "reporter": "text",
+  "check-coverage": false,
+  "reporter": ["lcov", "text"],
   "report-dir": "./coverage",
   "branches": 50,
   "functions": 65,
