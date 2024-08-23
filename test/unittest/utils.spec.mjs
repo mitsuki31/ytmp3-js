@@ -1,9 +1,12 @@
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getTempPath } from '@mitsuki31/temppath';
 
 import utils from '../../lib/utils.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('module:utils', function () {
   const testMessages = {
@@ -22,15 +25,23 @@ describe('module:utils', function () {
     ],
     ProgressBar: [
       'should initialize a new instance class',
-      'check the options of created `ProgressBar` instance',
-      'should create the formatted progress bar'
+      'should check the options of created `ProgressBar` instance',
+      'should create the formatted progress bar',
+      'should test the progress bar creation'
+    ],
+    createLogFile: [
+      'should create a log file with default prefix',
+      'should create a log file with specified prefix',
+      'should fallback to default prefix if the given prefix is nullable or falsy value'
     ],
     createDirIfNotExist: [
-      'should create a new directory if not exist asynchronously',
+      'should asynchronously create a new directory if not exist',
+      'should not create if the directory exists',
       'should reject if the given path is not a string'
     ],
     createDirIfNotExistSync: [
-      'should create a new directory if not exist synchronously',
+      'should synchronously create a new directory if not exist',
+      'should not create if the directory exists',
       'should throw if the given path is not a string'
     ],
     dropNullAndUndefined: [
@@ -114,6 +125,13 @@ describe('module:utils', function () {
     it(testMessages.ProgressBar[0], function () {
       assert.notStrictEqual(pb, null);
       assert.notStrictEqual(typeof pb, 'undefined');
+      // Dump test
+      assert.doesNotThrow(() => new utils.ProgressBar({
+        barWidth: 20,
+        barCharTotal: '_',
+        barCharElapsed: '$',
+        bytesInfo: false
+      }));
     });
 
     it(testMessages.ProgressBar[1], function () {
@@ -130,6 +148,53 @@ describe('module:utils', function () {
       assert.notStrictEqual(bar, null);
       assert.notStrictEqual(typeof bar, 'undefined');
       assert.notStrictEqual(bar.length, 0);
+
+      // Dump test
+      const columns = process.stdout.columns;
+      if ('columns' in process.stdout) delete process.stdout.columns;
+      new utils.ProgressBar({ barWidth: 'auto' }).create(1, 10);
+      if (columns) process.stdout.columns = columns;
+    });
+
+    it(testMessages.ProgressBar[3], function () {
+      const pb = new utils.ProgressBar({ barWidth: 10 });
+      const totalBytes = 3000;
+      let bytesDownloaded = 0;
+      this.timeout(totalBytes);
+      this.slow(totalBytes / 3);
+
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          if (bytesDownloaded >= totalBytes) {
+            clearInterval(interval);
+          }
+          bytesDownloaded += Math.random() * 500;
+          // Dump the output
+          pb.create(bytesDownloaded, totalBytes);
+          resolve();
+        }, 70);
+      });
+    });
+  });
+
+  describe('#createLogFile', function () {
+    it(testMessages.createLogFile[0], function () {
+      const logFile = utils.createLogFile();
+      assert.ok(!utils.isNullOrUndefined(logFile));
+      assert.strictEqual(typeof logFile, 'string');
+      assert.ok(logFile.startsWith('ytmp3Error'));
+    });
+
+    it(testMessages.createLogFile[1], function () {
+      const prefix = 'testError#';
+      assert.ok(utils.createLogFile(prefix).startsWith(prefix));
+    });
+
+    it(testMessages.createLogFile[2], function () {
+      const defaultPrefix = 'ytmp3Error';
+      ['', false, null, undefined, 0].forEach((prefix) => {
+        assert.ok(utils.createLogFile(prefix).startsWith(defaultPrefix));
+      });
     });
   });
 
@@ -145,8 +210,14 @@ describe('module:utils', function () {
     });
 
     it(testMessages.createDirIfNotExist[1], function () {
+      // If only check, the function run synchronous
+      utils.createDirIfNotExist(__dirname);
+      assert.ok(fs.statSync(__dirname).isDirectory());
+    });
+
+    it(testMessages.createDirIfNotExist[2], function () {
       return new Promise((resolve) => {
-        assert.rejects(utils.createDirIfNotExist([ 'foo' ]), TypeError);
+        assert.rejects(() => utils.createDirIfNotExist([ 'foo' ]), TypeError);
         resolve();
       });
     });
@@ -169,6 +240,11 @@ describe('module:utils', function () {
     });
 
     it(testMessages.createDirIfNotExistSync[1], function () {
+      utils.createDirIfNotExistSync(__dirname);
+      assert.ok(fs.statSync(__dirname).isDirectory());
+    });
+
+    it(testMessages.createDirIfNotExistSync[2], function () {
       assert.throws(() => utils.createDirIfNotExistSync(123), TypeError);
     });
 
