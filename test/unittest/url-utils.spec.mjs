@@ -39,10 +39,16 @@ describe('module:url-utils', function () {
 
     describe('#extractVideoId', function () {
       const id = 'abcdeQWERTY';  // Valid video ID always have 11 characters
-      const url = `https://www.youtube.com/watch?v=${id}`;
+      let urls;
+
+      before (function () {
+        urls = URLUtils.BASIC_YOUTUBE_DOMAINS.map((url) => {
+          return new URL((url !== 'youtu.be') ? `watch?v=${id}` : id, `https://${url}`);
+        });
+      });
 
       it(testMessages.extractVideoId[0], function () {
-        assert.strictEqual(URLUtils.extractVideoId(url), id);
+        urls.forEach((url) => assert.strictEqual(URLUtils.extractVideoId(url), id));
       });
 
       it(testMessages.extractVideoId[1], function () {
@@ -54,8 +60,12 @@ describe('module:url-utils', function () {
       });
 
       it(testMessages.extractVideoId[2], function () {
-        assert.throws(() =>
-          URLUtils.extractVideoId('https://youtu.be/watch?v=abc'), IDExtractorError);
+        assert.throws(() => {
+          URLUtils.extractVideoId('https://youtu.be/watch?v=abc');
+        }, IDExtractorError);
+        assert.throws(() => {
+          URLUtils.extractVideoId('https://m.youtube.com/channels/UC_12345abcde');
+        }, IDExtractorError);
       });
 
       it(testMessages.extractVideoId[3], function () {
@@ -69,18 +79,22 @@ describe('module:url-utils', function () {
 
       it(testMessages.validateUrl[0], function () {
         assert.ok(URLUtils.validateUrl(exampleValidUrl));
+        assert.ok(URLUtils.validateUrl(new URL(exampleValidUrl)));
       });
 
       it(testMessages.validateUrl[1], function () {
         assert.equal(URLUtils.validateUrl('https://www.google.com/'), false);
+        assert.equal(URLUtils.validateUrl(new URL('https://www.google.com/')), false);
       });
 
       it(testMessages.validateUrl[2], function () {
         assert.equal(URLUtils.validateUrl(exampleInvalidUrl), false);
+        assert.equal(URLUtils.validateUrl(new URL(exampleInvalidUrl)), false);
       });
 
       it(testMessages.validateUrl[3], function () {
         assert.ok(URLUtils.validateUrl(exampleInvalidUrl, false));
+        assert.ok(URLUtils.validateUrl(new URL(exampleInvalidUrl), false));
       });
 
       it(testMessages.validateUrl[4], function () {
