@@ -3,6 +3,8 @@ name: Codecov Coverage
 on:
   push:
     branches: [ "master" ]
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
 
 jobs:
   coverage:
@@ -25,15 +27,15 @@ jobs:
     - name: Clean install the project
       run: npm ci
     - name: Run coverage
-      # Currently we only run coverage for unit tests
-      run: npx nyc --reporter lcov --reporter text npm run test:unit
+      # Currently only run coverage for unit tests
+      run: npx nyc npm run test:unit
     - name: Upload coverage
       uses: codecov/codecov-action@v4
       with:
-        name: codecov-unittest
+        name: codecov-unittest@${{ matrix.os }}
         fail_ci_if_error: true
         env_vars: os,node-version
         directory: './coverage'
-        flags: unittests
+        flags: unittests,${{ matrix.os }}
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
