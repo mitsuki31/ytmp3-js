@@ -33,6 +33,11 @@ describe('module:audioconv', function () {
     ],
     createConversionProgress: [
       'should create a progress bar from specified options'
+    ],
+    convertAudio: [
+      'should throw an error when input file does not exist',
+      'should reject when ffmpeg has not installed',
+      'should pass the pre-setup of ffmpeg chain without any error'
     ]
   };
 
@@ -293,6 +298,71 @@ describe('module:audioconv', function () {
       )).test(pb));
       assert.ok((new RegExp(`${info.percent}%`)).test(pb));
       assert.ok((new RegExp(`${(info.targetSize / 1024).toFixed(2)} MB`)).test(pb));
+    });
+  });
+
+  describe('#convertAudio', function () {
+    const consoleLog = console.log;
+    const consoleError = console.error;
+    const spawnSyncStub = childProcess.spawnSync;
+    const ffmpegPath = process.env.FFMPEG_PATH;
+    const PromiseStub = global.Promise;
+    let fakeAudioFile;
+
+    before(async function () {
+      // Keep the 'quiet' option disabled but these should be mocked
+      console.log = () => {};
+      console.error = () => {};
+      global.Promise = class {
+        constructor(fn) {
+          setImmediate(() => PromiseStub.resolve());
+        }
+      };
+
+      fakeAudioFile = path.join(utils.ROOTDIR, 'tmp', 'testaudio-01.wav');
+      await utils.createDirIfNotExist(path.dirname(fakeAudioFile));
+      await fs.promises.writeFile(fakeAudioFile, '', { encoding: 'utf8' });
+    });
+
+    beforeEach(function () {
+      childProcess.spawnSync = () => {
+        return { status: 0 };
+      };
+    });
+
+    it(testMessages.convertAudio[0], async function () {
+      await assert.rejects(async () => {
+        await audioconv.convertAudio('a/b/foo/inexistence file.wav');
+      });
+    });
+
+    it(testMessages.convertAudio[1], async function () {
+      delete process.env.FFMPEG_PATH;
+      childProcess.spawnSync = () => { return { status: 1 } };
+
+      await assert.rejects(async () => {
+        await audioconv.convertAudio(fakeAudioFile);
+      }, Error);
+    });
+
+    it(testMessages.convertAudio[2], async function () {
+      await audioconv.convertAudio(fakeAudioFile, {
+        outputOptions: '-acodec wav'
+      });
+      await audioconv.convertAudio(fakeAudioFile, {
+        outputOptions: []
+      });
+    });
+
+    after(function () {
+      console.log = consoleLog;
+      console.error = consoleError;
+      childProcess.spawnSync = spawnSyncStub;
+      process.env.FFMPEG_PATH = ffmpegPath;
+      global.Promise = PromiseStub;
+
+      // Delete the fake audio file
+      if (fs.existsSync(fakeAudioFile)) fs.rmSync(fakeAudioFile);
     });
   });
 });
