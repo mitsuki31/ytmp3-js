@@ -30,6 +30,7 @@ jobs:
       # Currently only run coverage for unit tests
       run: npx nyc npm run test:unit
     - name: Upload coverage
+      if: ${{ github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' }}
       uses: codecov/codecov-action@v4
       with:
         name: codecov-unittest@${{ matrix.os }}
