@@ -12,7 +12,7 @@ describe('module:audioconv', function () {
     ],
     resolveOptions: [
       'should return default options if given argument is nullable value',
-      'should return nullable options if given argument is nullable value',
+      'should return default options if given argument is not an object',
       'should resolve the given configuration options'
     ]
   };
@@ -92,7 +92,7 @@ describe('module:audioconv', function () {
     });
 
     it(testMessages.resolveOptions[0], function () {
-      const actualOptions = [null, undefined, {}].map((val) => {
+      const actualOptions = [null, undefined, false].map((val) => {
         return audioconv.resolveOptions(val , true);
       });
 
@@ -110,15 +110,16 @@ describe('module:audioconv', function () {
     });
 
     it(testMessages.resolveOptions[1], function () {
-      const actualOptions = [null, undefined, {}].map((val) => {
+      const actualOptions = ['&', /y/, 16n].map((val) => {
         return audioconv.resolveOptions(val , false);
       });
 
       actualOptions.forEach((actual) => {
         assert.notStrictEqual(actual, null);  // Non-nullable
         assert.notStrictEqual(typeof actual, 'undefined');
-        assert.notDeepStrictEqual(actual, expectedOptions[0]);
-        assert.deepStrictEqual(actual, expectedOptions[2]);
+        assert.deepStrictEqual(actual, expectedOptions[0]);
+        assert.notDeepStrictEqual(actual, expectedOptions[1]);
+        assert.notDeepStrictEqual(actual, expectedOptions[2]);
       });
       [...actualOptions].reverse().forEach((actual1) => {
         actualOptions.forEach((actual2) => {
