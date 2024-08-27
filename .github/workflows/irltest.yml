@@ -53,6 +53,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-ver }}
         cache: 'npm'
+    - name: Setup FFmpeg
+      uses: FedericoCarboni/setup-ffmpeg@v3
+      id: setup-ffmpeg
+      with:
+        ffmpeg-version: release
+        linking-type: static
+        architecture: x64
+        github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
     - name: Clean install the project
       run: npm ci
     - name: Run IRL Test
