@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import config from '../../lib/config.js';
+import utils from '../../lib/utils.js';
 
 describe('module:config', function () {
   const testMessages = {
@@ -12,7 +13,7 @@ describe('module:config', function () {
       'should parse and resolve the given configuration file'
     ]
   };
-  const tempFile = path.join('tmp', 'tempTestConfig.json');
+  const tempFile = path.join(utils.ROOTDIR, 'tmp', 'tempTestConfig.json');
   const configObj = {
     downloadOptions: {
       cwd: null,
