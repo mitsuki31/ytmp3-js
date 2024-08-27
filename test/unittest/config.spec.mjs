@@ -38,7 +38,7 @@ describe('module:config', function () {
 
   before(function () {
     tempFileNoExt = path.join(
-      tmpdir(), 'config@unittest',
+      utils.ROOTDIR, 'tmp', 'config@unittest',
       'tempTestConfig'
     );
     configObj = {
