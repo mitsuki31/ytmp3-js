@@ -251,12 +251,11 @@ describe('IRL (In Real Life) Test', function () {
             assert.ok(err.cause instanceof Error);
             assert.match(err.cause.message, /simulated error test/i);
           })
-          .finally(done);
+          .finally(() => {
+            fs.createWriteStream = createWriteStreamStub;
+            done();
+          });
         });
-
-      after(function () {
-        fs.createWriteStream = createWriteStreamStub;
-      })
     });
 
     after(async function () {

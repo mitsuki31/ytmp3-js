@@ -225,12 +225,14 @@ describe('module:audioconv', function () {
 
   describe('#writeErrorLog', function () {
     let logFile, logFileBase;
-    // Create a stub for `fs.createWriteStream`
-    const createWriteStreamStub = fs.createWriteStream;
+    let createWriteStreamStub;
 
     before(function () {
       logFile = getTempPath(utils.LOGDIR, 20) + '.log';
       logFileBase = path.basename(logFile);
+
+      // Create a stub for `fs.createWriteStream`
+      createWriteStreamStub = fs.createWriteStream;
     });
 
     it(testMessages.writeErrorLog[0], async function () {
@@ -302,14 +304,20 @@ describe('module:audioconv', function () {
   });
 
   describe('#convertAudio', function () {
-    const consoleLog = console.log;
-    const consoleError = console.error;
-    const spawnSyncStub = childProcess.spawnSync;
-    const ffmpegPath = process.env.FFMPEG_PATH;
-    const PromiseStub = global.Promise;
     let fakeAudioFile;
+    let consoleLog;
+    let consoleError;
+    let spawnSyncStub;
+    let ffmpegPath;
+    let PromiseStub;
 
     before(async function () {
+      consoleLog = console.log;
+      consoleError = console.error;
+      spawnSyncStub = childProcess.spawnSync;
+      ffmpegPath = process.env.FFMPEG_PATH;
+      PromiseStub = global.Promise;
+
       // Keep the 'quiet' option disabled but these should be mocked
       console.log = () => {};
       console.error = () => {};
