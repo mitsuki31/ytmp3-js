@@ -1,8 +1,12 @@
 {
   "all": false,
-  "check-coverage": false,
+  "check-coverage": true,
   "reporter": ["lcov", "text"],
   "report-dir": "./coverage",
+  "exclude": [
+    ".mocharc.js",
+    "tmp/**"
+  ],
   "branches": 50,
   "functions": 65,
   "lines": 50,

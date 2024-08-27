@@ -28,7 +28,7 @@
     "test:unit": "mocha test/unittest",
     "test:nyan:unit": "mocha test/unittest --reporter nyan",
     "test:irl": "mocha test/irl.test.mjs",
-    "coverage": "nyc --reporter lcov --reporter text npm test"
+    "coverage": "nyc npm test"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",

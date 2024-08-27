@@ -17,7 +17,8 @@ module.exports = [
       '**/test/',
       '**/coverage/',
       'jsdoc.config.js',
-      'eslint.config.test.js'
+      'eslint.config.test.js',
+      '.mocharc.js'
     ]
   },
 
