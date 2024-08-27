@@ -32,36 +32,8 @@ describe('module:config', function () {
       'should throw `TypeError` if any known options is not an object type'
     ]
   };
-  const tempFile = path.join(utils.ROOTDIR, 'tmp', 'tempTestConfig.json');
-  const configObj = {
-    downloadOptions: {
-      cwd: null,
-      outDir: path.join('tmp', 'downloads'),
-    },
-    audioConverterOptions: {
-      format: 'opus',
-      codec: 'libopus',
-      frequency: 12000,
-      channels: 1
-    }
-  };
-  const expectedResolvedConfig = {
-    cwd: path.resolve('.'),
-    outDir: path.resolve('.', 'tmp', 'downloads'),
-    convertAudio: true,
-    quiet: false,
-    converterOptions: {
-      inputOptions: undefined,
-      outputOptions: undefined,
-      format: 'opus',
-      codec: 'libopus',
-      frequency: 12000,
-      bitrate: undefined,
-      channels: 1,
-      deleteOld: undefined,
-      quiet: undefined
-    }
-  };
+  let configObj;
+  let expectedResolvedConfig;
   let tempFileNoExt;
 
   before(function () {
