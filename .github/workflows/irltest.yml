@@ -1,13 +1,10 @@
 name: IRL Test
 
 on:
-  ## Due to YouTube bot detection when downloading YouTube videos,
-  ## this workflow will not be triggered automatically until we address it.
-  ## Still if we run manually, it will returns an error.
-  # pull_request:
-  #   branches: [ "master" ]
-  # schedule:
-  #   - cron: '0 6,12,18,0 * * *'
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '0 6,12,18,0 * * *'
   workflow_dispatch:
     inputs:
       traceDeprecation:

@@ -27,8 +27,7 @@ jobs:
     - name: Clean install the project
       run: npm ci
     - name: Run coverage
-      # Currently only run coverage for unit tests
-      run: npx nyc npm run test:unit
+      run: npm run coverage
     - name: Upload coverage
       if: ${{ github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' }}
       uses: codecov/codecov-action@v4
