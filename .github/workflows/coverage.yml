@@ -8,6 +8,7 @@ on:
 
 jobs:
   coverage:
+    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') || github.actor != 'dependabot[bot]' }}
     name: ${{ matrix.os }} / Node.js ${{ matrix.node-version }}
     runs-on: ${{ matrix.os }}-latest
 
@@ -37,13 +38,13 @@ jobs:
     - name: Run coverage
       run: npm run coverage
     - name: Upload coverage
-      if: ${{ github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' }}
+      if: ${{ github.event_name != 'pull_request' }}
       uses: codecov/codecov-action@v4
       with:
-        name: codecov-unittest@${{ matrix.os }}
+        name: codecov-alltests@${{ matrix.os }}
         fail_ci_if_error: true
         env_vars: os,node-version
         directory: './coverage'
-        flags: unittests,${{ matrix.os }}
+        flags: all,${{ matrix.os }}
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
