@@ -31,8 +31,16 @@
 const { ArgumentParser, SUPPRESS } = require('argparse');
 
 const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
-const { dropNullAndUndefined } = require('../lib/utils');
-const { importConfig } = require('../lib/config');
+const {
+  dropNullAndUndefined,
+  isPlainObject,
+  isNullOrUndefined
+} = require('../lib/utils');
+const {
+  importConfig,
+  findGlobalConfig,
+  parseGlobalConfig
+} = require('../lib/config');
 const { resolveDlOptions } = require('../lib/ytmp3');
 const pkg = require('../package.json');
 
@@ -115,6 +123,11 @@ function initParser() {
     type: 'str',
     dest: 'config',
     default: SUPPRESS
+  });
+  // :: noConfig
+  parser.add_argument('--noConfig', '--no-config', {
+    help: 'Disable the automatic loading and merging of global or specified configuration files',
+    action: 'store_true'
   });
   // :: convertAudio
   parser.add_argument('-C', '--convertAudio', '--convert-audio', {
@@ -267,18 +280,58 @@ function initParser() {
  * @since   1.0.0
  */
 async function filterOptions({ options }) {
-  if (!options || (Array.isArray(options) || typeof options !== 'object')) return {};
+  if (!options || !isPlainObject(options)) return {};
 
-  // Deep copy the options
-  const optionsCopy = JSON.parse(JSON.stringify(options));
+  // Deep copy the options and remove unspecified options,
+  // especially for 'cwd' and 'outDir'
+  let optionsCopy = dropNullAndUndefined(
+    JSON.parse(JSON.stringify(options)));
 
+  const { noConfig, quiet } = optionsCopy;
   // We need to extract the quiet option first and delete it
   // if not, `audioconv.resolveOptions()` function will throw an error
-  const { quiet } = optionsCopy;
   delete optionsCopy.quiet;
+  delete optionsCopy.noConfig;  // No longer used
+
+  // Look up for global configuration file and parse if available
+  const globalConfigFile = await findGlobalConfig();  // ! Can be null
+  // Only parse the global configuration file if `--no-config` option is disabled
+  const globalConfig = (globalConfigFile && !noConfig)
+    ? await parseGlobalConfig(globalConfigFile)
+    : null;
+  const dlOptionsFromGlobalConfig = { ...(globalConfig || {}) };
+  const acOptionsFromGlobalConfig = globalConfig?.converterOptions || {};
+  if (dlOptionsFromGlobalConfig.converterOptions) {
+    delete dlOptionsFromGlobalConfig.converterOptions;
+  }
+
+  // Override options and resolve unspecified options
+  // if global config is available
+  if (!isNullOrUndefined(globalConfig) && !noConfig) {
+    optionsCopy = {
+      ...optionsCopy,
+      cwd: isNullOrUndefined(optionsCopy.cwd)
+        ? globalConfig.cwd : optionsCopy.cwd,
+      outDir: isNullOrUndefined(optionsCopy.outDir)
+        ? globalConfig.outDir : optionsCopy.outDir,
+      convertAudio: isNullOrUndefined(optionsCopy.convertAudio)
+        ? globalConfig.convertAudio : optionsCopy.convertAudio,
+      quiet: optionsCopy.quiet === 0
+        ? globalConfig.quiet : optionsCopy.quiet,
+    };
+  }
+
+  optionsCopy.convertAudio = isNullOrUndefined(optionsCopy.convertAudio)
+    ? false : optionsCopy.convertAudio;
+  // Set to an empty array for clarity that the options is empty and unspecified
+  optionsCopy.inputOptions = isNullOrUndefined(optionsCopy.inputOptions)
+    ? [] : optionsCopy.inputOptions;
+  optionsCopy.outputOptions = isNullOrUndefined(optionsCopy.outputOptions)
+    ? [] : optionsCopy.outputOptions;
 
   // Extract and resolve the download options from configuration file if given
-  let dlOptionsFromConfig = optionsCopy.config
+  // and only if the `--no-config` option is disabled
+  let dlOptionsFromConfig = optionsCopy.config && !noConfig
     ? importConfig(optionsCopy.config)
     : {};
   // Await the download options if it is a promise
@@ -297,6 +350,7 @@ async function filterOptions({ options }) {
     printConfig: optionsCopy.printConfig,
     downloadOptions: {
       ...resolveDlOptions({ downloadOptions: {
+        ...dlOptionsFromGlobalConfig,  // Download options from global config
         // Download options from config file can be overriden with download
         // options from the command-line
         ...dlOptionsFromConfig || {},
@@ -304,6 +358,7 @@ async function filterOptions({ options }) {
       }}),
       converterOptions: {
         ...resolveACOptions({
+          ...acOptionsFromGlobalConfig,  // Audio conversion options from global config
           ...dropNullAndUndefined(acOptionsFromConfig),
           ...dropNullAndUndefined(optionsCopy)
         }, false), 
