@@ -7,7 +7,10 @@ import { tmpdir } from 'node:os';
 import config from '../../lib/config.js';
 import utils from'../../lib/utils.js';
 import error from '../../lib/error.js';
-const { UnknownOptionError } = error;
+const {
+  UnknownOptionError,
+  InvalidTypeError
+} = error;
 
 describe('module:config', function () {
   const testMessages = {
@@ -15,7 +18,7 @@ describe('module:config', function () {
       'should parse and resolve the JSON configuration file',
       'should parse and resolve the ES Module configuration file',
       'should parse and resolve the CommonJS configuration file',
-      'should throw `TypeError` when configuration file path is not a string',
+      'should throw `InvalidTypeError` when configuration file path is not a string',
       'should throw `Error` if configuration file extension are unknown'
     ],
     parseConfig: [
@@ -27,9 +30,9 @@ describe('module:config', function () {
       'should return an empty object when specified configuration with nullable value'
     ],
     configChecker: [
-      'should throw `TypeError` if the given config is not an object',
+      'should throw `InvalidTypeError` if the given config is not an object',
       'should throw `UnknownOptionError` when found unknown download options',
-      'should throw `TypeError` if any known options is not an object type'
+      'should throw `InvalidTypeError` if any known options is not an object type'
     ]
   };
   let configObj;
@@ -132,7 +135,7 @@ describe('module:config', function () {
     it(testMessages.importConfig[3], async function () {
       await assert.rejects(async () => {
         await config.importConfig(123n);
-      }, TypeError);
+      }, InvalidTypeError);
     });
 
     it(testMessages.importConfig[4], async function () {
@@ -206,7 +209,8 @@ describe('module:config', function () {
 
     it(testMessages.configChecker[0], function () {
       [ null, 5, '_' ].forEach((cfg) =>
-        assert.throws(() => config.configChecker({ config: cfg, file })));
+        assert.throws(() =>
+          config.configChecker({ config: cfg, file })), InvalidTypeError);
     });
 
     it(testMessages.configChecker[1], function () {
@@ -222,7 +226,7 @@ describe('module:config', function () {
       ];
       configs.forEach((cfg) => {
         assert.throws(() =>
-          config.configChecker({ config: cfg, file }), TypeError);
+          config.configChecker({ config: cfg, file }), InvalidTypeError);
       });
     });
   });
