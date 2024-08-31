@@ -15,6 +15,7 @@ module.exports = [
       '**/coverage/',
       'config/example/**.{mjs,js,json}',
       'lib/',
+      'bin/',
       'index.js',
       'eslint.config.*'
     ]
