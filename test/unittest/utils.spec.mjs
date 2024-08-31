@@ -21,7 +21,10 @@ describe('module:utils', function () {
       'should return true if given argument is a nullable value'
     ],
     isObject: [
-      'should return true if supplied with a literal object'
+      'should return true if supplied with any object except array'
+    ],
+    isPlainObject: [
+      'should return true if supplied with a plain object only including null prototype object'
     ],
     ProgressBar: [
       'should initialize a new instance class',
@@ -108,10 +111,22 @@ describe('module:utils', function () {
 
   describe('#isObject', function () {
     it(testMessages.isObject[0], function () {
-      assert.ok(utils.isObject({}) === true);
-      assert.ok(utils.isObject([]) === false);
-      assert.ok(utils.isObject(new RegExp('foo')) === false);
-      assert.ok(utils.isObject(100n) === false);
+      assert.equal(utils.isObject({}), true);
+      assert.equal(utils.isObject([]), false);
+      assert.equal(utils.isObject(new RegExp('foo')), true);
+      assert.equal(utils.isObject(100n), false);
+      assert.equal(utils.isPlainObject(Object.create(null)), true);
+      assert.equal(utils.isObject(new Set()), true);
+    });
+  });
+
+  describe('#isPlainObject', function () {
+    it(testMessages.isPlainObject[0], function () {
+      assert.equal(utils.isPlainObject({}), true);
+      assert.equal(utils.isPlainObject([]), false);
+      assert.equal(utils.isPlainObject(/g/i), false);
+      assert.equal(utils.isPlainObject(Object.create(null)), true);
+      assert.equal(utils.isPlainObject(new Set()), false);
     });
   });
 
