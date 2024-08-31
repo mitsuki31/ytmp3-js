@@ -28,7 +28,7 @@
  * @since   1.0.0
  */
 
-const { ArgumentParser } = require('argparse');
+const { ArgumentParser, SUPPRESS } = require('argparse');
 
 const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
 const { dropNullAndUndefined } = require('../lib/utils');
@@ -83,41 +83,45 @@ function initParser() {
   parser.add_argument('URL', {
     help: 'The YouTube URL(s) to download. Supports multiple URLs',
     type: 'str',
-    nargs: '*'  // Support multiple URLs
+    nargs: '*',  // Support multiple URLs
+    default: SUPPRESS
   });
   // :: cwd
   parser.add_argument('--cwd', {
     metavar: 'DIR',
     help: 'Set the current working directory (default: current directory)',
     type: 'str',
-    default: '.'
+    default: SUPPRESS
   });
   // :: FILE
   parser.add_argument('-f', '--file', '--batch', {
     help: 'Path to a file containing a list of YouTube URLs for batch downloading',
     type: 'str',
-    dest: 'file'
+    dest: 'file',
+    default: SUPPRESS
   });
   // :: outDir
   parser.add_argument('-o', '--outDir', '--out-dir', {
     metavar: 'DIR',
     help: 'Specify the output directory for downloaded files (default: current directory)',
     type: 'str',
-    default: '.',
-    dest: 'outDir'
+    dest: 'outDir',
+    default: SUPPRESS
   });
   // :: config
   parser.add_argument('-c', '--config', {
     metavar: 'FILE',
     help: 'Path to configuration file containing `downloadOptions` object',
     type: 'str',
-    dest: 'config'
+    dest: 'config',
+    default: SUPPRESS
   });
   // :: convertAudio
   parser.add_argument('-C', '--convertAudio', '--convert-audio', {
     help: 'Enable audio conversion to a specific format (requires FFmpeg)',
     action: 'store_true',
-    dest: 'convertAudio'
+    dest: 'convertAudio',
+    default: SUPPRESS
   });
 
   // ==== Audio Converter Options ==== //
@@ -133,6 +137,7 @@ function initParser() {
       help: 'Add custom input options for audio conversion',
       type: 'str',
       dest: 'inputOptions',
+      default: SUPPRESS
     }
   );
   // :: outputOptions
@@ -149,6 +154,7 @@ function initParser() {
       help: 'Add custom output options for audio conversion',
       type: 'str',
       dest: 'outputOptions',
+      default: SUPPRESS
     }
   );
   // :: format
@@ -156,31 +162,36 @@ function initParser() {
     metavar: 'FMT',
     help: 'Convert the audio to the specified format. Requires `--convertAudio`',
     type: 'str',
+    default: SUPPRESS
   });
   // :: codec
   parser.add_argument('--codec', '--encoding', {
     metavar: 'CODEC',
     help: 'Specify the codec for the converted audio. Requires `--convertAudio`',
-    dest: 'codec'
+    dest: 'codec',
+    default: SUPPRESS
   });
   // :: bitrate
   parser.add_argument('--bitrate', {
     metavar: 'N',
     help: 'Set the bitrate for the converted audio in kbps. Requires `--convertAudio`',
-    type: 'str'
+    type: 'str',
+    default: SUPPRESS
   });
   // :: frequency
   parser.add_argument('--freq', '--frequency', {
     metavar: 'N',
     help: 'Set the audio sampling frequency for the converted audio in Hertz. Requires `--convertAudio`',
     type: 'int',
-    dest: 'frequency'
+    dest: 'frequency',
+    default: SUPPRESS
   });
   // :: channels
   parser.add_argument('--channels', {
     metavar: 'N',
     help: 'Specify the audio channels for the converted audio. Requires `--convertAudio`',
-    type: 'int'
+    type: 'int',
+    default: SUPPRESS
   });
   // :: deleteOld
   parser.add_argument('--deleteOld', '--delete-old', '--overwrite', {

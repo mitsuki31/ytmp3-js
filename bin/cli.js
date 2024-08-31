@@ -101,7 +101,7 @@ async function main() {
     downloadOptions,
     printConfig
   } = await filterOptions({
-    options: initParser().parse_args()
+    options: initParser().parse_intermixed_args()
   });
 
   // Version
