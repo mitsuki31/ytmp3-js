@@ -5,7 +5,7 @@
   "description": "A Node.js library offers an easy and uncomplicated method for downloading YouTube audio",
   "main": "index.js",
   "bin": {
-    "ytmp3": "./index.js"
+    "ytmp3": "./bin/cli.js"
   },
   "files": [
     "index.js",
