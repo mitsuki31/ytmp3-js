@@ -28,7 +28,12 @@
  * @since   1.0.0
  */
 
-const { ArgumentParser, SUPPRESS } = require('argparse');
+const {
+  SUPPRESS,
+  ZERO_OR_MORE,
+  ArgumentParser,
+  BooleanOptionalAction
+} = require('argparse');
 
 const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
 const {
@@ -91,7 +96,7 @@ function initParser() {
   parser.add_argument('URL', {
     help: 'The YouTube URL(s) to download. Supports multiple URLs',
     type: 'str',
-    nargs: '*',  // Support multiple URLs
+    nargs: ZERO_OR_MORE,  // Support multiple URLs
     default: SUPPRESS
   });
   // :: cwd
@@ -132,9 +137,8 @@ function initParser() {
   // :: convertAudio
   parser.add_argument('-C', '--convertAudio', '--convert-audio', {
     help: 'Enable audio conversion to a specific format (requires FFmpeg)',
-    action: 'store_true',
-    dest: 'convertAudio',
-    default: SUPPRESS
+    action: BooleanOptionalAction,
+    dest: 'convertAudio'
   });
 
   // ==== Audio Converter Options ==== //
@@ -209,7 +213,7 @@ function initParser() {
   // :: deleteOld
   parser.add_argument('--deleteOld', '--delete-old', '--overwrite', {
     help: 'Delete the old file after audio conversion is done. Requires `--convertAudio`',
-    action: 'store_true',
+    action: BooleanOptionalAction,
     dest: 'deleteOld'
   });
   // :: quiet
@@ -217,6 +221,12 @@ function initParser() {
     help: 'Suppress output messages. Use `-qq` to also suppress audio conversion progress',
     action: 'count',
     default: 0  // Set the default to ensure it is always number
+  });
+  // :: noQuiet
+  parser.add_argument('--noQuiet', '--no-quiet', {
+    help: 'Enable suppressed output messages (only affect if `quiet` is enabled)',
+    action: 'store_true',
+    dest: 'noQuiet'
   });
 
   // ==== Other Options ==== //
@@ -287,11 +297,16 @@ async function filterOptions({ options }) {
   let optionsCopy = dropNullAndUndefined(
     JSON.parse(JSON.stringify(options)));
 
-  const { noConfig, quiet } = optionsCopy;
+  const { noConfig, noQuiet } = optionsCopy;
+  let { quiet } = optionsCopy;
   // We need to extract the quiet option first and delete it
   // if not, `audioconv.resolveOptions()` function will throw an error
   delete optionsCopy.quiet;
   delete optionsCopy.noConfig;  // No longer used
+  delete optionsCopy.noQuiet;  // No longer used
+
+  // Reset the quiet level to zero if the `--no-quiet` is specified
+  if (noQuiet) quiet = 0;
 
   // Look up for global configuration file and parse if available
   const globalConfigFile = await findGlobalConfig();  // ! Can be null
