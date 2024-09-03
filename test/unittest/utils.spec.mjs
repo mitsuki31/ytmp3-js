@@ -140,7 +140,7 @@ describe('module:utils', function () {
     it(testMessages.ProgressBar[0], function () {
       assert.notStrictEqual(pb, null);
       assert.notStrictEqual(typeof pb, 'undefined');
-      // Dump test
+      // Dummy test
       assert.doesNotThrow(() => new utils.ProgressBar({
         barWidth: 20,
         barCharTotal: '_',
@@ -164,7 +164,7 @@ describe('module:utils', function () {
       assert.notStrictEqual(typeof bar, 'undefined');
       assert.notStrictEqual(bar.length, 0);
 
-      // Dump test
+      // Dummy test
       const columns = process.stdout.columns;
       if ('columns' in process.stdout) delete process.stdout.columns;
       new utils.ProgressBar({ barWidth: 'auto' }).create(1, 10);
