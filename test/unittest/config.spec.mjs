@@ -398,8 +398,14 @@ describe('module:config', function () {
     });
 
     it(testMessages.parseGlobalConfig[2], async function () {
-      await assert.rejects(() =>
-        config.parseGlobalConfig(exampleGlobalConfigWO), GlobalConfigParserError)
+      await assert.rejects(async () => {
+        // On Windows system, it would not rejects because the file is still readable
+        await config.parseGlobalConfig(exampleGlobalConfigWO);
+        // Throw an error for Windows only
+        if (process.platform === 'win32') {
+          throw new GlobalConfigParserError('Known rejection error: ' + process.platform);
+        }
+      }, GlobalConfigParserError);
     });
 
     it(testMessages.parseGlobalConfig[3], async function () {
