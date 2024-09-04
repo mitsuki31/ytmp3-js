@@ -32,7 +32,8 @@ const {
   SUPPRESS,
   ZERO_OR_MORE,
   ArgumentParser,
-  BooleanOptionalAction
+  BooleanOptionalAction,
+  RawDescriptionHelpFormatter
 } = require('argparse');
 
 const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
@@ -86,7 +87,14 @@ function initParser() {
       ? pkg.title.toLowerCase()
       : (pkg.name ? pkg.name.replace('-js', '') : 'ytmp3'),
     description: pkg.description,
-    epilog: `Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).`,
+    // eslint-disable-next-line camelcase
+    formatter_class: RawDescriptionHelpFormatter,
+    epilog: `
+      Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).
+      
+      \x1b[1;91m::\x1b[0m \x1b[1;96m[Homepage]\x1b[0m\thttps://mitsuki31.github.io/ytmp3-js
+      \x1b[1;91m::\x1b[0m \x1b[1;95m[GitHub]\x1b[0m\thttps://github.com/mitsuki31/ytmp3-js
+    `.trim().replace(/[ ]{2,}/g, ''),
     // eslint-disable-next-line camelcase
     add_help: false  // Use custom help argument
   });
