@@ -30,7 +30,7 @@
  * Utilities module for **YTMP3** project.
  *
  * @module    utils
- * @author    Ryuu Mitsuki (https://github.com/mitsuki31)
+ * @author    Ryuu Mitsuki &lt;https://github.com/mitsuki31>
  * @license   MIT
  * @since     1.0.0
  */
@@ -99,14 +99,34 @@ const FrozenProperty = {
 
 /**
  * The root directory of the project.
+ * @type {string}
+ * @constant
+ * @package
  * @since  1.0.0
  */
 const ROOTDIR = path.join(__dirname, '..');
 /**
  * The output directory for the downloaded audio files.
+ * @type {string}
+ * @constant
+ * @package
  * @since  1.0.0
  */
 const OUTDIR = path.join(ROOTDIR, 'download');
+/**
+ * The home directory path for the YTMP3-JS configuration and data files.
+ *
+ * This path is constructed by joining the user's home directory with the `'.ytmp3-js'` folder.
+ * On POSIX systems, this will typically be `"/home/&lt;USERNAME>/.ytmp3-js"`, while on Windows systems,
+ * it will be `"C:\Users\&lt;USERNAME>\.ytmp3-js"`. For Termux Android, it will be `"/data/data/com.termux/files/home/.ytmp3-js"`.
+ *
+ * @type {string}
+ * @constant
+ * @package
+ * @since    1.1.0
+ */
+const YTMP3_HOMEDIR = path.join(os.homedir(), '.ytmp3-js');
+
 /**
  * The log directory for error logs.
  *
@@ -114,10 +134,12 @@ const OUTDIR = path.join(ROOTDIR, 'download');
  *   - **POSIX**: `$HOME/.ytmp3-js/logs`
  *   - **Windows**: `%USERPROFILE%\.ytmp3-js\logs`
  *
+ * @type {string}
+ * @constant
+ * @package
  * @since  1.0.0
  */
-const LOGDIR = path.join(os.homedir(), '.ytmp3-js', 'logs');
-
+const LOGDIR = path.join(YTMP3_HOMEDIR, 'logs');
 
 // region Utilities Function
 
@@ -162,6 +184,9 @@ function createLogFile(prefix) {
     (new Date()).toISOString().split('.')[0].replace(/:/g, '.')}.log`;
 }
 
+
+// region Type Checker
+
 /**
  * Checks if a given value is null or undefined.
  *
@@ -176,25 +201,67 @@ function isNullOrUndefined(x) {
 }
 
 /**
- * Checks if a given value is an object type.
+ * Determines whether the provided value is a non-null object.
  *
- * This function will strictly checks whether the given value is an object, not `null`,
- * `Array`, a `RegExp` instance, neither a `URL` instance.
+ * This function returns `true` for any value that is of the object type and is not `null`, 
+ * but it does not guarantee that the object is a plain object (`{}`).
  *
- * @param {any} x - The value to check.
- * @returns {boolean} - `true` if the value is an object and not null, an array,
- *                      a `RegExp`, nor a URL object, otherwise false.
+ * @param {any} x - The value to be checked.
+ * @returns {boolean} `true` if the value is a non-null object, otherwise `false`.
  *
- * @public
- * @since  1.0.0
+ * @package
+ * @since    1.0.0
+ * @see      {@link module:utils~isPlainObject isPlainObject}
  */
 function isObject(x) {
-  return (!isNullOrUndefined(x)
-    &amp;&amp; !Array.isArray(x)
-    &amp;&amp; !(x instanceof RegExp)
-    &amp;&amp; !(x instanceof URL)
-    &amp;&amp; typeof x === 'object'
+  return (
+    !isNullOrUndefined(x) &amp;&amp;
+    typeof x === 'object' &amp;&amp;
+    !Array.isArray(x) &amp;&amp;
+    Object.prototype.toString &amp;&amp;
+    /^\[object .+\]$/.test(Object.prototype.toString.call(x))
   );
+}
+
+/**
+ * Determines whether the provided value is a plain object (`{}`).
+ *
+ * This function returns `true` only if the value is a non-null object with
+ * a prototype of `Object`.
+ *
+ * @param {any} x - The value to be checked.
+ * @returns {boolean} `true` if the value is a plain object, otherwise `false`.
+ *
+ * @package
+ * @since    1.1.0
+ * @see      {@link module:utils~isObject isObject}
+ */
+function isPlainObject(x) {
+  return (
+    !isNullOrUndefined(x) &amp;&amp;
+    typeof x === 'object' &amp;&amp;
+    !Array.isArray(x) &amp;&amp;
+    Object.prototype.toString &amp;&amp;
+    /^\[object Object\]$/.test(Object.prototype.toString.call(x))
+  );
+}
+
+/**
+ * Returns the type of the provided value as a string.
+ *
+ * For `null` values, it returns `'null'`, and for objects, it returns a more detailed
+ * type such as `'[object Object]'`.
+ *
+ * @param {any} x - The value whose type is to be determined.
+ * @returns {string} A string representing the type of the value.
+ *
+ * @package
+ * @since    1.1.0
+ */
+function getType(x) {
+  return x === null
+    ? 'null' : typeof x === 'object'
+      ? Object.prototype.toString.call(x) : typeof x;
 }
 
 /**
@@ -459,15 +526,17 @@ class ProgressBar {
 
 
 module.exports = Object.freeze({
-  ROOTDIR, OUTDIR, LOGDIR,
+  ROOTDIR, OUTDIR, LOGDIR, YTMP3_HOMEDIR,
   logger,
   log: logger, // alias for `logger`
   isNullOrUndefined,
   isObject,
+  isPlainObject,
   createDirIfNotExist,
   createDirIfNotExistSync,
   createLogFile,
   dropNullAndUndefined,
+  getType,
   ProgressBar
 });
 </code></pre>
@@ -480,13 +549,13 @@ module.exports = Object.freeze({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 17:01:43 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>

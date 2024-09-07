@@ -26,7 +26,7 @@
     
 
 
-    <h3>ytmp3-js 1.1.0-beta</h3>
+    <h3>ytmp3-js 1.1.0</h3>
 
 
 
@@ -44,23 +44,41 @@
 
     <section>
         <article><h1>YTMP3-JS</h1>
+<div align="center">
+  <a href="https://ko-fi.com/dhefam31" target="_blank"><img height="50" src="https://storage.ko-fi.com/cdn/kofi1.png?v=3" alt="Buy Me a Coffee at ko-fi.com"></a>
+</div>
 <table>
-  <tr>
-    <th align="left"><b>ESLint</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img alt="ESLint" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg"></a></td>
-  </tr>
-  <tr>
-    <th align="left"><b>Unit Test</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img alt="Unit Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg"></a></td>
-  </tr>
-  <tr>
-    <th align="left"><b>IRL Test</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img alt="IRL Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg"></a></td>
-  </tr>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Lint</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg" alt="ESLint"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Unit Testing</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg" alt="Unit Test"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Integration Testing</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg" alt="IRL Test"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Code Coverage</strong></td>
+<td style="text-align:left"><a href="https://app.codecov.io/gh/mitsuki31/ytmp3-js"><img src="https://img.shields.io/codecov/c/gh/mitsuki31/ytmp3-js?style=for-the-badge&amp;logo=codecov&amp;logoColor=white&amp;label=Coverage&amp;labelColor=DF0200&amp;color=DDDDDD" alt="Code coverage in codecov.io"></a></td>
+</tr>
+</tbody>
 </table>
+<p><img src="https://img.shields.io/npm/l/ytmp3-js?logo=github&amp;logoColor=f9f9f9&amp;label=License&amp;labelColor=yellow&amp;color=white" alt="NPM License">
+<img src="https://img.shields.io/node/v/ytmp3-js?label=Node.js&amp;logo=node.js" alt="Min. Node">
+<img src="https://img.shields.io/npm/unpacked-size/ytmp3-js?label=Unpacked+size&amp;logo=npm" alt="NPM Unpacked Size"></p>
 <p><strong>YTMP3-JS</strong> is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the <a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a> module. The library also optionally converts these audio files into MP3 format.</p>
 <p>This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.</p>
-<p>All downloaded audio files are saved in the current directory (default behavior, can be overriden with <code>-o</code> CLI option), which is relative to the project's root directory. If the <a href="https://ffmpeg.org">FFmpeg</a> library is installed on your system, these files are optionally converted to MP3 format (use the <code>-C</code> option to enable the audio conversion behavior).</p>
+<p>All downloaded audio files are saved in the current directory (unless being overridden with <code>-o</code> CLI option), which is relative to the project's root directory. If the <a href="https://ffmpeg.org">FFmpeg</a> library is installed on your system, these files are optionally converted to MP3 format (use the <code>-C</code> option to enable the audio conversion behavior).</p>
 <blockquote>
 <p>[!WARNING]<br>
 This project uses <a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fluent-ffmpeg</code></a> to convert audio files to the desired codec, specifically MP3. Therefore, it requires the <a href="https://ffmpeg.org"><code>ffmpeg</code></a> library and its binaries to be installed on your system, along with any necessary encoding libraries such as <code>libmp3lame</code> for MP3 conversion.</p>
@@ -90,15 +108,15 @@ This project uses <a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fl
 <h3>Command Usage</h3>
 <pre class="prettyprint source lang-bash"><code>ytmp3 [options] [[URL ...] | [-f &lt;FILE>]]
 </code></pre>
+<h3>Command Line Options</h3>
+<p>For command-line options with detailed information, please refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options">Command-Line Options</a> wiki's page.</p>
 <h3>Example Usage</h3>
 <pre class="prettyprint source lang-bash"><code>ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
 </code></pre>
 <p>In above example, the code is trying to download audio from a single URL and convert it to <a href="https://en.wikipedia.org/wiki/FLAC">FLAC codec</a> with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to <code>/home/Music</code> directory.</p>
 <p>If you'd supplied only the <code>-C</code> (or <code>--convertAudio</code>) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior).
 But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
-<h3>Command Line Options</h3>
-<p>For command-line options with detailed information, please refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options">Command-Line Options</a> wiki page.</p>
-<h2>APIs</h2>
+<h2>Featured APIs</h2>
 <h3><code>singleDownload</code></h3>
 <pre class="prettyprint source lang-ts"><code>async function singleDownload(
   inputUrl: string | URL,
@@ -208,7 +226,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <h3><code>checkFfmpeg</code></h3>
 <pre class="prettyprint source lang-ts"><code>async function checkFfmpeg(verbose?: boolean = false): Promise&lt;boolean>
 </code></pre>
-<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~checkFfmpeg"><strong>[See the implementation]</strong></a></p>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~checkFfmpeg"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Checks whether the <code>ffmpeg</code> binary is installed on system or not.</p>
@@ -241,7 +259,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
   options?: ConvertAudioOptions = defaultOptions
 ): Promise&lt;void>
 </code></pre>
-<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~convertAudio"><strong>[See the implementation]</strong></a></p>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~convertAudio"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Converts an audio file to a specified format using the given options.</p>
@@ -274,6 +292,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <h3><code>extractVideoId</code></h3>
 <pre class="prettyprint source lang-ts"><code>function extractVideoId(url: string | URL): string
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.extractVideoId"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Extracts the YouTube video ID from given YouTube URL.</p>
@@ -311,6 +330,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <h3><code>validateUrl</code></h3>
 <pre class="prettyprint source lang-ts"><code>function validateUrl(url: string | URL, withId?: boolean = true): boolean
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateUrl"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Validates the given YouTube URL and optionally validates its video ID.</p>
@@ -344,6 +364,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <h3><code>validateId</code></h3>
 <pre class="prettyprint source lang-ts"><code>function validateId(id: string): boolean
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateId"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <h4>Parameters</h4>
@@ -366,6 +387,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <h4>Returns</h4>
 <p>Returns <code>true</code> if the given ID correctly represents the YouTube video ID; otherwise <code>false</code>.<br>
 <strong>Type:</strong> <code>boolean</code></p>
+</details>
 <hr>
 <p>Refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki#example-api-usages">Wiki's Homepage</a> for information on how to use APIs.</p>
 <h2>Acknowledgements</h2>
@@ -373,7 +395,7 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 <ul>
 <li><strong>(Outdated)</strong> <a href="https://www.npmjs.com/package/ytdl-core"><code>ytdl-core</code></a> - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.</li>
 <li><a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a> - DisTube fork of <code>ytdl-core</code>. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.</li>
-<li><a href="https://www.npmjs.com/package/fluent-ffmpeg">fluent-ffmpeg</a> - A library that fluents <code>ffmpeg</code> command-line usage, easy to use Node.js module.</li>
+<li>[<code>fluent-ffmpeg</code>] - A library that fluents <code>ffmpeg</code> command-line usage, easy to use Node.js module.</li>
 </ul>
 <p>Special thanks to the authors and contributors of these libraries for their valuable work.</p>
 <h2>Contribution</h2>
@@ -391,13 +413,13 @@ But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 17:01:43 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>
