@@ -12,7 +12,7 @@ module.exports = {
   plugins: [ 'plugins/markdown' ],
   source: {
     include: [ 'lib', 'config' ],
-    exclude: [ 'docs', 'node_modules' ],
+    exclude: [ 'docs', 'node_modules', 'config/example' ],
     includePattern: /.+\.[tj]s(doc|x)?$/,
     excludePattern: /(^|\/|\\)_/
   },
