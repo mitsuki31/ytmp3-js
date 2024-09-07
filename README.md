@@ -6,10 +6,14 @@
 
 |   |   |
 |:--|:--|
-| *Lint* | [![ESLint](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml) |
-| *Unit Testing* | [![Unit Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml) |
-| *Integration Testing* | [![IRL Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml) |
-| *Code Coverage* | [![Code coverage in codecov.io](https://img.shields.io/codecov/c/gh/mitsuki31/ytmp3-js?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage&labelColor=DF0200&color=DDDDDD)](https://app.codecov.io/gh/mitsuki31/ytmp3-js) |
+| **Lint** | [![ESLint](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml) |
+| **Unit Testing** | [![Unit Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml) |
+| **Integration Testing** | [![IRL Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml) |
+| **Code Coverage** | [![Code coverage in codecov.io](https://img.shields.io/codecov/c/gh/mitsuki31/ytmp3-js?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage&labelColor=DF0200&color=DDDDDD)](https://app.codecov.io/gh/mitsuki31/ytmp3-js) |
+
+![NPM License](https://img.shields.io/npm/l/ytmp3-js?logo=github&logoColor=f9f9f9&label=License&labelColor=yellow&color=white)
+![Min. Node](https://img.shields.io/node/v/ytmp3-js?label=Node.js&logo=node.js)
+![NPM Unpacked Size](https://img.shields.io/npm/unpacked-size/ytmp3-js?label=Unpacked+size&logo=npm)
 
 **YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
 
@@ -332,7 +336,7 @@ This project utilizes the following libraries and APIs:
 
 - **(Outdated)** [`ytdl-core`] - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.
 - [`@distube/ytdl-core`] - DisTube fork of `ytdl-core`. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.
-- [fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
+- [`fluent-ffmpeg`] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
 
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
