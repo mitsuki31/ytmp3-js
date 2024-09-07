@@ -28,6 +28,10 @@
 
 <header>
     
+        
+            
+        
+    
 </header>
 
 <article>
@@ -44,12 +48,26 @@ and optionally resolve the configuration file containing the download options
 and audio converter options (if defined). Before being resolved, the configuration
 file will be validated first and will throws a <code>TypeError</code> if any known
 configuration options has an invalid type, or throws a
-<a href="module-config-UnknownOptionError.html"><code><code>UnknownOptionError</code></code></a> if there
+<code><code>UnknownOptionError</code></code> if there
 is an unknown option defined within the configuration object (see the
 <a href="module-config.html#~KNOWN_OPTIONS"><code><code>KNOWN_OPTIONS</code></code></a>).</p></div>
         
 
         
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <dl class="details">
@@ -106,9 +124,25 @@ is an unknown option defined within the configuration object (see the
 </dl>
 
 
-        
-            <h3>Examples</h3>
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
         <p class="code-caption"> JSON Configuration File </p>
     
     <pre class="prettyprint"><code>{
@@ -152,6 +186,8 @@ is an unknown option defined within the configuration object (see the
   }
 }</code></pre>
 
+
+
         
     
     </div>
@@ -171,13 +207,6 @@ is an unknown option defined within the configuration object (see the
     
 
     
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></dt>
-            <dd></dd>
-        </dl>
-    
 
     
 
@@ -190,7 +219,7 @@ is an unknown option defined within the configuration object (see the
 
         
             
-<h4 class="name" id="~ERR_FORMAT"><span class="type-signature">(inner, constant) </span>ERR_FORMAT<span class="type-signature"></span></h4>
+<h4 class="name" id="~ERR_FORMAT"><span class="type-signature">(package, inner, constant) </span>ERR_FORMAT<span class="type-signature"> :string</span></h4>
 
 
 
@@ -204,6 +233,16 @@ of the configuration file.</p>
 </div>
 
 
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -246,7 +285,7 @@ of the configuration file.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line119">line 119</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -264,7 +303,7 @@ of the configuration file.</p>
 
         
             
-<h4 class="name" id="~KNOWN_CONFIG_EXTS"><span class="type-signature">(inner, constant) </span>KNOWN_CONFIG_EXTS<span class="type-signature"></span></h4>
+<h4 class="name" id="~KNOWN_CONFIG_EXTS"><span class="type-signature">(package, inner, constant) </span>KNOWN_CONFIG_EXTS<span class="type-signature"> :Readonly.&lt;Array.&lt;('.js'|'.mjs'|'.cjs'|'.json')>></span></h4>
 
 
 
@@ -274,6 +313,16 @@ of the configuration file.</p>
 </div>
 
 
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;('.js'|'.mjs'|'.cjs'|'.json')>></span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -316,7 +365,7 @@ of the configuration file.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line101">line 101</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line106">line 106</a>
     </li></ul></dd>
     
 
@@ -334,7 +383,7 @@ of the configuration file.</p>
 
         
             
-<h4 class="name" id="~KNOWN_OPTIONS"><span class="type-signature">(inner, constant) </span>KNOWN_OPTIONS<span class="type-signature"></span></h4>
+<h4 class="name" id="~KNOWN_OPTIONS"><span class="type-signature">(package, inner, constant) </span>KNOWN_OPTIONS<span class="type-signature"> :Readonly.&lt;Array.&lt;('downloadOptions'|'audioConverterOptions')>></span></h4>
 
 
 
@@ -344,6 +393,16 @@ of the configuration file.</p>
 </div>
 
 
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;('downloadOptions'|'audioConverterOptions')>></span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -386,7 +445,7 @@ of the configuration file.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line107">line 107</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line116">line 116</a>
     </li></ul></dd>
     
 
@@ -414,7 +473,280 @@ of the configuration file.</p>
     
 
     
-    <h4 class="name" id="~importConfig"><span class="type-signature">(inner) </span>importConfig<span class="signature">(file)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
+    <h4 class="name" id="~configChecker"><span class="type-signature">(package, inner) </span>configChecker<span class="signature">(params)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Checks the given configuration for validity.</p>
+<p>This function ensures that the configuration object adheres to the expected structure
+and types. It checks for unknown fields and validates the types of known options.
+Throws an error if there any known options is not object type or if there are
+unknown fields defined in the configuration.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The parameters for the function.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#YTMP3Config">YTMP3Config</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The configuration object to be checked.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The file path from which the config object was sourced,
+used for error reporting.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line204">line 204</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If any known options is not object type.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If there are unknown fields in the configuration.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="UnknownOptionError.html">UnknownOptionError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~importConfig"><span class="type-signature">(package, inner) </span>importConfig<span class="signature">(file<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
     
 
     
@@ -423,7 +755,7 @@ of the configuration file.</p>
 
 <div class="description">
     <p>An alias for <a href="module-config.html#~parseConfig"><code><code>parseConfig</code></code></a> function,
-with <code>resolve</code> argument is set to true.</p>
+with <code>resolve</code> parameter is set to <code>true</code>.</p>
 </div>
 
 
@@ -519,7 +851,7 @@ with <code>resolve</code> argument is set to true.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line332">line 332</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line333">line 333</a>
     </li></ul></dd>
     
 
@@ -529,7 +861,7 @@ with <code>resolve</code> argument is set to true.</p>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li><a href="module-config.html#~parseConfig"><code>`parseConfig`</code></a></li>
+            <li><a href="module-config.html#~parseConfig"><code>parseConfig</code></a></li>
         </ul>
     </dd>
     
@@ -586,7 +918,7 @@ with <code>resolve</code> argument is set to true.</p>
     
 
     
-    <h4 class="name" id="~parseConfig"><span class="type-signature">(inner) </span>parseConfig<span class="signature">(configFile<span class="signature-attributes">non-null</span>, resolve<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
+    <h4 class="name" id="~parseConfig"><span class="type-signature">(package, inner) </span>parseConfig<span class="signature">(configFile<span class="signature-attributes">non-null</span>, resolve<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
     
 
     
@@ -665,7 +997,7 @@ object. It also supports optional resolution of the configuration.</p>
                 </td>
             
 
-            <td class="description last"><p>The path or URL to the configuration file.</p></td>
+            <td class="description last"><p>A string path refers to the configuration file.</p></td>
         </tr>
 
     
@@ -749,7 +1081,7 @@ If set to <code>false</code>, will validate the configuration only.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line263">line 263</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -759,7 +1091,10 @@ If set to <code>false</code>, will validate the configuration only.</p></td>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li><a href="module-config.html#~resolveConfig"><code>`resolveConfig({ config, file</code></a>)`}</li>
+            <li><a href="module-config.html#~resolveConfig"><code>resolveConfig</code></a></li>
+        
+            <li><a href="module-config.html#~importConfig"><code>importConfig</code></a>
+         (alias for <code>parseConfig(config, true)</code>)</li>
         </ul>
     </dd>
     
@@ -898,7 +1233,7 @@ console.log(config);</code></pre>
     
 
     
-    <h4 class="name" id="~resolveConfig"><span class="type-signature">(inner) </span>resolveConfig<span class="signature">(params)</span><span class="type-signature"> &rarr; {<a href="global.html#DownloadOptions">DownloadOptions</a>}</span></h4>
+    <h4 class="name" id="~resolveConfig"><span class="type-signature">(package, inner) </span>resolveConfig<span class="signature">(params)</span><span class="type-signature"> &rarr; {<a href="global.html#DownloadOptions">DownloadOptions</a>}</span></h4>
     
 
     
@@ -1079,7 +1414,7 @@ used for error reporting.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="config.js.html">config.js</a>, <a href="config.js.html#line152">line 152</a>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -1177,13 +1512,13 @@ options if provided.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>

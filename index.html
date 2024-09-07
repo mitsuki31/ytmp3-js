@@ -26,7 +26,7 @@
     
 
 
-    <h3>ytmp3-js 1.0.0</h3>
+    <h3>ytmp3-js 1.1.0-beta</h3>
 
 
 
@@ -44,6 +44,20 @@
 
     <section>
         <article><h1>YTMP3-JS</h1>
+<table>
+  <tr>
+    <th align="left"><b>ESLint</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img alt="ESLint" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg"></a></td>
+  </tr>
+  <tr>
+    <th align="left"><b>Unit Test</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img alt="Unit Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg"></a></td>
+  </tr>
+  <tr>
+    <th align="left"><b>IRL Test</b></th>
+    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img alt="IRL Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg"></a></td>
+  </tr>
+</table>
 <p><strong>YTMP3-JS</strong> is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the <a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a> module. The library also optionally converts these audio files into MP3 format.</p>
 <p>This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.</p>
 <p>All downloaded audio files are saved in the current directory (default behavior, can be overriden with <code>-o</code> CLI option), which is relative to the project's root directory. If the <a href="https://ffmpeg.org">FFmpeg</a> library is installed on your system, these files are optionally converted to MP3 format (use the <code>-C</code> option to enable the audio conversion behavior).</p>
@@ -52,10 +66,24 @@
 This project uses <a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fluent-ffmpeg</code></a> to convert audio files to the desired codec, specifically MP3. Therefore, it requires the <a href="https://ffmpeg.org"><code>ffmpeg</code></a> library and its binaries to be installed on your system, along with any necessary encoding libraries such as <code>libmp3lame</code> for MP3 conversion.</p>
 <p>However, don't worry if your system does not have <a href="https://ffmpeg.org"><code>ffmpeg</code></a> installed. The download process will not fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in <a href="https://en.wikipedia.org/wiki/Advanced_Audio_Coding">AAC (Advanced Audio Coding)</a> format with a <code>.m4a</code> extension.</p>
 </blockquote>
+<h2>Features</h2>
+<ul>
+<li>Download a YouTube single audio or multiple audios and save them to your device with ease and uncomplicated command-line usage.</li>
+<li>Support batch download using a file containing a list of YouTube URLs (per line).</li>
+<li>Provide a simple and minimal Node.js library for programmatic use.</li>
+<li>Easy and automatic conversion of downloaded audio files to specific encoding and format as per your preferences (requires FFmpeg).</li>
+</ul>
+<h2>Disadvantages</h2>
+<ul>
+<li>Unable to continue downloading bytes from the last downloaded bytes.</li>
+<li>Doesn't support downloading a YouTube playlist.</li>
+<li>The lack of APIs makes it difficult to integrate them into complex website or bot projects.</li>
+</ul>
 <h2>Getting Started</h2>
 <h3>Installation</h3>
 <pre class="prettyprint source lang-bash"><code>npm i -g ytmp3-js
 </code></pre>
+<hr>
 <p>If you've downloaded package from the release asset, you may use local installation like this:</p>
 <pre class="prettyprint source lang-bash"><code>npm i -g /path/to/ytmp3-js.&lt;VERSION>.tgz
 </code></pre>
@@ -66,133 +94,18 @@ This project uses <a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fl
 <pre class="prettyprint source lang-bash"><code>ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
 </code></pre>
 <p>In above example, the code is trying to download audio from a single URL and convert it to <a href="https://en.wikipedia.org/wiki/FLAC">FLAC codec</a> with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to <code>/home/Music</code> directory.</p>
-<h3>Options</h3>
-<h4>Download Options</h4>
-<table>
-<thead>
-<tr>
-<th>Option Name</th>
-<th style="text-align:center">Accepts</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--cwd</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Set the current working directory to specified directory, used to resolve the <code>outDir</code> path. Defaults to the current directory.</td>
-</tr>
-<tr>
-<td><code>-f</code> | <code>--file</code> | <code>--batch</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Path to a file containing a list of YouTube URLs for batch downloading.</td>
-</tr>
-<tr>
-<td><code>-c</code> | <code>--config</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Path to a configuration file containing the <code>downloadOptions</code> object to configure both the download options and audio converter options.</td>
-</tr>
-<tr>
-<td><code>-o</code> | <code>--outDir</code> | <code>--out-dir</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Specify the output directory for downloaded files. Defaults to the current directory.</td>
-</tr>
-<tr>
-<td><code>-C</code> | <code>--convertAudio</code> | <code>--convert-audio</code></td>
-<td style="text-align:center">-</td>
-<td>Enable audio conversion to a specific format (requires <a href="https://ffmpeg.org">FFmpeg</a>).</td>
-</tr>
-<tr>
-<td><code>-q</code> | <code>--quiet</code></td>
-<td style="text-align:center">-</td>
-<td>Suppress all output messages. Use it twice (<code>-qq</code>) to also suppress the audio conversion progress.</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>[!NOTE]<br>
-When using the <code>-c</code> or <code>--config</code> option to specify a configuration file, any changes made to specific options on the command line
-will override the corresponding options in the configuration file. This means that the modified options in the configuration file
-will be overridden with the values set from the command line.</p>
-</blockquote>
-<h4>Audio Converter Options</h4>
-<table>
-<thead>
-<tr>
-<th>Option Name</th>
-<th style="text-align:center">Accepts</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--format</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Convert the audio to the specified format.</td>
-</tr>
-<tr>
-<td><code>--codec</code> | <code>--encoding</code></td>
-<td style="text-align:center"><code>string</code></td>
-<td>Specify the codec for the converted audio.</td>
-</tr>
-<tr>
-<td><code>--bitrate</code></td>
-<td style="text-align:center"><code>int</code> | <code>string</code></td>
-<td>Set the bitrate for the converted audio in kbps.</td>
-</tr>
-<tr>
-<td><code>--freq</code> | <code>--frequency</code></td>
-<td style="text-align:center"><code>int</code></td>
-<td>Set the audio sampling frequency for the converted audio in Hertz (Hz).</td>
-</tr>
-<tr>
-<td><code>--channels</code></td>
-<td style="text-align:center"><code>int</code></td>
-<td>Specify the audio channels for the converted audio.</td>
-</tr>
-<tr>
-<td><code>--deleteOld</code> | <code>--delete-old</code> | <code>--overwrite</code></td>
-<td style="text-align:center">-</td>
-<td>Delete the old audio file after the audio conversion is done.</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>[!NOTE]<br>
-All audio converter options above requires the audio conversion behavior to be enabled first -- enable it using <code>-C</code> or <code>--convertAudio</code> option --
-otherwise, the specified values from these options will be ignored.</p>
-</blockquote>
-<h4>Miscellaneous Options</h4>
-<table>
-<thead>
-<tr>
-<th>Option Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>-h</code> | <code>-?</code> | <code>--help</code></td>
-<td>Display the help message and exit.</td>
-</tr>
-<tr>
-<td><code>-V</code> | <code>--version</code></td>
-<td>Display the module version and exit. Use it twice (<code>-VV</code>) to also display all dependencies' version (not including <code>devDependencies</code>).</td>
-</tr>
-<tr>
-<td><code>--copyright</code></td>
-<td>Display the copyright information and exit.</td>
-</tr>
-<tr>
-<td><code>--print-config</code></td>
-<td>Display the configuration options that being used and exit. Very useful for debugging.</td>
-</tr>
-</tbody>
-</table>
+<p>If you'd supplied only the <code>-C</code> (or <code>--convertAudio</code>) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior).
+But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
+<h3>Command Line Options</h3>
+<p>For command-line options with detailed information, please refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options">Command-Line Options</a> wiki page.</p>
 <h2>APIs</h2>
 <h3><code>singleDownload</code></h3>
-<pre class="prettyprint source lang-ts"><code>async function singleDownload(inputUrl: string | URL): Promise&lt;string>
+<pre class="prettyprint source lang-ts"><code>async function singleDownload(
+  inputUrl: string | URL,
+  downloadOptions?: DownloadOptions | Object
+): Promise&lt;string>
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~singleDownload"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Downloads audio from a single YouTube URL and saves it to the output directory (change the output directory with <code>-o</code> or <code>--outDir</code> option).</p>
@@ -211,6 +124,11 @@ otherwise, the specified values from these options will be ignored.</p>
 <td><code>string | URL</code></td>
 <td>The URL of the YouTube video to download audio from.</td>
 </tr>
+<tr>
+<td><code>downloadOptions</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions"><code>DownloadOptions</code></a> | <code>Object</code></td>
+<td>Options to configure the download process. If not specified, it will automatically uses default options.</td>
+</tr>
 </tbody>
 </table>
 <h4>Returns</h4>
@@ -219,8 +137,12 @@ otherwise, the specified values from these options will be ignored.</p>
 </details>
 <hr>
 <h3><code>batchDownload</code></h3>
-<pre class="prettyprint source lang-ts"><code>async function batchDownload(inputFile: string): Promise&lt;string[]>
+<pre class="prettyprint source lang-ts"><code>async function batchDownload(
+  inputFile: string,
+  downloadOptions?: DownloadOptions | Object
+): Promise&lt;string[]>
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~batchDownload"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Downloads audio from a file containing YouTube URLs and saves them to the output directory (change the output directory with <code>-o</code> or <code>--outDir</code> option).</p>
@@ -239,6 +161,11 @@ otherwise, the specified values from these options will be ignored.</p>
 <td><code>string</code></td>
 <td>The path to the file containing YouTube URLs.</td>
 </tr>
+<tr>
+<td><code>downloadOptions</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions"><code>DownloadOptions</code></a> | <code>Object</code></td>
+<td>Options to configure the download process. If not specified, it will automatically uses default options.</td>
+</tr>
 </tbody>
 </table>
 <h4>Returns</h4>
@@ -247,8 +174,11 @@ otherwise, the specified values from these options will be ignored.</p>
 </details>
 <hr>
 <h3><code>getVideosInfo</code></h3>
-<pre class="prettyprint source lang-ts"><code>async function getVideosInfo(...urls: ...(string | URL)): Promise&lt;import('@distube/ytdl-core').videoInfo[]>
+<pre class="prettyprint source lang-ts"><code>async function getVideosInfo(
+  ...urls: string | URL
+): Promise&lt;import('@distube/ytdl-core').videoInfo[]>
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~getVideosInfo"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Retrieves information for multiple YouTube videos sequentially.</p>
@@ -264,8 +194,8 @@ otherwise, the specified values from these options will be ignored.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>urls</code></td>
-<td><code>...(string | URL)</code></td>
+<td><code>...urls</code></td>
+<td><code>string | URL</code></td>
 <td>The YouTube video URLs to fetch information for. Each URL can be either a string or a URL object.</td>
 </tr>
 </tbody>
@@ -278,6 +208,7 @@ otherwise, the specified values from these options will be ignored.</p>
 <h3><code>checkFfmpeg</code></h3>
 <pre class="prettyprint source lang-ts"><code>async function checkFfmpeg(verbose?: boolean = false): Promise&lt;boolean>
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~checkFfmpeg"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Checks whether the <code>ffmpeg</code> binary is installed on system or not.</p>
@@ -300,7 +231,8 @@ otherwise, the specified values from these options will be ignored.</p>
 </tbody>
 </table>
 <h4>Returns</h4>
-<p>A promise that resolves to a boolean value, <code>true</code> if the <code>ffmpeg</code> binary installed on system; otherwise, <code>false</code>.</p>
+<p>A promise that resolves to a boolean value, <code>true</code> if the <code>ffmpeg</code> binary installed on system; otherwise, <code>false</code>.<br>
+<strong>Type:</strong> <code>boolean</code></p>
 </details>
 <hr>
 <h3><code>convertAudio</code></h3>
@@ -309,6 +241,7 @@ otherwise, the specified values from these options will be ignored.</p>
   options?: ConvertAudioOptions = defaultOptions
 ): Promise&lt;void>
 </code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~convertAudio"><strong>[See the implementation]</strong></a></p>
 <details>
 <summary>API Details</summary>
 <p>Converts an audio file to a specified format using the given options.</p>
@@ -331,50 +264,110 @@ otherwise, the specified values from these options will be ignored.</p>
 </tr>
 <tr>
 <td><code>options</code></td>
-<td><code>ConvertAudioOptions | undefined</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/global.html#ConvertAudioOptions"><code>ConvertAudioOptions</code></a> | <code>undefined</code></td>
 <td>Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format.</td>
 </tr>
 </tbody>
 </table>
 </details>
 <hr>
-<h3>API Usage</h3>
-<p>Download audio from a single YouTube URL:</p>
-<pre class="prettyprint source lang-js"><code>const ytmp3 = require('ytmp3-js');
-const url = 'https://youtu.be/abcdefg'
-
-ytmp3.singleDownload(url)
-  .then(outFile => console.log(outFile))
-  .catch(err => console.error(err));
+<h3><code>extractVideoId</code></h3>
+<pre class="prettyprint source lang-ts"><code>function extractVideoId(url: string | URL): string
 </code></pre>
+<details>
+<summary>API Details</summary>
+<p>Extracts the YouTube video ID from given YouTube URL.</p>
+<p>The YouTube video ID have exactly 11 characters with allowed symbols are <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code>, and <code>-</code>.</p>
+<p>Allowed YouTube domains to extract:</p>
+<ul>
+<li><code>www.youtube.com</code></li>
+<li><code>m.youtube.com</code></li>
+<li><code>youtube.com</code></li>
+<li><code>youtu.be</code></li>
+<li><code>music.youtube.com</code></li>
+</ul>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>string | URL</code></td>
+<td>The URL to evaluate.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>A string with 11 characters representing the video ID.<br>
+<strong>Type:</strong> <code>string</code></p>
+</details>
 <hr>
-<p>Download audios from a bunch of YouTube URLs within a file:</p>
-<pre class="prettyprint source lang-js"><code>const ytmp3 = require('ytmp3-js');
-const batchFile = 'path/to/myurls.txt';
-
-ytmp3.batchDownload(batchFile)
-  .then(outFiles => console.log(outFiles))
-  .catch(err => console.error(err));
+<h3><code>validateUrl</code></h3>
+<pre class="prettyprint source lang-ts"><code>function validateUrl(url: string | URL, withId?: boolean = true): boolean
 </code></pre>
+<details>
+<summary>API Details</summary>
+<p>Validates the given YouTube URL and optionally validates its video ID.</p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>string | URL</code></td>
+<td>The URL to validate.</td>
+</tr>
+<tr>
+<td><code>withId</code></td>
+<td><code>boolean</code></td>
+<td>Whether to also validate the video ID within the URL. If <code>false</code>, the function will only validate the URL's domain name. Defaults to <code>true</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>Returns <code>true</code> if the given URL is a valid YouTube URL; otherwise <code>false</code>.<br>
+<strong>Type:</strong> <code>boolean</code></p>
+</details>
 <hr>
-<p>Download multiple URLs from an array:</p>
-<pre class="prettyprint source lang-js"><code>const ytmp3 = require('ytmp3-js');
-const urls = [
-  'https://music.youtube.com/watch?v=abcdefg'
-  'https://youtube.com/watch?v=abcd1234'
-  // ... and more
-];
-
-(async () => {
-  // Iterate over the array of URL using for-loop
-  // Use this iteration to ensure the download processes
-  // runs sequentially instead of parallel
-  for (const url of urls) {
-    const outFile = await singleDownload(url);
-    console.log('Downloaded:', outFile);
-  }
-})();
+<h3><code>validateId</code></h3>
+<pre class="prettyprint source lang-ts"><code>function validateId(id: string): boolean
 </code></pre>
+<details>
+<summary>API Details</summary>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>string</code></td>
+<td>The video ID to validate.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>Returns <code>true</code> if the given ID correctly represents the YouTube video ID; otherwise <code>false</code>.<br>
+<strong>Type:</strong> <code>boolean</code></p>
+<hr>
+<p>Refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki#example-api-usages">Wiki's Homepage</a> for information on how to use APIs.</p>
 <h2>Acknowledgements</h2>
 <p>This project utilizes the following libraries and APIs:</p>
 <ul>
@@ -398,13 +391,13 @@ const urls = [
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>

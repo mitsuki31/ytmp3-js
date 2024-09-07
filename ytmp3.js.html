@@ -58,10 +58,10 @@
  *   .catch(err => console.error('Download failed:', err));
  *
  * @module    ytmp3
- * @version   1.0.0
+ * @version   1.1.0
  * @requires  audioconv
  * @requires  utils
- * @requires  yt-urlfmt
+ * @requires  url-utils
  * @author    Ryuu Mitsuki (https://github.com/mitsuki31)
  * @license   MIT
  * @since     1.0.0
@@ -83,14 +83,16 @@ const {
   LOGDIR,
   logger: log,
   ProgressBar,
-  createDirIfNotExist
+  createDirIfNotExist,
+  createDirIfNotExistSync,
+  createLogFile
 } = require('./utils');
 const {
   checkFfmpeg,
   convertAudio,
   defaultOptions: defaultAudioConvOptions
 } = require('./audioconv');
-const { VIDEO: VIDEO_URL } = require('./yt-urlfmt');
+const URLUtils = require('./url-utils');
 
 /**
  * The video information object.
@@ -143,22 +145,48 @@ const { VIDEO: VIDEO_URL } = require('./yt-urlfmt');
  * @since   1.0.0
  */
 
+
+// region Constants
+
 /**
- * The library version.
+ * The library name.
  * @constant
  * @default
  * @public
  */
-const VERSION = '1.0.0';
+const NAME = 'ytmp3';
+
+/**
+ * The library version.
+ * @constant
+ * @public
+ */
+const VERSION = require('../package.json').version;
+
+/**
+ * The library version information in a frozen object.
+ *
+ * @property {number} major - The major version number.
+ * @property {number} minor - The minor version number.
+ * @property {number} patch - The patch version number.
+ * @property {string} build - The build information of current version (i.e., stable).
+ *
+ * @readonly
+ * @public
+ * @since    1.1.0
+ */
+const VERSION_INFO = (() => {
+  const [ major, minor, patch, build ] = VERSION.split(/[.-]/g);
+  return Object.freeze({
+    major: Number.parseInt(major),
+    minor: Number.parseInt(minor),
+    patch: Number.parseInt(patch),
+    build: !build ? 'stable' : build });
+})();
+delete VERSION_INFO.prototype;
 
 // Prevent the 'ytdl-core' module to check updates
 Object.assign(process.env, { YTDL_NO_UPDATE: true });
-
-const FrozenProperty = {
-  writable: false,
-  configurable: false,
-  enumerable: true
-};
 
 /**
  * The audio format options for the `ytdl.downloadFromInfo()` function.
@@ -172,6 +200,9 @@ const AUDIO_FMT_OPTIONS = {
 };
 
 
+// region Helpers
+
+
 /**
  * Validates a YouTube URL.
  *
@@ -183,7 +214,7 @@ const AUDIO_FMT_OPTIONS = {
  * @throws {TypeError}          If the URL is not a string nor an instance of `URL`.
  * @throws {Error}              If the input URL is not valid.
  *
- * @private
+ * @package
  * @since  1.0.0
  */
 function validateYTURL(url, verbose=false) {
@@ -191,17 +222,14 @@ function validateYTURL(url, verbose=false) {
     throw new TypeError(`Invalid type of URL: ${typeof url}`);
   }
 
-  // Test that the given URL is valid and extract it
-  url = ((typeof url === 'string') ? (new URL(url)) : url).href;
+  // Parse the given URL string
+  url = (typeof url === 'string') ? new URL(url) : url;
 
-  verbose &amp;&amp; process.stdout.write(
-    `${log.INFO_PREFIX} Validating URL, please wait...`);
-  if (VIDEO_URL.test(url) || ytdl.validateURL(url)) {
-    verbose &amp;&amp; process.stdout.write(
-      `\n${log.DONE_PREFIX} \x1b[92m\u2714\x1b[0m URL is valid\n`);
+  verbose &amp;&amp; log.info('Validating URL, please wait...');
+  if (URLUtils.validateUrl(url)) {
+    verbose &amp;&amp; log.done('\x1b[92m\u2714\x1b[0m URL is valid');
   } else {
-    verbose &amp;&amp; process.stderr.write(
-      `\n${log.ERROR_PREFIX} \x1b[91m\u2716\x1b[0m URL is invalid\n`);
+    verbose &amp;&amp; log.error('\x1b[91m\u2716\x1b[0m URL is invalid');
     throw new Error('Invalid URL: ' + url);
   }
 }
@@ -225,7 +253,7 @@ function validateYTURL(url, verbose=false) {
  * @throws {TypeError} If the given argument is non-null, but also not an object type.
  *                     And if any of the options have incorrect type.
  *
- * @private
+ * @public
  * @since    1.0.0
  */
 function resolveDlOptions({ downloadOptions }) {
@@ -325,6 +353,8 @@ function resolveDlOptions({ downloadOptions }) {
 }
 
 
+// region Core Functions
+
 
 /**
  * Retrieves information for multiple YouTube videos sequentially.
@@ -363,14 +393,19 @@ async function getVideosInfo(...urls) {
 
   for (let url of urls) {
     url = (url instanceof URL) ? url.href : url?.trim();
-    if (!ytdl.validateURL(url)) throw new Error(`Invalid URL: ${url}`);
+    if (!URLUtils.validateUrl(url)) throw new URIError(`Invalid URL: ${url}`);
     results.push((await ytdl.getInfo(url)));
   }
   return results;
 }
 
 /**
- * Writes an error message to a specific log file.
+ * Writes error details and associated video information to a log file.
+ * 
+ * This function creates or appends to a log file in the {@link module:utils~LOGDIR `LOGDIR`}
+ * directory, logging the error message along with relevant video data. If the log file is empty
+ * after writing, it will be deleted, and the function returns `false`. Otherwise, it 
+ * returns `true` to indicate successful logging.
  *
  * The error message is written to the log file in the following format:
  *
@@ -384,34 +419,47 @@ async function getVideosInfo(...urls) {
  * ---------------------------------------------
  * ```
  *
- * Immediately return if the given log file name is invalid. The error log
- * will be in the {@link module:utils~LOGDIR LOGDIR} directory.
+ * Immediately return `false` if the given log file name is invalid. The error log
+ * will be in the {@link module:utils~LOGDIR `LOGDIR`} directory.
  *
- * @param {string} logfile - The log file name without the path.
- * @param {VideoData} videoData - The video information to write to the log file.
+ * @param {string} logfile - The name of the log file where the error details should be written.
+ * @param {VideoData | Object} videoData - An object containing information about the video associated
+ *                                         with the error.
  * @param {Error} [error] - The error object, optional. If not provided,
  *                          an error message will be `'Unknown error'`.
  *
+ * @returns {Promise&lt;boolean>} A promise that resolves to `true` if the log was written
+ *                             successfully, otherwise `false`.
+ *
  * @async
- * @private
+ * @package
  * @since  1.0.0
  */
-async function writeLogError(logfile, videoData, error) {
-  if (!logfile || typeof logfile !== 'string') return;
+async function writeErrorLog(logfile, videoData, error) {
+  if (!logfile || typeof logfile !== 'string') return false;
 
   logfile = path.join(LOGDIR, path.basename(logfile));
-  await createDirIfNotExist(LOGDIR);
+  createDirIfNotExistSync(LOGDIR);
 
-  const logStream = fs.createWriteStream(logfile, { flags: 'a+', flush: true });
+  return new Promise((resolve, reject) => {
+    const logStream = fs.createWriteStream(logfile, { flags: 'a+', flush: true });
+  
+    // Write the necessary video information to the log file
+    logStream.write(`[ERROR] ${error?.message || 'Unknown error'}${os.EOL}`);
+    logStream.write(`   Title: ${videoData.title}${os.EOL}`);
+    logStream.write(`   Author: ${videoData.author}${os.EOL}`);
+    logStream.write(`   Channel ID: ${videoData.channelId}${os.EOL}`);
+    logStream.write(`   Viewers: ${videoData.viewers}${os.EOL}`);
+    logStream.write(`   URL: ${videoData.videoUrl}${os.EOL}`);
+    logStream.write(`---------------------------------------------${os.EOL}`);
+    logStream.end(os.EOL);
 
-  // Write the necessary video information to the log file
-  logStream.write(`[ERROR] ${error?.message || 'Unknown error'}${os.EOL}`);
-  logStream.write(`   Title: ${videoData.title}${os.EOL}`);
-  logStream.write(`   Author: ${videoData.author}${os.EOL}`);
-  logStream.write(`   Channel ID: ${videoData.channelId}${os.EOL}`);
-  logStream.write(`   Viewers: ${videoData.viewers}${os.EOL}`);
-  logStream.write(`   URL: ${videoData.videoUrl}${os.EOL}`);
-  logStream.write(`---------------------------------------------${os.EOL}${os.EOL}`);
+    logStream.on('finish', () => resolve(true));
+    logStream.on('error', (err) => {
+      if (!logStream.destroyed) logStream.destroy();
+      reject(err);
+    });
+  });
 }
 
 
@@ -425,7 +473,7 @@ async function writeLogError(logfile, videoData, error) {
  *
  * @async
  * @generator
- * @private
+ * @package
  * @since   1.0.0
  */
 async function* downloadAudio(...urls) {
@@ -464,18 +512,6 @@ async function* downloadAudio(...urls) {
   }
 }
 
-/**
- * Creates the error log file, prefixed with `'ytmp3Error'`.
- *
- * @return {string} The created error log file.
- * @private
- * @since  1.0.0
- */
-function createLogFile() {
-  return `ytmp3Error-${
-    (new Date()).toISOString().split('.')[0].replace(/:/g, '.')}.log`;
-}
-
 
 /**
  * 
@@ -488,7 +524,7 @@ function createLogFile() {
  * @param {boolean} verbose - Whether to display progress bar and error message to the terminal or not.
  *
  * @async
- * @private
+ * @package
  * @since  1.0.0
  */
 async function downloadHandler(readable, data, verbose=false) {
@@ -504,14 +540,12 @@ async function downloadHandler(readable, data, verbose=false) {
         verbose &amp;&amp; log.done(`Download finished: \x1b[93m${data.videoData.title}\x1b[0m`);
         resolve();
       })
-      .on('error', async (err) => {
+      .on('error', (err) => {
         verbose &amp;&amp; log.error(`Download failed: ${data.videoData.title}`);
 
         // Close the output stream if it's still open
         data.outStream.closed || data.outStream.close();
-
-        await writeLogError(data.errLogFile, data.videoData, err);
-        reject(err);
+        writeErrorLog(data.errLogFile, data.videoData, err).then(() => reject(err));
       })
       .pipe(data.outStream);
   });
@@ -599,6 +633,7 @@ async function singleDownload(inputUrl, downloadOptions) {
       } catch (err) {
         if (!quiet) {
           log.error(err.message);
+          console.error(err.stack);
           log.warn('Skipping audio conversion for this file');
         }
       }
@@ -698,9 +733,14 @@ async function batchDownload(inputFile, downloadOptions) {
         errLogFile, progressBar
       }, !quiet);
       successDownloads.push(outFile);
+    /* eslint-disable-next-line no-unused-vars
+       ---
+       In this case, we don't need to do anything with the error,
+       just continue the downloads and brief the download errors
+       to user on the download summary afterwards */
     } catch (_err) {
       failedDownloads.push(outFile);
-      // * Do not throw, continue download any remaining audios
+      // * Do not throw, continue download remaining audios if any
     }
   }
 
@@ -747,23 +787,19 @@ async function batchDownload(inputFile, downloadOptions) {
   return successDownloads;
 }
 
-
-
-//==-----------------------==//
-//---===== [EXPORTS] =====---//
-//==-----------------------==//
-
-const ytmp3 = Object.create(null, {
-  ProgressBar: { value: ProgressBar, ...FrozenProperty },
-  resolveDlOptions: { value: resolveDlOptions, ...FrozenProperty },
-  getVideosInfo: { value: getVideosInfo, ...FrozenProperty },
-  singleDownload: { value: singleDownload, ...FrozenProperty },
-  batchDownload: { value: batchDownload, ...FrozenProperty },
-  name: { value: 'ytmp3', ...FrozenProperty },
-  version: { value: VERSION, ...FrozenProperty },
+module.exports = Object.freeze({
+  NAME,
+  VERSION,
+  VERSION_INFO,
+  validateYTURL,
+  resolveDlOptions,
+  downloadAudio,
+  downloadHandler,
+  getVideosInfo,
+  writeErrorLog,
+  singleDownload,
+  batchDownload
 });
-
-module.exports = Object.freeze(ytmp3);
 </code></pre>
         </article>
     </section>
@@ -774,13 +810,13 @@ module.exports = Object.freeze(ytmp3);
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>

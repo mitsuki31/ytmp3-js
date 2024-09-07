@@ -89,6 +89,7 @@ const path = require('node:path');
  * @since    1.0.0
  */
 
+// region Constants
 
 const FrozenProperty = {
   writable: false,
@@ -96,13 +97,29 @@ const FrozenProperty = {
   enumerable: true
 };
 
-/** The root directory of the project. */
+/**
+ * The root directory of the project.
+ * @since  1.0.0
+ */
 const ROOTDIR = path.join(__dirname, '..');
-/** The output directory for the downloaded audio files. */
+/**
+ * The output directory for the downloaded audio files.
+ * @since  1.0.0
+ */
 const OUTDIR = path.join(ROOTDIR, 'download');
-/** The log directory for the download error logs. */
+/**
+ * The log directory for error logs.
+ *
+ * Basically, the log directory is set to:
+ *   - **POSIX**: `$HOME/.ytmp3-js/logs`
+ *   - **Windows**: `%USERPROFILE%\.ytmp3-js\logs`
+ *
+ * @since  1.0.0
+ */
 const LOGDIR = path.join(os.homedir(), '.ytmp3-js', 'logs');
 
+
+// region Utilities Function
 
 /**
  * Synchronously checks whether the specified directory path is exist,
@@ -116,15 +133,34 @@ const LOGDIR = path.join(os.homedir(), '.ytmp3-js', 'logs');
  * @since  1.0.0
  */
 async function createDirIfNotExist(dirpath) {
-  if (!fs.existsSync(dirpath)) await fs.promises.mkdir(dirpath);
+  if (!fs.existsSync(dirpath)) await fs.promises.mkdir(dirpath, { recursive: true });
 }
 
 /**
- * **Logger Namespace**
- * @namespace module:utils~Logger
+ * Similar with {@link module:utils~createDirIfNotExist `createDirIfNotExist`}
+ * function, but it uses synchronous directory creation.
+ *
  * @public
+ * @since 1.0.1
+ */
+function createDirIfNotExistSync(dirpath) {
+  if (!fs.existsSync(dirpath)) fs.mkdirSync(dirpath, { recursive: true });
+}
+
+/**
+ * Creates the error log file with the specified prefix.
+ * If the prefix is not specified, it will use `'ytmp3Error'` as the prefix.
+ *
+ * @param {string} [prefix='ytmp3Error'] - The prefix of the error log file.
+ *
+ * @return {string} The created error log file.
+ * @private
  * @since  1.0.0
  */
+function createLogFile(prefix) {
+  return `${prefix || 'ytmp3Error'}-${
+    (new Date()).toISOString().split('.')[0].replace(/:/g, '.')}.log`;
+}
 
 /**
  * Checks if a given value is null or undefined.
@@ -160,6 +196,13 @@ function isObject(x) {
     &amp;&amp; typeof x === 'object'
   );
 }
+
+/**
+ * **Logger Namespace**
+ * @namespace module:utils~Logger
+ * @public
+ * @since  1.0.0
+ */
 
 /**
  * A custom logger object for the **YTMP3** project with ANSI color codes.
@@ -277,6 +320,24 @@ Object.defineProperties(logger, {
   }
 });
 
+/**
+ * Drops null and undefined values from the input object.
+ *
+ * @param {Object} obj - The input object to filter null and undefined values from.
+ * @return {Object} The filtered object without null and undefined values.
+ *
+ * @public
+ * @since  1.0.0
+ */
+function dropNullAndUndefined(obj) {
+  return Object.keys(obj).reduce((acc, key) => {
+    if (!isNullOrUndefined(obj[key])) acc[key] = obj[key];
+    return acc;
+  }, {});
+}
+
+
+// region Utilities Class
 
 class ProgressBar {
   /**
@@ -397,31 +458,17 @@ class ProgressBar {
 }
 
 
-/**
- * Drops null and undefined values from the input object.
- *
- * @param {Object} obj - The input object to filter null and undefined values from.
- * @return {Object} The filtered object without null and undefined values.
- *
- * @public
- * @since  1.0.0
- */
-function dropNullAndUndefined(obj) {
-  return Object.keys(obj).reduce((acc, key) => {
-    if (!isNullOrUndefined(obj[key])) acc[key] = obj[key];
-    return acc;
-  }, {});
-}
-
-
 module.exports = Object.freeze({
   ROOTDIR, OUTDIR, LOGDIR,
   logger,
+  log: logger, // alias for `logger`
   isNullOrUndefined,
   isObject,
-  ProgressBar,
   createDirIfNotExist,
-  dropNullAndUndefined
+  createDirIfNotExistSync,
+  createLogFile,
+  dropNullAndUndefined,
+  ProgressBar
 });
 </code></pre>
         </article>
@@ -433,13 +480,13 @@ module.exports = Object.freeze({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -28,6 +28,10 @@
 
 <header>
     
+        
+            
+        
+    
 </header>
 
 <article>
@@ -47,13 +51,27 @@ Or if you want to download a bunch of YouTube videos, first you need to store al
         
 
         
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <dl class="details">
 
     
     <dt class="tag-version">Version:</dt>
-    <dd class="tag-version"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    <dd class="tag-version"><ul class="dummy"><li>1.1.0</li></ul></dd>
     
 
     
@@ -106,9 +124,25 @@ Or if you want to download a bunch of YouTube videos, first you need to store al
 </dl>
 
 
-        
-            <h3>Examples</h3>
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
         <p class="code-caption"> Download a single YouTube video </p>
     
     <pre class="prettyprint"><code>const ytmp3 = require('ytmp3-js');
@@ -127,6 +161,8 @@ ytmp3.batchDownload('./urls.txt')
   })
   .catch(err => console.error('Download failed:', err));</code></pre>
 
+
+
         
     
     </div>
@@ -141,7 +177,7 @@ ytmp3.batchDownload('./urls.txt')
         
             <li><a href="module-utils.html">module:utils</a></li>
         
-            <li><a href="module-yt-urlfmt.html">module:yt-urlfmt</a></li>
+            <li><a href="module-url-utils.html">module:url-utils</a></li>
         </ul>
     
 
@@ -155,6 +191,73 @@ ytmp3.batchDownload('./urls.txt')
 
     
         <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~NAME"><span class="type-signature">(inner, constant) </span>NAME<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The library name.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>ytmp3</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line129">line 129</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
 
         
             
@@ -198,16 +301,197 @@ ytmp3.batchDownload('./urls.txt')
     
 
     
-    <dt class="tag-default">Default Value:</dt>
-    <dd class="tag-default"><ul class="dummy">
-            <li>1.0.0</li>
-        </ul></dd>
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~VERSION_INFO"><span class="type-signature">(inner, constant) </span>VERSION_INFO<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The library version information in a frozen object.</p>
+</div>
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>major</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The major version number.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>minor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The minor version number.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>patch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The patch version number.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>build</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The build information of current version (i.e., stable).</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line124">line 124</a>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -399,7 +683,7 @@ into the download process, and also more better and improved errors handling.</p
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line618">line 618</a>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line653">line 653</a>
     </li></ul></dd>
     
 
@@ -486,6 +770,485 @@ successfully downloaded files or rejects if an error occurs.</p>
     <pre class="prettyprint"><code>batchDownload('/path/to/urls.txt')
   .then(outFiles => console.log(outFiles))
   .catch(err => console.error('Download failed:', err));</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~downloadAudio"><span class="type-signature">(async, generator, package, inner) </span>downloadAudio<span class="signature">(&hellip;urls)</span><span class="type-signature"> &rarr; {Promise.&lt;DownloadResult>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Downloads audio from multiple YouTube videos sequentially.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>urls</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The URLs to download audio from.
+Each URL can be a string or a URL object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line451">line 451</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Yields:</h5>
+
+        
+<div class="param-desc">
+    A promise that resolves to an object containing
+                                  video information, video data, and a download stream.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;DownloadResult></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~downloadHandler"><span class="type-signature">(async, package, inner) </span>downloadHandler<span class="signature">(readable<span class="signature-attributes">non-null</span>, data, verbose)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>readable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Readable</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The readable stream to process.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The data object containing video information, video data, and an output stream.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>videoData</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">VideoData</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The processed video data.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>outStream</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">fs.WriteStream</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The output stream to write to.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>errLogFile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error log file for logging errors during download.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>progressBar</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ProgressBar</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The progress bar object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verbose</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Whether to display progress bar and error message to the terminal or not.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line502">line 502</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -618,7 +1381,7 @@ for. Each URL can be either a string or a URL object.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line331">line 331</a>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line361">line 361</a>
     </li></ul></dd>
     
 
@@ -712,6 +1475,269 @@ getVideosInfo(...videoUrls).then(videoInfos => {
 }).catch(error => {
   console.error('Error fetching video info:', error);
 });</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~resolveDlOptions"><span class="type-signature">(inner) </span>resolveDlOptions<span class="signature">(options)</span><span class="type-signature"> &rarr; {<a href="global.html#DownloadOptions">DownloadOptions</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Resolves and validates download options.</p>
+<p>This function ensures the provided download options are correctly typed and
+assigns default values where necessary.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The options object.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>downloadOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+|
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The download options to resolve and validate.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line231">line 231</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the given argument is non-null, but also not an object type.
+And if any of the options have incorrect type.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The resolved download options. This object can be passed
+safely to <a href="module-ytmp3.html#~singleDownload"><code><code>singleDownload</code></code></a> or
+<a href="module-ytmp3.html#~singleDownload"><code><code>singleDownload</code></code></a> function.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -879,7 +1905,7 @@ getVideosInfo(...videoUrls).then(videoInfos => {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line529">line 529</a>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line563">line 563</a>
     </li></ul></dd>
     
 
@@ -997,6 +2023,518 @@ or rejects if an error occurs.</p>
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="~validateYTURL"><span class="type-signature">(package, inner) </span>validateYTURL<span class="signature">(url, verbose<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Validates a YouTube URL.</p>
+<p>This function validates a YouTube URL and throws an error if it is not valid.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The URL to validate.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>verbose</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to log verbose messages or not.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line192">line 192</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the URL is not a string nor an instance of <code>URL</code>.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the input URL is not valid.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~writeErrorLog"><span class="type-signature">(async, package, inner) </span>writeErrorLog<span class="signature">(logfile, videoData, error<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;boolean>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Writes error details and associated video information to a log file.</p>
+<p>This function creates or appends to a log file in the <a href="module-utils.html#~LOGDIR"><code><code>LOGDIR</code></code></a>
+directory, logging the error message along with relevant video data. If the log file is empty
+after writing, it will be deleted, and the function returns <code>false</code>. Otherwise, it
+returns <code>true</code> to indicate successful logging.</p>
+<p>The error message is written to the log file in the following format:</p>
+<pre class="prettyprint source lang-txt"><code>[ERROR] &lt;error message>
+  Title: &lt;video title>
+  Author: &lt;video author>
+  Channel ID: &lt;video channel ID>
+  Viewers: &lt;video viewers>
+  URL: &lt;video URL>
+---------------------------------------------
+</code></pre>
+<p>Immediately return <code>false</code> if the given log file name is invalid. The error log
+will be in the <a href="module-utils.html#~LOGDIR"><code><code>LOGDIR</code></code></a> directory.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>logfile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The name of the log file where the error details should be written.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>videoData</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">VideoData</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>An object containing information about the video associated
+with the error.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The error object, optional. If not provided,
+an error message will be <code>'Unknown error'</code>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="ytmp3.js.html">ytmp3.js</a>, <a href="ytmp3.js.html#line410">line 410</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves to <code>true</code> if the log was written
+successfully, otherwise <code>false</code>.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;boolean></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -1012,13 +2550,13 @@ or rejects if an error occurs.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="module-config-UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jul 24 2024 17:13:05 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sat Sep 07 2024 15:50:24 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>
