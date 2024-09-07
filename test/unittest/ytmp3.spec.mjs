@@ -70,7 +70,7 @@ describe('module:ytmp3', function () {
       const versionStr = Object.values(ytmp3.VERSION_INFO).reduce((acc, val) => {
         acc += (typeof val !== 'number' && val.toLowerCase() === 'beta')
           ? `-${val}`
-          : ((!acc) ? val : `.${val}`);
+          : (val !== 'stable') ? ((!acc) ? val : `.${val}`) : '';
         return acc;
       }, '');
       assert.strictEqual(versionStr, ytmp3.VERSION);
