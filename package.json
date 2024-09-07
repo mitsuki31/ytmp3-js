@@ -1,6 +1,6 @@
 {
   "name": "ytmp3-js",
-  "version": "1.1.0-beta",
+  "version": "1.1.0",
   "title": "YTMP3",
   "description": "A Node.js library offers an easy and uncomplicated method for downloading YouTube audio",
   "main": "index.js",
