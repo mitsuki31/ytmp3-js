@@ -1,25 +1,21 @@
 # YTMP3-JS
 
-<table>
-  <tr>
-    <th align="left"><b>ESLint</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img alt="ESLint" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg"></a></td>
-  </tr>
-  <tr>
-    <th align="left"><b>Unit Test</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img alt="Unit Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg"></a></td>
-  </tr>
-  <tr>
-    <th align="left"><b>IRL Test</b></th>
-    <td align="left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img alt="IRL Test" src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg"></a></td>
-  </tr>
-</table>
+<div align="center">
+  <a href="https://ko-fi.com/dhefam31" target="_blank"><img height="50" src="https://storage.ko-fi.com/cdn/kofi1.png?v=3" alt="Buy Me a Coffee at ko-fi.com"></a>
+</div>
+
+|   |   |
+|:--|:--|
+| *Lint* | [![ESLint](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml) |
+| *Unit Testing* | [![Unit Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml) |
+| *Integration Testing* | [![IRL Test](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg)](https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml) |
+| *Code Coverage* | [![Code coverage in codecov.io](https://img.shields.io/codecov/c/gh/mitsuki31/ytmp3-js?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage&labelColor=DF0200&color=DDDDDD)](https://app.codecov.io/gh/mitsuki31/ytmp3-js) |
 
 **YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
 
 This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.
 
-All downloaded audio files are saved in the current directory (default behavior, can be overriden with `-o` CLI option), which is relative to the project's root directory. If the [FFmpeg][ffmpeg] library is installed on your system, these files are optionally converted to MP3 format (use the `-C` option to enable the audio conversion behavior).
+All downloaded audio files are saved in the current directory (unless being overridden with `-o` CLI option), which is relative to the project's root directory. If the [FFmpeg][ffmpeg] library is installed on your system, these files are optionally converted to MP3 format (use the `-C` option to enable the audio conversion behavior).
 
 > [!WARNING]  
 > This project uses [`fluent-ffmpeg`][fluent-ffmpeg] to convert audio files to the desired codec, specifically MP3. Therefore, it requires the [`ffmpeg`][ffmpeg] library and its binaries to be installed on your system, along with any necessary encoding libraries such as `libmp3lame` for MP3 conversion.
@@ -50,14 +46,20 @@ npm i -g ytmp3-js
 ---
 
 If you've downloaded package from the release asset, you may use local installation like this:
+
 ```bash
 npm i -g /path/to/ytmp3-js.<VERSION>.tgz
 ```
 
 ### Command Usage
+
 ```bash
 ytmp3 [options] [[URL ...] | [-f <FILE>]]
 ```
+
+### Command Line Options
+
+For command-line options with detailed information, please refer to [Command-Line Options][Command-Line-Options] wiki's page.
 
 ### Example Usage
 
@@ -70,75 +72,18 @@ In above example, the code is trying to download audio from a single URL and con
 If you'd supplied only the `-C` (or `--convertAudio`) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior).
 But only if you've installed [FFmpeg][ffmpeg].
 
-### Options
-
-#### Download Options
-
-| Option Name | Accepts | Description |
-| ----------- | :--: | ----------- |
-| `--cwd` | `string` | Sets the current working directory to specified directory, used to resolve the `outDir` path. Defaults to the current directory. |
-| `-f` \| `--file` \| `--batch` | `string` | Specifies the path to a file containing a list of YouTube URLs for batch downloading. |
-| `-c` \| `--config` | `string` | Specifies the path to a configuration file containing the `downloadOptions` object to configure both the download options and audio converter options. |
-| `-o` \| `--outDir` \| `--out-dir` | `string` | Specifies the output directory for downloaded files. Defaults to the current directory. |
-| `-C` \| `--convertAudio` \| `--convert-audio` | - | Enables audio conversion behavior (requires [FFmpeg](https://ffmpeg.org)). |
-| `-q` \| `--quiet`  | - | Suppresses all output messages. Use it twice (`-qq`) to also suppresses the audio conversion progress. |
-
-> [!NOTE]  
-> When using the `-c` or `--config` option to specify a configuration file, any changes made to specific options on the command line
-> will override the corresponding options in the configuration file. This means that the modified options in the configuration file
-> will be overridden with the values set from the command line.
-
-#### Audio Converter Options
-
-| Option Name | Accepts | Description |
-| ----------- | :--: | ----------- |
-| `--input-options` \| `--inputOptions` \| `--addInputOptions` \| `--add-input-options` \| `--inOpt` | `string` | Specifies custom FFmpeg input options for audio conversion. |
-| `--output-options` \| `--outputOptions` \| `--addOptions` \| `--add-options` \| `--addOutputOptions` \| `--add-output-options` \| `--outOpt` | `string` | Specifies custom FFmpeg output options for audio conversion. |
-| `--format` | `string` | Converts the audio to the specified format, also used for output file extension. |
-| `--codec` \| `--encoding` | `string` | Specifies the codec for the converted audio. |
-| `--bitrate` | `int` \| `string` | Sets the bitrate for the converted audio in kbps. |
-| `--freq` \| `--frequency` | `int` | Sets the audio sampling frequency for the converted audio in Hertz (Hz). |
-| `--channels` | `int` | Specifies the audio channels for the converted audio. |
-| `--deleteOld` \| `--delete-old` \| `--overwrite` | - | Deletes the old audio file after the audio conversion is done. |
-
-> [!NOTE]  
-> All audio converter options above requires the audio conversion behavior to be enabled first -- enable it using `-C` or `--convertAudio` option --
-> otherwise, the specified values from these options will be ignored.
->
-> ---
->
-> To customize FFmpeg with specific input and output options, use the `--input-options` and `--output-options` flags.
-> The options should be enclosed in either single or double quotes, with each option separated by a space.
-> For example:
->
-> ```bash
-> ytmp3 <YT_URL> -C --output-options '-b:a 320k -ar 28000'
-> ```
->
-> When using any of those input or output options, they will take precedence over other audio conversion options (e.g., `--bitrate`, `--frequency`, etc.).
->
-> However, you can still specify the output format or file extension using the `--format` flag in combination with these options. For instance:
->
-> ```bash
-> ytmp3 <URL> -o ~/Downloads -C --format opus --output-options "-acodec libopus -ar 28000"
-> ```
-
-#### Miscellaneous Options
-
-| Option Name | Description |
-| ----------- | ----------- |
-| `-h` \| `-?` \| `--help` | Displays the help message and exit. |
-| `-V` \| `--version` | Displays the module version and exit. Use it twice (`-VV`) to also display all dependencies' version (not including `devDependencies`). |
-| `--copyright` | Displays the copyright information and exit. |
-| `--print-config` | Displays the configuration options that being used and exit. Very useful for debugging. |
-
-
-## APIs
+## Featured APIs
 
 ### `singleDownload`
+
 ```ts
-async function singleDownload(inputUrl: string | URL): Promise<string>
+async function singleDownload(
+  inputUrl: string | URL,
+  downloadOptions?: DownloadOptions | Object
+): Promise<string>
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~singleDownload)
 
 <details>
 <summary>API Details</summary>
@@ -150,6 +95,7 @@ Downloads audio from a single YouTube URL and saves it to the output directory (
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `inputUrl` | `string \| URL` | The URL of the YouTube video to download audio from. |
+| `downloadOptions` | [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions) \| `Object` | Options to configure the download process. If not specified, it will automatically uses default options. |
 
 #### Returns
 
@@ -161,9 +107,15 @@ A promise that resolves a string representating the output file when the downloa
 ---
 
 ### `batchDownload`
+
 ```ts
-async function batchDownload(inputFile: string): Promise<string[]>
+async function batchDownload(
+  inputFile: string,
+  downloadOptions?: DownloadOptions | Object
+): Promise<string[]>
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~batchDownload)
 
 <details>
 <summary>API Details</summary>
@@ -175,6 +127,7 @@ Downloads audio from a file containing YouTube URLs and saves them to the output
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `inputFile` | `string` | The path to the file containing YouTube URLs. |
+| `downloadOptions` | [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions) \| `Object` | Options to configure the download process. If not specified, it will automatically uses default options. |
 
 #### Returns
 
@@ -186,11 +139,14 @@ A promise that resolves to an array of strings representing the successfully dow
 ---
 
 ### `getVideosInfo`
+
 ```ts
 async function getVideosInfo(
   ...urls: string | URL
 ): Promise<import('@distube/ytdl-core').videoInfo[]>
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~getVideosInfo)
 
 <details>
 <summary>API Details</summary>
@@ -215,9 +171,12 @@ A promise that resolves to an array of video information objects.
 ---
 
 ### `checkFfmpeg`
+
 ```ts
 async function checkFfmpeg(verbose?: boolean = false): Promise<boolean>
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~checkFfmpeg)
 
 <details>
 <summary>API Details</summary>
@@ -242,12 +201,15 @@ A promise that resolves to a boolean value, `true` if the `ffmpeg` binary instal
 ---
 
 ### `convertAudio`
+
 ```ts
 async function convertAudio(
   inFile: string,
   options?: ConvertAudioOptions = defaultOptions
 ): Promise<void>
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~convertAudio)
 
 <details>
 <summary>API Details</summary>
@@ -263,16 +225,19 @@ If the `ffmpeg` is not installed on the system, this function will aborts immedi
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `inFile` | `string` | The input file path of the audio file to be converted. |
-| `options` | `ConvertAudioOptions \| undefined` | Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format. |
+| `options` | [`ConvertAudioOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#ConvertAudioOptions) \| `undefined` | Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format. |
 
 </details>
 
 ---
 
 ### `extractVideoId`
+
 ```ts
 function extractVideoId(url: string | URL): string
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.extractVideoId)
 
 <details>
 <summary>API Details</summary>
@@ -282,11 +247,12 @@ Extracts the YouTube video ID from given YouTube URL.
 The YouTube video ID have exactly 11 characters with allowed symbols are `A-Z`, `a-z`, `0-9`, `_`, and `-`.
 
 Allowed YouTube domains to extract:
-  - `www.youtube.com`
-  - `m.youtube.com`
-  - `youtube.com`
-  - `youtu.be`
-  - `music.youtube.com`
+
+- `www.youtube.com`
+- `m.youtube.com`
+- `youtube.com`
+- `youtu.be`
+- `music.youtube.com`
 
 #### Parameters
 
@@ -304,9 +270,12 @@ A string with 11 characters representing the video ID.
 ---
 
 ### `validateUrl`
+
 ```ts
 function validateUrl(url: string | URL, withId?: boolean = true): boolean
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateUrl)
 
 <details>
 <summary>API Details</summary>
@@ -330,9 +299,12 @@ Returns `true` if the given URL is a valid YouTube URL; otherwise `false`.
 ---
 
 ### `validateId`
+
 ```ts
 function validateId(id: string): boolean
 ```
+
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateId)
 
 <details>
 <summary>API Details</summary>
@@ -348,53 +320,11 @@ function validateId(id: string): boolean
 Returns `true` if the given ID correctly represents the YouTube video ID; otherwise `false`.  
 **Type:** `boolean`
 
----
-
-### API Usage
-
-Download audio from a single YouTube URL:
-```js
-const ytmp3 = require('ytmp3-js');
-const url = 'https://youtu.be/abcdefg'
-
-ytmp3.singleDownload(url)
-  .then(outFile => console.log(outFile))
-  .catch(err => console.error(err));
-```
+</details>
 
 ---
 
-Download audios from a bunch of YouTube URLs within a file:
-```js
-const ytmp3 = require('ytmp3-js');
-const batchFile = 'path/to/myurls.txt';
-
-ytmp3.batchDownload(batchFile)
-  .then(outFiles => console.log(outFiles))
-  .catch(err => console.error(err));
-```
-
----
-
-Download multiple URLs from an array:
-```js
-const ytmp3 = require('ytmp3-js');
-const urls = [
-  'https://music.youtube.com/watch?v=abcdefg'
-  'https://youtube.com/watch?v=abcd1234'
-  // ... and more
-];
-
-(async () => {
-  // Iterate over the array of URL using for-loop
-  // Use this iteration to ensure the download processes
-  // runs sequentially instead of parallel
-  for (const url of urls) {
-    const outFile = await singleDownload(url);
-    console.log('Downloaded:', outFile);
-  }
-})();
-```
+Refer to [Wiki's Homepage](https://github.com/mitsuki31/ytmp3-js/wiki#example-api-usages) for information on how to use APIs.
 
 ## Acknowledgements
 
@@ -414,10 +344,12 @@ Any contributions to this project are welcome :D
 
 This project is licensed under MIT License. For more details, see [LICENSE](https://github.com/mitsuki31/ytmp3-js/blob/master/LICENSE) file.
 
-
 <!-- Links -->
 
 [`ytdl-core`]: https://www.npmjs.com/package/ytdl-core
 [`@distube/ytdl-core`]: https://www.npmjs.com/package/@distube/ytdl-core
 [fluent-ffmpeg]: https://www.npmjs.com/package/fluent-ffmpeg
 [ffmpeg]: https://ffmpeg.org
+
+[Wiki-Home]: https://github.com/mitsuki31/ytmp3-js/wiki
+[Command-Line-Options]: https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options
