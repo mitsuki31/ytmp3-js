@@ -10,6 +10,7 @@
   "files": [
     "index.js",
     "lib/*",
+    "bin/*",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
