@@ -15,6 +15,9 @@
 ![Min. Node](https://img.shields.io/node/v/ytmp3-js?label=Node.js&logo=node.js)
 ![NPM Unpacked Size](https://img.shields.io/npm/unpacked-size/ytmp3-js?label=Unpacked+size&logo=npm)
 
+**Wiki Homepage**: [[here]](https://github.com/mitsuki31/ytmp3-js/wiki)  
+**API Documentation**: [[here]](https://mitsuki31.github.io/ytmp3-js)
+
 **YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
 
 This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.
