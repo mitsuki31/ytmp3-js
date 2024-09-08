@@ -1,3 +1,9 @@
+## 1.1.1 - September 08, 2024
+
+- [`c57d8fe`](https://github.com/mitsuki31/ytmp3-js/commit/c57d8fe8100a8071d49d59fe1fd7a3717230c627) : docs(readme): Add links refer to wiki & API docs (Ryuu Mitsuki)
+- [`9427cbf`](https://github.com/mitsuki31/ytmp3-js/commit/9427cbf5e72bd867596861bd24a14337facddad4) : fix: Include 'bin' directory in `files` field in `package.json` (#48) (Ryuu Mitsuki)
+
+
 ## 1.1.0 - September 07, 2024
 
 - [`0418e82`](https://github.com/mitsuki31/ytmp3-js/commit/0418e8226455afcebb40bffeacdf9b48e9d3336c) : chore(npm): Prepare for release v1.1.0 (Ryuu Mitsuki)
