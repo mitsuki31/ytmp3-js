@@ -13,7 +13,7 @@ import ffmpeg from 'fluent-ffmpeg';
 
 import audioconv from '../lib/audioconv.js';
 import ytmp3 from '../lib/ytmp3.js';
-import utils from '../lib/utils.js';
+import utils from '../lib/utils/index.js';
 
 const ffprobe = promisify(ffmpeg.ffprobe);
 const createTempPath = promisify(_createTempPath);

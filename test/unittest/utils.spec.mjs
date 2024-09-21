@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getTempPath } from '@mitsuki31/temppath';
 
-import utils from '../../lib/utils.js';
+import utils from '../../lib/utils/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

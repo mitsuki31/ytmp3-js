@@ -5,7 +5,7 @@ import childProcess from 'node:child_process';
 import { getTempPath } from '@mitsuki31/temppath';
 
 import audioconv from '../../lib/audioconv.js';
-import utils from '../../lib/utils.js';
+import utils from '../../lib/utils/index.js';
 
 describe('module:audioconv', function () {
   const testMessages = {

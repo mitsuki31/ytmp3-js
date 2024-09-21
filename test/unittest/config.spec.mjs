@@ -8,7 +8,7 @@ import { lsFiles } from 'lsfnd';
 import { getTempPath } from '@mitsuki31/temppath';
 
 import config from '../../lib/config.js';
-import utils from'../../lib/utils.js';
+import utils from '../../lib/utils/index.js';
 import audioconv from '../../lib/audioconv.js';
 import error from '../../lib/error.js';
 const {
