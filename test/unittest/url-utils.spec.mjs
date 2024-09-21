@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import URLUtils from '../../lib/url-utils.js';
+import URLUtils from '../../lib/utils/url-utils.js';
 import error from '../../lib/error.js';
 const { IDExtractorError } = error;
 

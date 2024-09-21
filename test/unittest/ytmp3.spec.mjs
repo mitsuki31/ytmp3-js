@@ -5,7 +5,7 @@ import { getTempPath } from '@mitsuki31/temppath';
 
 import ytmp3 from '../../lib/ytmp3.js';
 import audioconv from '../../lib/audioconv.js';
-import utils from '../../lib/utils.js';
+import utils from '../../lib/utils/index.js';
 const pkg = JSON.parse(
   fs.readFileSync(path.join(utils.ROOTDIR, 'package.json'), 'utf8'));
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import yturlfmt from '../../lib/yt-urlfmt.js';
+import yturlfmt from '../../lib/utils/yt-urlfmt.js';
 
 describe('module:yt-urlfmt', function () {
   const testMessage = 'check and validate regular expression';
