@@ -18,7 +18,7 @@ const {
   checkFfmpeg,
   convertAudio
 } = require('./lib/audioconv');
-const URLUtils = require('./lib/url-utils');
+const URLUtils = require('./lib/utils/url-utils');
 const error = require('./lib/error');
 const ytmp3 = require('./lib/ytmp3');
 
