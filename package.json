@@ -29,7 +29,8 @@
     "test:unit": "mocha test/unittest",
     "test:nyan:unit": "mocha test/unittest --reporter nyan",
     "test:irl": "mocha test/irl.test.mjs",
-    "coverage": "nyc npm test"
+    "coverage": "nyc npm test",
+    "coverage:no-dltest": "npm run test:unit && npm run test:irl -- -g '\\[CONVERT\\]'"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
