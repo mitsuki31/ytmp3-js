@@ -25,12 +25,14 @@
     "lint:prod": "eslint . -c eslint.config.js",
     "lint:test": "eslint . -c eslint.config.test.js",
     "test": "npm run test:unit && npm run test:irl",
+    "test:no-dltest": "npm run test:unit && npm run test:irl:no-dltest",
     "test:nyan": "mocha --recursive --reporter nyan",
     "test:unit": "mocha test/unittest",
     "test:nyan:unit": "mocha test/unittest --reporter nyan",
     "test:irl": "mocha test/irl.test.mjs",
+    "test:irl:no-dltest": "mocha test/irl.test.mjs -g '\\[CONVERT\\]'",
     "coverage": "nyc npm test",
-    "coverage:no-dltest": "npm run test:unit && npm run test:irl -- -g '\\[CONVERT\\]'"
+    "coverage:no-dltest": "nyc npm run test:no-dltest"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
