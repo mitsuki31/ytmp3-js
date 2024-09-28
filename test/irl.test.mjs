@@ -27,8 +27,6 @@ function getAudioFile(filename) {
 }
 
 describe('IRL (In Real Life) Test', function () {
-  console.log('\x1b[33mCAUTION! Data charge may apply in several test cases.\x1b[0m');
-
   const videoIDs = [
     'Z0z5mNPODrc',
     'XFkzRNyygfk',
@@ -45,36 +43,8 @@ describe('IRL (In Real Life) Test', function () {
     console.error = (...args) => {};
   });
 
-  describe.skip('Downloading and converting some YouTube videos to MP3 format', function () {
-    console.log('Please wait for a while...');
-
-    for (const id of videoIDs) {
-      it(id, async function () {
-        this.timeout(1000 * 60 * 13);  // Give 13 minutes
-        this.slow(1000 * 60 * 5);  // 5 minute
-
-        outputFiles[id] = await ytmp3.singleDownload(`https://youtu.be/${id}`, {
-          outDir,
-          convertAudio: false,
-          quiet: true
-        });
-
-        assert.ok(fs.existsSync(outputFiles[id]));
-
-        await audioconv.convertAudio(outputFiles[id], {
-          format: 'mp3',
-          codec: 'libmp3lame',
-          deleteOld: false,
-          quiet: true
-        });
-
-        assert.ok(fs.existsSync(outputFiles[id]));
-        assert.ok(fs.existsSync(outputFiles[id].replace(/\.m4a$/, '.mp3')));
-      });
-    }
-  });
-
-  describe.skip('Downloading some YouTube videos using batch download', function () {
+  describe('[DOWNLOAD]', function () {
+    consoleLogStub('\x1b[33mCAUTION! Data charge may apply for download tests.\x1b[0m');
     let tempFile;
 
     before(async function () {
@@ -84,6 +54,7 @@ describe('IRL (In Real Life) Test', function () {
         ext: 'dl'
       });
 
+      // Write URLs to temporary file for batch download test
       return new Promise((resolve) => {
         const tempFileStream = fs.createWriteStream(tempFile);
         for (const id of videoIDs) {
@@ -94,19 +65,36 @@ describe('IRL (In Real Life) Test', function () {
       });
     });
 
-    it('should succeed to download', async function () {
-      this.timeout(1000 * 60 * 15);  // Give 15 minutes
-      this.slow(1000 * 60 * 5);  // 5 minutes
+    it('Download YouTube videos using single download', async function () {
+      this.timeout(1000 * 60 * 13);  // Give 13 minutes before timeout
+      this.slow(1000 * 60 * 5);      // 5 minute
+
+      for (const id of videoIDs) {
+        consoleLogStub(id);
+        outputFiles[id] = await ytmp3.singleDownload(`https://youtu.be/${id}`, {
+          outDir,
+          convertAudio: false,
+          quiet: false
+        });
+
+        assert.ok(fs.existsSync(outputFiles[id]));
+      }
+    });
+
+    it('Download YouTube videos using batch download', async function () {
+      consoleLogStub(path.basename(tempFile));
+      this.timeout(1000 * 60 * 15);  // Give 15 minutes before timeout
+      this.slow(1000 * 60 * 5);      // 5 minutes
 
       await ytmp3.batchDownload(tempFile, {
         outDir,
         convertAudio: false,
-        quiet: true
+        quiet: false
       });
     });
   });
 
-  describe('Converting audio files to specific formats', function () {
+  describe('[CONVERT]', function () {
     const testDynMessages = [
       'should convert audio file to MP3 format with sample rate of 48kHz',
       'should convert audio file to OPUS format with audio channel set to mono',
@@ -223,14 +211,13 @@ describe('IRL (In Real Life) Test', function () {
       this.slow(800);
       await assert.rejects(() => {
         return audioconv.convertAudio(audioFile, {});
-      }, { message: /format.+not available/i });
+      }, { message: /format .+ not available/i });
     });
 
     it(testMessages[1], function (done) {
       this.slow(600);
 
       const createWriteStreamStub = fs.createWriteStream;
-      const promiseStub = global.Promise;
       let hasError;
       fs.createWriteStream = (f, o) => {
         const stream = createWriteStreamStub(f, o);
@@ -273,5 +260,7 @@ describe('IRL (In Real Life) Test', function () {
   after(function () {
     // Clean up temporary working directory
     if (fs.existsSync(outDir)) fs.rmSync(path.dirname(outDir), { recursive: true });
+    console.log = consoleLogStub;
+    console.error = consoleErrorStub;
   });
 });
