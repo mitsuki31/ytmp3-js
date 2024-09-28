@@ -4,12 +4,12 @@ on:
   pull_request:
     branches: [ "master" ]
   schedule:
-    - cron: '0 6,12,18,0 * * *'
+    - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
 
 jobs:
   irltest:
-    name: ${{ matrix.os }} / Node ${{ matrix.node-ver }}
+    name: IRL Test (${{ matrix.os }}, Node v${{ matrix.node-ver }})
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -17,24 +17,29 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         node-ver: [ 18.x, 20.x ]
 
+    env:
+      FFMPEG_VERSION: 7.0.2
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup Node.js / ${{ matrix.node-ver }}
+    - name: Setup Node v${{ matrix.node-ver }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-ver }}
         cache: 'npm'
-    - name: Setup FFmpeg
+    - name: Setup FFmpeg v${{ env.FFMPEG_VERSION }}
       uses: FedericoCarboni/setup-ffmpeg@v3
       id: setup-ffmpeg
       with:
-        ffmpeg-version: release
+        ffmpeg-version: ${{ env.FFMPEG_VERSION }}
         linking-type: static
         architecture: x64
         github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
     - name: Clean install the project
       run: npm ci
     - name: Run IRL Test
-      run: >
-        npm run test:irl
+      # FIXME: This test is only specific to conversion tests and should be fixed in the future.
+      #        This is due to YouTube restricts download YouTube videos in cloud CI environments
+      #        and bots automation, unless handled by proxies.
+      run: npm run test:irl -- -g "\\[CONVERT\\]"
