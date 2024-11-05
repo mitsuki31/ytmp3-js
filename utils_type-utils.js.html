@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils/type-utils.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/type-utils.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Utility submodule containing type checker and helper.
+ *
+ * @module    utils/type-utils
+ * @author    Ryuu Mitsuki &lt;https://github.com/mitsuki31>
+ * @license   MIT
+ * @since     1.2.0
+ */
+
+'use strict';
+
+const TypeUtils = {};
+
+/**
+ * Checks if a given value is null or undefined.
+ *
+ * @param {any} x - The value to check.
+ * @returns {boolean} `true` if the value is null or undefined, otherwise `false`.
+ *
+ * @package
+ * @since  1.0.0
+ */
+function isNullOrUndefined(x) {
+  return (x === null || typeof x === 'undefined');
+}
+TypeUtils.isNullOrUndefined = isNullOrUndefined;  // Assign to `TypeUtils`
+
+/**
+ * Determines whether the provided value is a non-null object.
+ *
+ * This function returns `true` for any value that is of the object type and is not `null`, 
+ * but it does not guarantee that the object is a plain object (`{}`).
+ *
+ * @param {any} x - The value to be checked.
+ * @returns {boolean} `true` if the value is a non-null object, otherwise `false`.
+ *
+ * @package
+ * @since    1.0.0
+ * @see      {@link module:utils~isPlainObject isPlainObject}
+ */
+function isObject(x) {
+  return (
+    !isNullOrUndefined(x) &amp;&amp;
+    typeof x === 'object' &amp;&amp;
+    !Array.isArray(x) &amp;&amp;
+    Object.prototype.toString &amp;&amp;
+    /^\[object .+\]$/.test(Object.prototype.toString.call(x))
+  );
+}
+TypeUtils.isObject = isObject;  // Assign to `TypeUtils`
+
+/**
+ * Determines whether the provided value is a plain object (`{}`).
+ *
+ * This function returns `true` only if the value is a non-null object with
+ * a prototype of `Object`.
+ *
+ * @param {any} x - The value to be checked.
+ * @returns {boolean} `true` if the value is a plain object, otherwise `false`.
+ *
+ * @package
+ * @since    1.1.0
+ * @see      {@link module:utils~isObject isObject}
+ */
+function isPlainObject(x) {
+  return (
+    !isNullOrUndefined(x) &amp;&amp;
+    typeof x === 'object' &amp;&amp;
+    !Array.isArray(x) &amp;&amp;
+    Object.prototype.toString &amp;&amp;
+    /^\[object Object\]$/.test(Object.prototype.toString.call(x))
+  );
+}
+TypeUtils.isPlainObject = isPlainObject;  // Assign to `TypeUtils`
+
+/**
+ * Returns the type of the provided value as a string.
+ *
+ * For `null` values, it returns `'null'`, and for objects, it returns a more detailed
+ * type such as `'[object Object]'`.
+ *
+ * @param {any} x - The value whose type is to be determined.
+ * @returns {string} A string representing the type of the value.
+ *
+ * @package
+ * @since    1.1.0
+ */
+function getType(x) {
+  return x === null
+    ? 'null' : typeof x === 'object'
+      ? Object.prototype.toString.call(x) : typeof x;
+}
+TypeUtils.getType = getType;  // Assign to `TypeUtils`
+
+/**
+ * Drops null and undefined values from the input object.
+ *
+ * @param {Object} obj - The input object to filter null and undefined values from.
+ * @return {Object} The filtered object without null and undefined values.
+ *
+ * @package
+ * @since  1.0.0
+ */
+function dropNullAndUndefined(obj) {
+  return Object.keys(obj).reduce((acc, key) => {
+    if (!isNullOrUndefined(obj[key])) acc[key] = obj[key];
+    return acc;
+  }, {});
+}
+TypeUtils.dropNullAndUndefined = dropNullAndUndefined;  // Assign to `TypeUtils`
+
+module.exports = TypeUtils;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Classes</h3><ul><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Nov 05 2024 21:48:06 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

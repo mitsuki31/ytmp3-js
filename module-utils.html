@@ -38,7 +38,15 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Utilities module for <strong>YTMP3</strong> project.</p></div>
+            <div class="description"><p>Main entry for <code>utils</code> module of <strong>YTMP3-JS</strong> project.</p>
+<p>This module provides a set of submodules for working with various utilities.
+These submodules are:</p>
+<ul>
+<li><a href="module-utils_logger.html"><code>module:utils/logger</code></a> - A submodule for logging process.</li>
+<li><a href="module-utils_yt-urlfmt.html"><code>module:utils/yt-urlfmt</code></a> - A submodule containing all supported YouTube URLs in regular expressions (<em>deprecated</em>).</li>
+<li><a href="module-utils_url-utils.html"><code>module:utils/url-utils</code></a> - A submodule for working with YouTube URLs.</li>
+<li><a href="module-utils_type-utils.html"><code>module:utils/type-utils</code></a> - A submodule for type checking and utility functions.</li>
+</ul></div>
         
 
         
@@ -100,7 +108,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line1">line 1</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -137,6 +145,18 @@
     
 
     
+        <h3 class="subsection-title">Requires</h3>
+
+        <ul>
+            <li><a href="module-utils_logger.html">module:utils/logger</a></li>
+        
+            <li><a href="module-utils_yt-urlfmt.html">module:utils/yt-urlfmt</a></li>
+        
+            <li><a href="module-utils_url-utils.html">module:utils/url-utils</a></li>
+        
+            <li><a href="module-utils_type-utils.html">module:utils/type-utils</a></li>
+        </ul>
+    
 
     
         <h3 class="subsection-title">Classes</h3>
@@ -151,13 +171,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl>
-            <dt><a href="module-utils-Logger.html">Logger</a></dt>
-            <dd></dd>
-        </dl>
     
 
     
@@ -227,7 +240,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line114">line 114</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line107">line 107</a>
     </li></ul></dd>
     
 
@@ -302,7 +315,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line87">line 87</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -377,7 +390,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line79">line 79</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line69">line 69</a>
     </li></ul></dd>
     
 
@@ -404,7 +417,8 @@
     <p>The home directory path for the YTMP3-JS configuration and data files.</p>
 <p>This path is constructed by joining the user's home directory with the <code>'.ytmp3-js'</code> folder.
 On POSIX systems, this will typically be <code>&quot;/home/&lt;USERNAME&gt;/.ytmp3-js&quot;</code>, while on Windows systems,
-it will be <code>&quot;C:\Users\&lt;USERNAME&gt;\.ytmp3-js&quot;</code>. For Termux Android, it will be <code>&quot;/data/data/com.termux/files/home/.ytmp3-js&quot;</code>.</p>
+it will be <code>&quot;C:\Users\&lt;USERNAME&gt;\.ytmp3-js&quot;</code>. For Termux Android, it will be
+<code>&quot;/data/data/com.termux/files/home/.ytmp3-js&quot;</code>.</p>
 </div>
 
 
@@ -455,98 +469,12 @@ it will be <code>&quot;C:\Users\&lt;USERNAME&gt;\.ytmp3-js&quot;</code>. For Ter
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line100">line 100</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
     
 
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~logger"><span class="type-signature">(inner, constant) </span>logger<span class="type-signature"> :<a href="module-utils-Logger.html">module:utils~Logger</a></span></h4>
-
-
-
-
-<div class="description">
-    <p>A custom logger object for the <strong>YTMP3</strong> project with ANSI color codes.</p>
-<p>The logger is using the ANSI color codes to add color to the log messages,
-it might not support on every terminals.</p>
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><a href="module-utils-Logger.html">module:utils~Logger</a></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line259">line 259</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-utils-Logger.html"><code>Logger (namespace)</code></a></li>
-        
-            <li><a href="module-utils.html#~LoggerInterface"><code>LoggerInterface</code></a></li>
-        </ul>
-    </dd>
     
 
     
@@ -569,7 +497,7 @@ it might not support on every terminals.</p>
     
 
     
-    <h4 class="name" id="~createDirIfNotExist"><span class="type-signature">(async, inner) </span>createDirIfNotExist<span class="signature">(dirpath)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
+    <h4 class="name" id="~createDirIfNotExist"><span class="type-signature">(async, package, inner) </span>createDirIfNotExist<span class="signature">(dirpath)</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
     
 
     
@@ -674,7 +602,7 @@ creates new if not exist with asynchronous operation.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line129">line 129</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -728,7 +656,7 @@ creates new if not exist with asynchronous operation.</p>
     
 
     
-    <h4 class="name" id="~createDirIfNotExistSync"><span class="type-signature">(inner) </span>createDirIfNotExistSync<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~createDirIfNotExistSync"><span class="type-signature">(package, inner) </span>createDirIfNotExistSync<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -784,7 +712,7 @@ function, but it uses synchronous directory creation.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line140">line 140</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line134">line 134</a>
     </li></ul></dd>
     
 
@@ -809,838 +737,6 @@ function, but it uses synchronous directory creation.</p>
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~dropNullAndUndefined"><span class="type-signature">(inner) </span>dropNullAndUndefined<span class="signature">(obj)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Drops null and undefined values from the input object.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>obj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The input object to filter null and undefined values from.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line371">line 371</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The filtered object without null and undefined values.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~getType"><span class="type-signature">(package, inner) </span>getType<span class="signature">(x)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Returns the type of the provided value as a string.</p>
-<p>For <code>null</code> values, it returns <code>'null'</code>, and for objects, it returns a more detailed
-type such as <code>'[object Object]'</code>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">any</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The value whose type is to be determined.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line233">line 233</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A string representing the type of the value.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~isNullOrUndefined"><span class="type-signature">(inner) </span>isNullOrUndefined<span class="signature">(x)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Checks if a given value is null or undefined.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">any</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The value to check.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line171">line 171</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <ul>
-<li><code>true</code> if the value is null or undefined, otherwise <code>false</code>.</li>
-</ul>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~isObject"><span class="type-signature">(package, inner) </span>isObject<span class="signature">(x)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Determines whether the provided value is a non-null object.</p>
-<p>This function returns <code>true</code> for any value that is of the object type and is not <code>null</code>,
-but it does not guarantee that the object is a plain object (<code>{}</code>).</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">any</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The value to be checked.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line188">line 188</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-utils.html#~isPlainObject"><code>isPlainObject</code></a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p><code>true</code> if the value is a non-null object, otherwise <code>false</code>.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="~isPlainObject"><span class="type-signature">(package, inner) </span>isPlainObject<span class="signature">(x)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Determines whether the provided value is a plain object (<code>{}</code>).</p>
-<p>This function returns <code>true</code> only if the value is a non-null object with
-a prototype of <code>Object</code>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">any</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The value to be checked.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line211">line 211</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-utils.html#~isObject"><code>isObject</code></a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p><code>true</code> if the value is a plain object, otherwise <code>false</code>.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -1653,494 +749,6 @@ a prototype of <code>Object</code>.</p>
         <h3 class="subsection-title">Type Definitions</h3>
 
         
-                
-
-    
-
-    
-    <h4 class="name" id="~LoggerFunc"><span class="type-signature"></span>LoggerFunc<span class="signature">(msg)</span><span class="type-signature"> &rarr; {void}</span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>msg</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The message to be displayed.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line16">line 16</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">void</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-            
-                
-<h4 class="name" id="~LoggerInterface">LoggerInterface</h4>
-
-
-
-
-<div class="description">
-    <p>The interface of <a href="module-utils.html#~logger"><code><code>logger</code></code></a> object.</p>
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>INFO_PREFIX</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The prefix for the info level message.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>DONE_PREFIX</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The prefix for the done level message.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>DEBUG_PREFIX</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The prefix for the debug level message.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>WARNING_PREFIX</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The prefix for the warning level message.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ERROR_PREFIX</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The prefix for the error level message.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>info</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">LoggerFunc</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The function to log the info level message to the console.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>done</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">LoggerFunc</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The function to log the done level message to the console.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>debug</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">LoggerFunc</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The function to log the debug level message to the console.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>warn</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">LoggerFunc</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The function to log the warning level message to the console.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>error</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">LoggerFunc</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The function to log the error level message to the console.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-    <dt class="tag-since">Since:</dt>
-    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line23">line 23</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
                 
 <h4 class="name" id="~ProgressBarOptions">ProgressBarOptions</h4>
 
@@ -2384,7 +992,7 @@ or a number representing the number of characters.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line40">line 40</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -2584,7 +1192,7 @@ or a number representing the number of characters.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js.html">utils.js</a>, <a href="utils.js.html#line52">line 52</a>
+        <a href="utils_index.js.html">utils/index.js</a>, <a href="utils_index.js.html#line35">line 35</a>
     </li></ul></dd>
     
 
@@ -2614,13 +1222,13 @@ or a number representing the number of characters.</p></td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-url-utils.html">url-utils</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-yt-urlfmt.html">yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils-Logger.html">Logger</a></li></ul><h3>Classes</h3><ul><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Classes</h3><ul><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Mon Sep 23 2024 16:54:52 GMT+0700 (Western Indonesia Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Nov 05 2024 21:48:07 GMT+0700 (Western Indonesia Time)
 </footer>
 
 <script> prettyPrint(); </script>
