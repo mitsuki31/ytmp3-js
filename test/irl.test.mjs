@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { EOL } from 'node:os';
+import { randomInt } from 'node:crypto';
 import {
   getTempPath,
   createTempPath as _createTempPath
@@ -70,7 +71,7 @@ describe('IRL (In Real Life) Test', function () {
       this.slow(1000 * 60 * 5);      // 5 minute
 
       for (const id of videoIDs) {
-        consoleLogStub(id);
+        consoleLogStub(`Downloading ${id}...`);
         outputFiles[id] = await ytmp3.singleDownload(`https://youtu.be/${id}`, {
           outDir,
           convertAudio: false,
@@ -87,6 +88,20 @@ describe('IRL (In Real Life) Test', function () {
       this.slow(1000 * 60 * 5);      // 5 minutes
 
       await ytmp3.batchDownload(tempFile, {
+        outDir,
+        convertAudio: false,
+        quiet: false
+      });
+    });
+
+    it('Download a YouTube video with ID only using `downloadFromID`', async function () {
+      this.timeout(1000 * 60 * 13);  // Give 13 minutes before timeout
+      this.slow(1000 * 60 * 5);      // 5 minutes
+
+      consoleLogStub('Picking a random video ID from the list...');
+      const id = videoIDs[randomInt(0, videoIDs.length - 1)];  // Pick a random ID from the list
+      consoleLogStub(`Downloading ${id}...`);
+      await ytmp3.downloadFromID(id, {
         outDir,
         convertAudio: false,
         quiet: false
