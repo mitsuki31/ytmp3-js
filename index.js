@@ -31,6 +31,7 @@ module.exports = Object.freeze({
   version_info: ytmp3.VERSION_INFO,
   singleDownload: ytmp3.singleDownload,
   batchDownload: ytmp3.batchDownload,
+  downloadFromID: ytmp3.downloadFromID,
   getVideosInfo: ytmp3.getVideosInfo,
   // :: URLUtils
   YTURLUtils: URLUtils,  // aliased to `YTURLUtils` for readability
