@@ -339,7 +339,7 @@ This project utilizes the following libraries and APIs:
 
 - **(Outdated)** [`ytdl-core`] - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.
 - [`@distube/ytdl-core`] - DisTube fork of `ytdl-core`. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.
-- [`fluent-ffmpeg`] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
+- [`fluent-ffmpeg`][fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
 
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
