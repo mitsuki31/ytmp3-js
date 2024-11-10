@@ -38,7 +38,6 @@ jobs:
     - name: Run coverage
       run: npm run coverage:no-dltest
     - name: Upload coverage
-      if: ${{ github.event_name != 'pull_request' }}
       uses: codecov/codecov-action@v4
       with:
         name: codecov-alltests@${{ matrix.os }}
