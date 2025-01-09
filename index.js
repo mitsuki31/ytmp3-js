@@ -1,11 +1,10 @@
 /**
  * @file Main module of **YTMP3-JS** library providing useful APIs to download YouTube audios with ease.
  *
- * @requires  lib/audioconv
- * @requires  lib/error
- * @requires  lib/url-utils
- * @requires  lib/utils
- * @requires  lib/ytmp3
+ * @requires  audioconv
+ * @requires  error
+ * @requires  utils
+ * @requires  ytmp3
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @license   MIT
  * @since     0.1.0
@@ -18,7 +17,10 @@ const {
   checkFfmpeg,
   convertAudio
 } = require('./lib/audioconv');
-const URLUtils = require('./lib/utils/url-utils');
+const {
+  URLUtils,
+  FormatUtils
+} = require('./lib/utils');
 const error = require('./lib/error');
 const ytmp3 = require('./lib/ytmp3');
 
@@ -38,6 +40,8 @@ module.exports = Object.freeze({
   extractVideoId: URLUtils.extractVideoId,
   validateUrl: URLUtils.validateUrl,
   validateId: URLUtils.validateId,
+  // :: FormatUtils
+  FormatUtils,
   // :: audioconv
   defaultAudioConvOptions,
   checkFfmpeg,
