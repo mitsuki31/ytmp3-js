@@ -19,7 +19,8 @@ const {
 } = require('./lib/audioconv');
 const {
   URLUtils,
-  FormatUtils
+  FormatUtils,
+  ThumbnailUtils
 } = require('./lib/utils');
 const error = require('./lib/error');
 const ytmp3 = require('./lib/ytmp3');
@@ -42,6 +43,11 @@ module.exports = Object.freeze({
   validateId: URLUtils.validateId,
   // :: FormatUtils
   FormatUtils,
+  // :: ThumbnailUtils
+  ThumbnailUtils,
+  getAllThumbnails: ThumbnailUtils.getAllThumbnails,
+  getThumbnailByResolution: ThumbnailUtils.getThumbnailByResolution,
+  getThumbnail: ThumbnailUtils.getThumbnail,
   // :: audioconv
   defaultAudioConvOptions,
   checkFfmpeg,
