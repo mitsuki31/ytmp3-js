@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg",
+    "width": 168,
+    "height": 94
+  },
+  {
+    "url": "https://i.ytimg.com/vi/VIDEO_ID/mqdefault.jpg",
+    "width": 320,
+    "height": 180
+  },
+  {
+    "url": "https://i.ytimg.com/vi/VIDEO_ID/sddefault.jpg",
+    "width": 640,
+    "height": 480
+  },
+  {
+    "url": "https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg",
+    "width": 1280,
+    "height": 720
+  }
+]
