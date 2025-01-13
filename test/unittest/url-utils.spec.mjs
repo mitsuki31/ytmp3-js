@@ -2,7 +2,11 @@ import assert from 'node:assert';
 
 import URLUtils from '../../lib/utils/url-utils.js';
 import error from '../../lib/error.js';
-const { IDExtractorError } = error;
+const {
+  IDExtractorError,
+  InvalidTypeError,
+  UnknownYouTubeDomainError
+} = error;
 
 describe('module:url-utils', function () {
   describe('.URLUtils', function () {
@@ -12,21 +16,21 @@ describe('module:url-utils', function () {
       ],
       extractVideoId: [
         'should return the video ID of given YouTube URL if it is valid',
-        'should throw a `TypeError` if given URL is neither a string or URL object',
+        'should throw a `InvalidTypeError` if given URL is neither a string or URL object',
         'should throw a `IDExtractorError` if an incorrect YouTube URL are given',
-        "should throw a `URIError` if the given URL's domain is not a YouTube domain"
+        "should throw a `UnknownYouTubeDomainError` if the given URL's domain is not a YouTube domain"
       ],
       validateUrl: [
         'should return true if the given URL is valid',
         "should return false if the given URL's domain name is not a YouTube domain",
         'should return false if the given URL is valid but with invalid video ID',
         'should return true if the given URL is valid but with invalid video ID and `withId` disabled',
-        'should throw `TypeError` if the given URL is neither a string or URL object'
+        'should throw `InvalidTypeError` if the given URL is neither a string or URL object'
       ],
       validateId: [
         'should return true if the given ID is valid',
         'should return false if the given ID is invalid',
-        'should throw `TypeError` if the given ID is not a string'
+        'should throw `InvalidTypeError` if the given ID is not a string'
       ]
     };
 
@@ -52,11 +56,11 @@ describe('module:url-utils', function () {
       });
 
       it(testMessages.extractVideoId[1], function () {
-        assert.throws(() => URLUtils.extractVideoId(123), TypeError);
-        assert.throws(() => URLUtils.extractVideoId([]), TypeError);
-        assert.throws(() => URLUtils.extractVideoId(true), TypeError);
-        assert.throws(() => URLUtils.extractVideoId(0n), TypeError);
-        assert.throws(() => URLUtils.extractVideoId(-Infinity), TypeError);
+        assert.throws(() => URLUtils.extractVideoId(123), InvalidTypeError);
+        assert.throws(() => URLUtils.extractVideoId([]), InvalidTypeError);
+        assert.throws(() => URLUtils.extractVideoId(true), InvalidTypeError);
+        assert.throws(() => URLUtils.extractVideoId(0n), InvalidTypeError);
+        assert.throws(() => URLUtils.extractVideoId(-Infinity), InvalidTypeError);
       });
 
       it(testMessages.extractVideoId[2], function () {
@@ -69,7 +73,7 @@ describe('module:url-utils', function () {
       });
 
       it(testMessages.extractVideoId[3], function () {
-        assert.throws(() => URLUtils.extractVideoId('https://open.spotify.com'), URIError);
+        assert.throws(() => URLUtils.extractVideoId('https://open.spotify.com'), UnknownYouTubeDomainError);
       });
     });
 
@@ -98,11 +102,11 @@ describe('module:url-utils', function () {
       });
 
       it(testMessages.validateUrl[4], function () {
-        assert.throws(() => URLUtils.validateUrl(123), TypeError);
-        assert.throws(() => URLUtils.validateUrl([]), TypeError);
-        assert.throws(() => URLUtils.validateUrl(0n), TypeError);
-        assert.throws(() => URLUtils.validateUrl(-Infinity), TypeError);
-        assert.throws(() => URLUtils.validateUrl(/abc/), TypeError);
+        assert.throws(() => URLUtils.validateUrl(123), InvalidTypeError);
+        assert.throws(() => URLUtils.validateUrl([]), InvalidTypeError);
+        assert.throws(() => URLUtils.validateUrl(0n), InvalidTypeError);
+        assert.throws(() => URLUtils.validateUrl(-Infinity), InvalidTypeError);
+        assert.throws(() => URLUtils.validateUrl(/abc/), InvalidTypeError);
       });
     });
 
@@ -119,11 +123,11 @@ describe('module:url-utils', function () {
       });
 
       it(testMessages.validateId[2], function () {
-        assert.throws(() => URLUtils.validateId(/_ba$/), TypeError);
-        assert.throws(() => URLUtils.validateId(0x12345), TypeError);
-        assert.throws(() => URLUtils.validateId(999n), TypeError);
-        assert.throws(() => URLUtils.validateId(Infinity), TypeError);
-        assert.throws(() => URLUtils.validateId({}), TypeError);
+        assert.throws(() => URLUtils.validateId(/_ba$/), InvalidTypeError);
+        assert.throws(() => URLUtils.validateId(0x12345), InvalidTypeError);
+        assert.throws(() => URLUtils.validateId(999n), InvalidTypeError);
+        assert.throws(() => URLUtils.validateId(Infinity), InvalidTypeError);
+        assert.throws(() => URLUtils.validateId({}), InvalidTypeError);
       });
     });
   });
