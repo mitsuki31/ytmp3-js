@@ -13,7 +13,7 @@ import {
 } from '../../lib/cache.js';
 import utils from '../../lib/utils/index.js';
 import error from '../../lib/error.js';
-const { InvalidTypeError, IDValidationError } = error;
+const { InvalidTypeError, IDValidationError, CacheValidationError } = error;
 
 describe('module:cache', function () {
   const testMessages = {
@@ -29,7 +29,6 @@ describe('module:cache', function () {
     ],
     VInfoCache: [
       'should create a cache for video information',
-      'should check if a cache exists and is valid',
       'should retrieve cached video information',
       'should retrieve all caches',
       'should throw InvalidTypeError for invalid video info object',
@@ -37,7 +36,8 @@ describe('module:cache', function () {
       'should throw InvalidTypeError for invalid video ID type',
       'should throw InvalidTypeError for invalid cache directory type',
       'should throw IDValidationError for invalid video ID',
-      'should able to create a simple human-readable string of the cache object'
+      'should able to create a simple human-readable string of the cache object',
+      'should validate cache object when cacheOptions.validate is true'
     ]
   };
 
@@ -104,80 +104,93 @@ describe('module:cache', function () {
   });
 
   describe('VInfoCache', function () {
+    let invalidIdCache, invalidCachePath;
+
+    before(async function () {
+      invalidIdCache = '12345abcd_-';
+      invalidCachePath = path.join(tempCacheDir, 'invalidCache');
+
+      await fs.promises.mkdir(invalidCachePath);
+      await fs.promises.writeFile(path.join(invalidCachePath, invalidIdCache), JSON.stringify({
+        id: invalidIdCache, encoding: 'binary', videoInfo: { type: 'invalid/type', data: null }
+      }));
+    });
+
     it(testMessages.VInfoCache[0], async function () {
       const cachePath = await VInfoCache.createCache(testVideoInfo, tempCacheDir);
       assert.ok(fs.existsSync(cachePath));
     });
 
     it(testMessages.VInfoCache[1], async function () {
-      const cacheExists = await VInfoCache.checkCache(testVideoId, tempCacheDir);
-      assert.strictEqual(cacheExists, true);
-    });
-
-    it(testMessages.VInfoCache[2], async function () {
       const cachedInfo = await VInfoCache.getCache(testVideoId, tempCacheDir);
       assert.strictEqual(cachedInfo.id, testVideoId);
     });
 
-    it(testMessages.VInfoCache[3], async function () {
+    it(testMessages.VInfoCache[2], async function () {
       const allCaches = await VInfoCache.getAllCaches(tempCacheDir);
       assert.ok(Array.isArray(allCaches));
       assert.ok(allCaches.length > 0);
       assert.ok(allCaches.some(cache => cache.id === testVideoId));
     });
 
-    it(testMessages.VInfoCache[4], async function () {
+    it(testMessages.VInfoCache[3], async function () {
       await assert.rejects(async () => {
         await VInfoCache.createCache('invalid video info', tempCacheDir);
       }, InvalidTypeError);
     });
 
-    it(testMessages.VInfoCache[5], async function () {
+    it(testMessages.VInfoCache[4], async function () {
       await assert.rejects(async () => {
         await VInfoCache.createCache(testVideoInfo, 123);
       }, InvalidTypeError);
       await assert.rejects(async () => {
         await VInfoCache.getCache(testVideoId, 123);
       }, InvalidTypeError);
+    });
+
+    it(testMessages.VInfoCache[5], async function () {
       await assert.rejects(async () => {
-        await VInfoCache.checkCache(testVideoId, 123);
+        await VInfoCache.getCache(123, tempCacheDir);
       }, InvalidTypeError);
     });
 
     it(testMessages.VInfoCache[6], async function () {
       await assert.rejects(async () => {
-        await VInfoCache.getCache(123, tempCacheDir);
-      }, InvalidTypeError);
-      await assert.rejects(async () => {
-        await VInfoCache.checkCache(123, tempCacheDir);
+        await VInfoCache.getAllCaches(0b11111);
       }, InvalidTypeError);
     });
 
     it(testMessages.VInfoCache[7], async function () {
       await assert.rejects(async () => {
-        await VInfoCache.getAllCaches(0b11111);
-      }, InvalidTypeError);
+        await VInfoCache.getCache('123', tempCacheDir);
+      }, IDValidationError);
     });
 
     it(testMessages.VInfoCache[8], async function () {
-      await assert.rejects(async () => {
-        await VInfoCache.getCache('123', tempCacheDir);
-      }, IDValidationError);
-      await assert.rejects(async () => {
-        await VInfoCache.checkCache('123', tempCacheDir);
-      }, IDValidationError);
-    });
-
-    it(testMessages.VInfoCache[9], async function () {
       const actualCache = await VInfoCache.getCache(testVideoId, {
         cachePath: tempCacheDir,
         humanReadable: true
       });
-      const actualAllCaches = await VInfoCache.getAllCaches(tempCacheDir, true);
+      const actualAllCaches = await VInfoCache.getAllCaches({
+        cachePath: tempCacheDir,
+        humanReadable: true
+      });
       assert.strictEqual(typeof actualCache, 'string');
       assert.strictEqual(typeof actualAllCaches, 'string');
       assert.ok(actualCache.includes(testVideoId));
       assert.ok(actualAllCaches.includes(actualCache));
+    });
+
+    it(testMessages.VInfoCache[9], async function () {
+      await assert.rejects(async () => {
+        await VInfoCache.getCache(invalidIdCache, {
+          cachePath: invalidCachePath,
+          validate: true
+        });
+      }, CacheValidationError);
+      await assert.rejects(async () => {
+        await VInfoCache.getAllCaches({ cachePath: invalidCachePath, validate: true });
+      }, CacheValidationError);
     });
   });
 
