@@ -37,7 +37,8 @@ describe('module:cache', function () {
       'should throw InvalidTypeError for invalid cache directory type',
       'should throw IDValidationError for invalid video ID',
       'should able to create a simple human-readable string of the cache object',
-      'should validate cache object when cacheOptions.validate is true'
+      'should validate cache object when cacheOptions.validate is true',
+      'should delete a stored cache with the given ID'
     ]
   };
 
@@ -182,15 +183,32 @@ describe('module:cache', function () {
     });
 
     it(testMessages.VInfoCache[9], async function () {
-      await assert.rejects(async () => {
-        await VInfoCache.getCache(invalidIdCache, {
-          cachePath: invalidCachePath,
+      // Will not reject if the given cache object is valid
+      await assert.doesNotReject(async () => {
+        await VInfoCache.getCache(testVideoId, {
+          cachePath: tempCacheDir,
           validate: true
         });
       }, CacheValidationError);
+      // Will reject if the given cache object is invalid
       await assert.rejects(async () => {
         await VInfoCache.getAllCaches({ cachePath: invalidCachePath, validate: true });
       }, CacheValidationError);
+    });
+
+    it(testMessages.VInfoCache[10], async function () {
+      // Create a copy of temporary cache
+      const copiedCache = path.join(tempCacheDir, '01', testVideoId);
+      await utils.createDirIfNotExist(path.dirname(copiedCache));
+      await fs.promises.cp(path.join(tempCacheDir, testVideoId), copiedCache);
+
+      // Delete the cache
+      await assert.doesNotReject(async () => {
+        assert.ok(await VInfoCache.deleteCache(testVideoId, {
+          cachePath: path.dirname(copiedCache)
+        }));
+      });
+      assert.strictEqual(fs.existsSync(copiedCache), false);
     });
   });
 
