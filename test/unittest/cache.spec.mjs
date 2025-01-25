@@ -50,10 +50,11 @@ describe('module:cache', function () {
       ownerProfileUrl: 'https://example.com'
     }
   };
-  const testVideoId = testVideoInfo.videoDetails.videoId;
+  let testVideoId;
   let tempCacheDir;
 
   before(async function () {
+    testVideoId = testVideoInfo.videoDetails.videoId;
     tempCacheDir = getTempPath(path.join(utils.ROOTDIR, 'tmp', 'cache'));
     await utils.createDirIfNotExist(tempCacheDir);
   });
