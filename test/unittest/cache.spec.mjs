@@ -169,11 +169,11 @@ describe('module:cache', function () {
 
     it(testMessages.VInfoCache[8], async function () {
       const actualCache = await VInfoCache.getCache(testVideoId, {
-        cachePath: tempCacheDir,
+        cacheDir: tempCacheDir,
         humanReadable: true
       });
       const actualAllCaches = await VInfoCache.getAllCaches({
-        cachePath: tempCacheDir,
+        cacheDir: tempCacheDir,
         humanReadable: true
       });
       assert.strictEqual(typeof actualCache, 'string');
@@ -186,13 +186,13 @@ describe('module:cache', function () {
       // Will not reject if the given cache object is valid
       await assert.doesNotReject(async () => {
         await VInfoCache.getCache(testVideoId, {
-          cachePath: tempCacheDir,
+          cacheDir: tempCacheDir,
           validate: true
         });
       }, CacheValidationError);
       // Will reject if the given cache object is invalid
       await assert.rejects(async () => {
-        await VInfoCache.getAllCaches({ cachePath: invalidCachePath, validate: true });
+        await VInfoCache.getAllCaches({ cacheDir: invalidCachePath, validate: true });
       }, CacheValidationError);
     });
 
@@ -205,7 +205,7 @@ describe('module:cache', function () {
       // Delete the cache
       await assert.doesNotReject(async () => {
         assert.ok(await VInfoCache.deleteCache(testVideoId, {
-          cachePath: path.dirname(copiedCache)
+          cacheDir: path.dirname(copiedCache)
         }));
       });
       assert.strictEqual(fs.existsSync(copiedCache), false);
