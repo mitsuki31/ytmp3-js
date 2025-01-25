@@ -127,4 +127,84 @@ describe('module:error', function () {
       assert.strictEqual(err.path, undefined);
     });
   });
+
+  describe('.IDValidationError', function () {
+    it('should create an instance with a message string', function () {
+      const err = new error.IDValidationError('Invalid ID');
+      assert.ok(err instanceof Error);
+      assert.strictEqual(err.message, 'Invalid ID');
+    });
+  });
+
+  describe('.URLValidationError', function () {
+    it('should create an instance with a message string', function () {
+      const err = new error.URLValidationError('Invalid URL');
+      assert.ok(err instanceof Error);
+      assert.strictEqual(err.message, 'Invalid URL');
+    });
+  });
+
+  describe('.UnknownYouTubeDomainError', function () {
+    it('should create an instance with a message string', function () {
+      const err = new error.UnknownYouTubeDomainError('Unknown domain');
+      assert.ok(err instanceof Error);
+      assert.strictEqual(err.message, 'Unknown domain');
+    });
+  });
+
+  describe('.CacheValidationError', function () {
+    it('should create an instance with a message string', function () {
+      const err = new error.CacheValidationError('Invalid cache');
+      assert.ok(err instanceof Error);
+      assert.strictEqual(err.message, 'Invalid cache');
+    });
+
+    it('should create an instance with a message from another `Error` instance', function () {
+      const msg = 'Original error message';
+      const originalError = new Error(msg);
+      const err = new error.CacheValidationError(originalError);
+      assert.strictEqual(err.message, msg);
+    });
+
+    it('should create an instance with `id`, `type`, and `path` if provided', function () {
+      const err = new error.CacheValidationError('Cache error', {
+        id: 'cache123',
+        type: 'memory',
+        path: '/cache/path',
+      });
+      assert.strictEqual(err.id, 'cache123');
+      assert.strictEqual(err.type, 'memory');
+      assert.strictEqual(err.path, '/cache/path');
+    });
+
+    it('should not set `id`, `type`, or `path` if they are not strings', function () {
+      const err = new error.CacheValidationError('Cache error', {
+        id: 123,
+        type: null,
+        path: {},
+      });
+      assert.strictEqual(err.id, undefined);
+      assert.strictEqual(err.type, undefined);
+      assert.strictEqual(err.path, undefined);
+    });
+
+    it('should set the cause if it is an instance of `Error`', function () {
+      const cause = new Error('Underlying cause');
+      const err = new error.CacheValidationError('Cache error', { cause });
+      assert.strictEqual(err.cause, cause);
+    });
+
+    it('should not set the cause if it is not an instance of `Error`', function () {
+      const err = new error.CacheValidationError('Cache error', { cause: 'Not an error' });
+      assert.strictEqual(err.cause, undefined);
+    });
+
+    it('should ignore options that are not plain objects', function () {
+      const err = new error.CacheValidationError('Cache error', null);
+      assert.strictEqual(err.id, undefined);
+      assert.strictEqual(err.type, undefined);
+      assert.strictEqual(err.path, undefined);
+      assert.strictEqual(err.cause, undefined);
+    });
+  });
 });
