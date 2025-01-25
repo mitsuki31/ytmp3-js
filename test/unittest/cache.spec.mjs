@@ -38,7 +38,8 @@ describe('module:cache', function () {
       'should throw IDValidationError for invalid video ID',
       'should able to create a simple human-readable string of the cache object',
       'should validate cache object when cacheOptions.validate is true',
-      'should delete a stored cache with the given ID'
+      'should delete a stored cache with the given ID',
+      'should return false if the cache deletion is unsuccessful due to non-existent cache'
     ]
   };
 
@@ -148,6 +149,9 @@ describe('module:cache', function () {
       await assert.rejects(async () => {
         await VInfoCache.getCache(testVideoId, 123);
       }, InvalidTypeError);
+      await assert.rejects(async () => {
+        await VInfoCache.deleteCache(testVideoId, 123);
+      }, InvalidTypeError);
     });
 
     it(testMessages.VInfoCache[5], async function () {
@@ -210,6 +214,14 @@ describe('module:cache', function () {
         }));
       });
       assert.strictEqual(fs.existsSync(copiedCache), false);
+    });
+
+    it(testMessages.VInfoCache[11], async function () {
+      await assert.doesNotReject(async () => {
+        assert.strictEqual(await VInfoCache.deleteCache('non_existID', {
+          cacheDir: tempCacheDir
+        }), false);
+      });
     });
   });
 
