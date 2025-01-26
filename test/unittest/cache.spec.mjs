@@ -39,7 +39,8 @@ describe('module:cache', function () {
       'should able to create a simple human-readable string of the cache object',
       'should validate cache object when cacheOptions.validate is true',
       'should delete a stored cache with the given ID',
-      'should return false if the cache deletion is unsuccessful due to non-existent cache'
+      'should return false if the cache deletion is unsuccessful due to non-existent cache',
+      'should able to overwrite the existing cache file if `cacheOptions.force` enabled'
     ]
   };
 
@@ -222,6 +223,28 @@ describe('module:cache', function () {
           cacheDir: tempCacheDir
         }), false);
       });
+    });
+
+    it(testMessages.VInfoCache[12], async function () {
+      // Get the cache before update
+      const cache = await VInfoCache.getCache(testVideoId, {
+        cacheDir: tempCacheDir
+      });
+
+      // Update the cache file
+      await VInfoCache.createCache(testVideoInfo, {
+        cacheDir: tempCacheDir,
+        force: true  // enable the force creation (e.g., overwrite)
+      });
+      // Get the updated version of cache
+      const cacheUpdated = await VInfoCache.getCache(testVideoId, {
+        cacheDir: tempCacheDir
+      });
+
+      // The ID will still be the same
+      assert.strictEqual(cache.id, cacheUpdated.id);
+      // ... but not for the `createdDate` timestamp
+      assert.notStrictEqual(cache.createdDate, cacheUpdated.createdDate);
     });
   });
 
