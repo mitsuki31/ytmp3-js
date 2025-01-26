@@ -40,7 +40,8 @@ describe('module:cache', function () {
       'should validate cache object when cacheOptions.validate is true',
       'should delete a stored cache with the given ID',
       'should return false if the cache deletion is unsuccessful due to non-existent cache',
-      'should able to overwrite the existing cache file if `cacheOptions.force` enabled'
+      'should able to overwrite the existing cache file if `cacheOptions.force` enabled',
+      'should return an empty array or `null` depending on `humanReadable` option when no caches found'
     ]
   };
 
@@ -245,6 +246,16 @@ describe('module:cache', function () {
       assert.strictEqual(cache.id, cacheUpdated.id);
       // ... but not for the `createdDate` timestamp
       assert.notStrictEqual(cache.createdDate, cacheUpdated.createdDate);
+    });
+
+    it(testMessages.VInfoCache[13], async function () {
+      const cacheDir = getTempPath(tempCacheDir);
+      const allCacheList = await VInfoCache.getAllCaches({ cacheDir });
+      const allCacheStr = await VInfoCache.getAllCaches({ cacheDir, humanReadable: true });
+
+      assert.ok(Array.isArray(allCacheList));
+      assert.deepStrictEqual(allCacheList, []);
+      assert.strictEqual(allCacheStr, null);
     });
   });
 
