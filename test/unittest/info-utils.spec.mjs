@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { MIMEType, MIMEParams } from 'node:util';
 
-import fmtUtils from '../../lib/utils/format-utils.js';
+import fmtUtils from '../../lib/utils/info-utils.js';
 import TypeUtils from '../../lib/utils/type-utils.js';
 import utils from '../../lib/utils/index.js';
 import error from '../../lib/error.js';
