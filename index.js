@@ -20,6 +20,7 @@ const {
 const {
   URLUtils,
   FormatUtils,
+  InfoUtils,
   ThumbnailUtils
 } = require('./lib/utils');
 const error = require('./lib/error');
@@ -43,6 +44,8 @@ module.exports = Object.freeze({
   validateId: URLUtils.validateId,
   // :: FormatUtils
   FormatUtils,
+  // :: InfoUtils
+  InfoUtils,
   // :: ThumbnailUtils
   ThumbnailUtils,
   getAllThumbnails: ThumbnailUtils.getAllThumbnails,

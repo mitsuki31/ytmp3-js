@@ -1,0 +1,83 @@
+{
+  "player_response": {
+    "captions": {
+      "playerCaptionsTracklistRenderer": {
+        "captionTracks": [
+          {
+            "baseUrl": "http://example.com/caption1"
+          },
+          {
+            "baseUrl": "http://example.com/caption2"
+          }
+        ]
+      }
+    },
+    "playabilityStatus": {
+      "status": "OK",
+      "playableInEmbed": true,
+      "offlineability": {
+        "offlineabilityRenderer": {
+          "offlineable": false,
+          "infoRenderer": {
+            "dismissableDialogRenderer": {
+              "dialogMessage": "Sorry, this video can't be taken offline.",
+              "title": "Download unavailable"
+            }
+          }
+        }
+      }
+    }
+  },
+  "formats": [
+    {
+      "itag": 18,
+      "mimeType": "video/mp4",
+      "hasVideo": true,
+      "hasAudio": true
+    },
+    {
+      "itag": 140,
+      "mimeType": "audio/mp4",
+      "hasVideo": false,
+      "hasAudio": true
+    },
+    {
+      "itag": 133,
+      "mimeType": "video/mp4",
+      "hasVideo": true,
+      "hasAudio": false
+    }
+  ],
+  "videoDetails": {
+    "author": {
+      "id": "author-id",
+      "name": "Author Name - Topic",
+      "user": "authorusername",
+      "user_url": "http://youtube.com/user/author",
+      "channel_url": "http://youtube.com/channel/author",
+      "external_channel_url": "http://external.com/channel/author",
+      "thumbnails": [
+        {
+          "url": "http://example.com/thumbnail.jpg"
+        }
+      ],
+      "verified": true,
+      "subscriber_count": 1000
+    },
+    "videoId": "video_id123",
+    "title": "Video Title",
+    "lengthSeconds": "300",
+    "uploadDate": "2022-01-01T11:17:10-07:00",
+    "publishDate": "2022-01-01T11:17:10-07:00",
+    "viewCount": "10000",
+    "likes": 500,
+    "description": "Video description.",
+    "keywords": [
+      "keyword1",
+      "keyword2"
+    ],
+    "category": "Music",
+    "age_restricted": false,
+    "isPrivate": false
+  }
+}
