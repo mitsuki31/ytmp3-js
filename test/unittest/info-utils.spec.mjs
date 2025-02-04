@@ -13,8 +13,9 @@ const { InvalidTypeError } = error;
 
 const TEST_ASSETS = path.join(utils.ROOTDIR, 'test', 'assets');
 
-describe('module:format-utils', function () {
+describe('module:info-utils', function () {
   const FORMATS = {};  // Store the format objects
+  let VIDEO_INFO;
   let formatsPath;
 
   before(async function () {
@@ -22,6 +23,10 @@ describe('module:format-utils', function () {
 
     // Import and parse the format objects from assets
     Object.assign(FORMATS, JSON.parse(await fs.promises.readFile(formatsPath)));
+    
+    // Import and parse the video info object
+    VIDEO_INFO = JSON.parse(
+      await fs.promises.readFile(path.join(TEST_ASSETS, 'json', 'videoInfo.json')));
   });
 
   describe('.DateFormatter', function () {
@@ -256,16 +261,7 @@ describe('module:format-utils', function () {
       });
     });
   });
-});
-
-describe('module:info-utils', function () {
-  let VIDEO_INFO;
-
-  before(async function () {
-    VIDEO_INFO = JSON.parse(
-      await fs.promises.readFile(path.join(TEST_ASSETS, 'json', 'videoInfo.json')));
-  });
-
+  
   describe('~InfoUtils', function () {
     const testMessages = {
       getAuthor: [
