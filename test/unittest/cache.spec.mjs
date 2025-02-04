@@ -175,6 +175,9 @@ describe('module:cache', function () {
     });
 
     it(testMessages.VInfoCache[8], async function () {
+      this.timeout(5 * 1000);  // 5s
+      this.slow(3 * 1000);     // 3s
+
       const actualCache = await VInfoCache.getCache(testVideoId, {
         cacheDir: tempCacheDir,
         humanReadable: true
