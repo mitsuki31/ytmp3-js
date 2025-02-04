@@ -315,6 +315,9 @@ describe('module:info-utils', function () {
       ],
       getFormats: [
         'should extract and return the available formats of the video',
+        'should extract and filter the formats that have audio content only',
+        'should extract and filter the formats that have video content only',
+        'should extract and filter the formats that have both audio and video content',
         'should throw a InvalidTypeError if the input is not an object',
         'should throw a InvalidTypeError if the given filter type is an unexpected value'
       ],
@@ -516,16 +519,44 @@ describe('module:info-utils', function () {
     describe('.getFormats', function () {
       it(testMessages.getFormats[0], function () {
         const formats = InfoUtils.getFormats(VIDEO_INFO);
+        const expectedFormats = VIDEO_INFO.formats;
         assert.ok(Array.isArray(formats));
-        assert.strictEqual(formats.length, 3);
+        assert.deepStrictEqual(formats, expectedFormats);
       });
 
       it(testMessages.getFormats[1], function () {
+        const formatsAudioOnly = InfoUtils.getFormats(VIDEO_INFO, 'audio');
+        const expectedFormats = VIDEO_INFO.formats.filter(info => {
+          return info.hasAudio && !info.hasVideo;
+        });
+        assert.ok(Array.isArray(formatsAudioOnly));
+        assert.deepStrictEqual(formatsAudioOnly, expectedFormats);
+      });
+
+      it(testMessages.getFormats[2], function () {
+        const formatsVideoOnly = InfoUtils.getFormats(VIDEO_INFO, 'video');
+        const expectedFormats = VIDEO_INFO.formats.filter(info => {
+          return !info.hasAudio && info.hasVideo;
+        });
+        assert.ok(Array.isArray(formatsVideoOnly));
+        assert.deepStrictEqual(formatsVideoOnly, expectedFormats);
+      });
+
+      it(testMessages.getFormats[3], function () {
+        const formatsVideoAndAudio = InfoUtils.getFormats(VIDEO_INFO, 'both');
+        const expectedFormats = VIDEO_INFO.formats.filter(info => {
+          return info.hasAudio && info.hasVideo;
+        });
+        assert.ok(Array.isArray(formatsVideoAndAudio));
+        assert.deepStrictEqual(formatsVideoAndAudio, expectedFormats);
+      });
+
+      it(testMessages.getFormats[4], function () {
         assert.throws(() => InfoUtils.getFormats('not an object'), InvalidTypeError);
         assert.throws(() => InfoUtils.getFormats(VIDEO_INFO, 'invalid filter'), InvalidTypeError);
       });
 
-      it(testMessages.getFormats[2], function () {
+      it(testMessages.getFormats[5], function () {
         assert.throws(() => InfoUtils.getFormats(VIDEO_INFO, 'invalid filter'), InvalidTypeError);
       });
     });
