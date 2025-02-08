@@ -69,7 +69,7 @@ module.exports = [
         }
       }],
       'linebreak-style': [ 'warn', 'unix' ],
-      quotes: [ 'warn', 'single', { avoidEscape: false } ],
+      quotes: [ 'warn', 'single', { avoidEscape: true } ],
       semi: [ 'error', 'always' ],
       camelcase: [ 'error', { properties: 'always' } ],
       curly: [ 'error', 'multi-line', 'consistent' ],
