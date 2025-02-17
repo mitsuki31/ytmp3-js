@@ -80,6 +80,7 @@ describe('module:config', function () {
       outDir: path.resolve('.', 'tmp', 'downloads'),
       convertAudio: true,
       quiet: false,
+      useCache: true,
       converterOptions: {
         inputOptions: undefined,
         outputOptions: undefined,
@@ -355,7 +356,8 @@ describe('module:config', function () {
           outDir: path.join(os.homedir(), 'downloads'),  // Relative to 'cwd'
           convertAudio: false,
           converterOptions: audioconv.defaultOptions,
-          quiet: true
+          quiet: true,
+          useCache: true
         }
       }
 
