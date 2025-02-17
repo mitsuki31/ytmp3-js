@@ -49,6 +49,10 @@ describe('module:utils', function () {
     ],
     dropNullAndUndefined: [
       'should return filtered object without null or undefined properties'
+    ],
+    getType: [
+      'should return a string representing the given object',
+      'should return a string representing the name of given object'
     ]
   };
 
@@ -280,6 +284,18 @@ describe('module:utils', function () {
       };
       const actualObj = utils.dropNullAndUndefined(obj);
       assert.deepStrictEqual(actualObj, expectedObj);
+    });
+  });
+
+  describe('#getType', function () {
+    it(testMessages.getType[0], function () {
+      assert.strictEqual(utils.getType({}), '[object Object]');
+      assert.strictEqual(utils.getType(new Error()), '[object Error]');
+    });
+
+    it(testMessages.getType[1], function () {
+      assert.strictEqual(utils.getType({}, true), 'Object');
+      assert.strictEqual(utils.getType(new Error(), true), 'Error');
     });
   });
 });
