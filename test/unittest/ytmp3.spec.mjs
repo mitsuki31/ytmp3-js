@@ -6,6 +6,8 @@ import { getTempPath } from '@mitsuki31/temppath';
 import ytmp3 from '../../lib/ytmp3.js';
 import audioconv from '../../lib/audioconv.js';
 import utils from '../../lib/utils/index.js';
+import error from '../../lib/error.js';
+const { InvalidTypeError } = error;
 const pkg = JSON.parse(
   fs.readFileSync(path.join(utils.ROOTDIR, 'package.json'), 'utf8'));
 
@@ -114,8 +116,8 @@ describe('module:ytmp3', function () {
     });
 
     it(testMessages.validateYTURL[3], function () {
-      assert.throws(() => ytmp3.validateYTURL(123, true), TypeError);
-      assert.throws(() => ytmp3.validateYTURL([], true), TypeError);
+      assert.throws(() => ytmp3.validateYTURL(123, true), InvalidTypeError);
+      assert.throws(() => ytmp3.validateYTURL([], true), InvalidTypeError);
     });
 
     after(function () {
@@ -135,7 +137,8 @@ describe('module:ytmp3', function () {
         outDir: path.resolve('.', 'tmp', 'downloads'),
         convertAudio: true,
         converterOptions: audioconv.defaultOptions,
-        quiet: true
+        quiet: true,
+        useCache: true
       };
       const actualOptions = ytmp3.resolveDlOptions({ downloadOptions });
       assert.deepStrictEqual(actualOptions, expectedDownloadOptions);
