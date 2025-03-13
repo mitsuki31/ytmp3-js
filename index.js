@@ -13,7 +13,6 @@
 'use strict';
 
 const {
-  defaultOptions: defaultAudioConvOptions,
   checkFfmpeg,
   convertAudio
 } = require('./lib/audioconv');
@@ -24,20 +23,32 @@ const {
   ThumbnailUtils
 } = require('./lib/utils');
 const error = require('./lib/error');
+const { defaults } = require('./lib/utils/options');
 const ytmp3 = require('./lib/ytmp3');
 
+// Change several default options for `DownloadOptions`
+const { DownloadOptions: OldDownloadOptions } = defaults;
+defaults.DownloadOptions = Object.freeze({
+  ...OldDownloadOptions,
+  handler: ytmp3.defaultHandler,
+  // Set the `quiet` option to `true` by default
+  quiet: true
+});
 
-module.exports = Object.freeze({
-  // :: ytmp3 (Core)
-  name: ytmp3.NAME,
-  version: ytmp3.VERSION,
-  // eslint-disable-next-line camelcase
-  version_info: ytmp3.VERSION_INFO,
-  singleDownload: ytmp3.singleDownload,
-  batchDownload: ytmp3.batchDownload,
-  downloadFromID: ytmp3.downloadFromID,
-  getVideosInfo: ytmp3.getVideosInfo,
-  getInfo: ytmp3.getInfo,
+// Change several default options for `AudioConverterOptions`
+defaults.AudioConverterOptions = Object.freeze({
+  ...defaults.AudioConverterOptions,
+  // Set the `quiet` option to `true` by default
+  quiet: true
+});
+
+
+Object.assign(ytmp3, {
+  // :: audioconv
+  checkFfmpeg,
+  convertAudio,
+  // :: defaults options
+  defaults,
   // :: URLUtils
   YTURLUtils: URLUtils,  // aliased to `YTURLUtils` for readability
   extractVideoId: URLUtils.extractVideoId,
@@ -52,10 +63,8 @@ module.exports = Object.freeze({
   getAllThumbnails: ThumbnailUtils.getAllThumbnails,
   getThumbnailByResolution: ThumbnailUtils.getThumbnailByResolution,
   getThumbnail: ThumbnailUtils.getThumbnail,
-  // :: audioconv
-  defaultAudioConvOptions,
-  checkFfmpeg,
-  convertAudio,
   // :: error
   ...error
 });
+
+module.exports = Object.freeze(ytmp3);
