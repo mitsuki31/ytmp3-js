@@ -1,7 +1,9 @@
 import assert from 'node:assert';
 
 import options from '../../lib/utils/options.js';
+import error from '../../lib/error.js';
 const { resolve } = options;
+const { InvalidTypeError } = error;
 
 describe('module:options', function () {
   const testMessages = {
@@ -15,7 +17,8 @@ describe('module:options', function () {
       'should validate instance of a class correctly',
       'should reject incorrect class instance types',
       'should handle multiple expected types correctly',
-      'should fallback when multiple expected types do not match'
+      'should fallback when multiple expected types do not match',
+      'should throw `InvalidTypeError` if the `shouldThrow` is true',
     ]
   };
 
@@ -113,5 +116,18 @@ describe('module:options', function () {
       const result = resolve(input, expected);
       assert.strictEqual(result.value, 'fallback');
     });
+
+    it(testMessages.resolve[10], function () {
+      const err = new InvalidTypeError();
+      err.message = /invalid type/;
+      err.actualType = 'string';
+      err.expectedType = 'number';
+
+      const input = { value: '42' };
+      const expected = { value: ['number', 'fallback'] };
+      assert.throws(() => {
+        resolve(input, expected, true);
+      }, err);
+    })
   });
 });
