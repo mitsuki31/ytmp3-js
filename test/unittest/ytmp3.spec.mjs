@@ -13,15 +13,15 @@ const pkg = JSON.parse(
 
 describe('module:ytmp3', function () {
   const testMessages = {
-    NAME: [
+    name: [
       'should be a string type',
       'should be match to "ytmp3"'
     ],
-    VERSION: [
+    version: [
       'should be a string type',
       'should be match to the version in package.json'
     ],
-    VERSION_INFO: [
+    version_info: [
       'should be a frozen object',
       'should match with `VERSION` value when assembled as a string',
       'should throw an error (in ESM) when attempting to modify read-only properties'
@@ -42,45 +42,45 @@ describe('module:ytmp3', function () {
     ]
   };
 
-  describe('~NAME', function () {
-    it(testMessages.NAME[0], function () {
-      assert.strictEqual(typeof ytmp3.NAME, 'string');
+  describe('.name', function () {
+    it(testMessages.name[0], function () {
+      assert.strictEqual(typeof ytmp3.name, 'string');
     });
 
-    it(testMessages.NAME[1], function () {
-      assert.strictEqual(ytmp3.NAME, 'ytmp3');
-    });
-  });
-
-  describe('~VERSION', function () {
-    it(testMessages.VERSION[0], function () {
-      assert.strictEqual(typeof ytmp3.VERSION, 'string');
-    });
-
-    it(testMessages.VERSION[1], function () {
-      assert.strictEqual(ytmp3.VERSION, pkg.version);
+    it(testMessages.name[1], function () {
+      assert.strictEqual(ytmp3.name, 'ytmp3');
     });
   });
 
-  describe('~VERSION_INFO', function () {
-    it(testMessages.VERSION_INFO[0], function () {
-      assert.ok(utils.isObject(ytmp3.VERSION_INFO));
-      assert.ok(Object.isFrozen(ytmp3.VERSION_INFO));
+  describe('.version', function () {
+    it(testMessages.version[0], function () {
+      assert.strictEqual(typeof ytmp3.version, 'string');
     });
 
-    it(testMessages.VERSION_INFO[1], function () {
-      const versionStr = Object.values(ytmp3.VERSION_INFO).reduce((acc, val) => {
+    it(testMessages.version[1], function () {
+      assert.strictEqual(ytmp3.version, pkg.version);
+    });
+  });
+
+  describe('.version_info', function () {
+    it(testMessages.version_info[0], function () {
+      assert.ok(utils.isObject(ytmp3.version_info));
+      assert.ok(Object.isFrozen(ytmp3.version_info));
+    });
+
+    it(testMessages.version_info[1], function () {
+      const versionStr = Object.values(ytmp3.version_info).reduce((acc, val) => {
         acc += (typeof val !== 'number' && val.toLowerCase() === 'beta')
           ? `-${val}`
           : (val !== 'stable') ? ((!acc) ? val : `.${val}`) : '';
         return acc;
       }, '');
-      assert.strictEqual(versionStr, ytmp3.VERSION);
+      assert.strictEqual(versionStr, ytmp3.version);
     });
 
-    it(testMessages.VERSION_INFO[2], function () {
+    it(testMessages.version_info[2], function () {
       // Attempt to modify the property value
-      assert.throws(() => ytmp3.VERSION_INFO.major = Infinity, {
+      assert.throws(() => ytmp3.version_info.major = Infinity, {
         message: /cannot assign/i
       });
     });
@@ -106,7 +106,7 @@ describe('module:ytmp3', function () {
 
     it(testMessages.validateYTURL[1], function () {
       assert.doesNotThrow(() => ytmp3.validateYTURL(
-        new URL('https://youtu.be/Z0z5mNPODrc', 'https://youtube.com'), true),
+        new URL('Z0z5mNPODrc', 'https://youtu.be'), true),
         Error
       );
     });
