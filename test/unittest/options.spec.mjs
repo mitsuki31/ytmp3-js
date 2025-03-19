@@ -2,6 +2,7 @@ import assert from 'node:assert';
 
 import options from '../../lib/utils/options.js';
 import error from '../../lib/error.js';
+import TypeUtils from '../../lib/utils/type-utils.js';
 const { resolve } = options;
 const { InvalidTypeError } = error;
 
@@ -19,6 +20,8 @@ describe('module:options', function () {
       'should handle multiple expected types correctly',
       'should fallback when multiple expected types do not match',
       'should throw `InvalidTypeError` if the `shouldThrow` is true',
+      'should not throw an error when shouldThrow is false',
+      'should throw an InvalidTypeError with correct details'
     ]
   };
 
@@ -119,15 +122,41 @@ describe('module:options', function () {
 
     it(testMessages.resolve[10], function () {
       const err = new InvalidTypeError();
+      const value = Buffer.from('hello');
+      const expectedType = ['string', Error];
       err.message = /invalid type/;
-      err.actualType = 'string';
-      err.expectedType = 'number';
+      err.actualType = TypeUtils.getType(value, false);
+      err.expectedType = expectedType.map(TypeUtils.getType).join(' | ');
 
-      const input = { value: '42' };
-      const expected = { value: ['number', 'fallback'] };
+      const input = { value };
+      const expected = { value: [expectedType, null] };
       assert.throws(() => {
         resolve(input, expected, true);
       }, err);
-    })
+    });
+
+    it(testMessages.resolve[11], function () {
+      const inOpts = { test: 'value' };
+      const expectedOpts = { test: ['string'] };
+      assert.doesNotThrow(() => {
+        resolve(inOpts, expectedOpts, false),
+        InvalidTypeError
+      });
+    });
+
+    it(testMessages.resolve[12], function () {
+      const inOpts = { test: 123 };
+      const expectedOpts = { test: ['string'] };
+      try {
+        resolve(inOpts, expectedOpts, true);
+      } catch (err) {
+        assert.ok(err instanceof InvalidTypeError);
+        assert.match(err.message, /test.+invalid type/i);
+        assert.deepStrictEqual(JSON.parse(JSON.stringify(err)), {
+          actualType: 'number',
+          expectedType: 'string'
+        });
+      }
+    });
   });
 });
