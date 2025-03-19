@@ -8,6 +8,8 @@ import utils from '../../lib/utils/index.js';
 import error from '../../lib/error.js';
 const {
   CACHE_KEYS,
+  CACHE_EXPIRE_TIME,
+  hasExpired,
   getCachePath,
   CacheBase64,
   CacheZLib,
@@ -51,8 +53,12 @@ const testMessages = {
     deleteCache: [
       'should delete a stored cache with the given ID',
       'should return false if the cache deletion is unsuccessful due to non-existent cache'
-    ]
-  }
+    ],
+  },
+  hasExpired: [
+    'should return true if the cache has expired',
+    'should return false if the cache has not expired'
+  ]
 };
 
 describe('module:cache', function () {
@@ -159,6 +165,9 @@ describe('module:cache', function () {
       });
 
       it(testMessages.VInfoCache.createCache[3], async function () {
+        this.timeout(2 * 1000);  // 2s
+        this.slow(700);          // 0.7s
+
         // Get the cache before update
         const cache = await VInfoCache.getCache(testVideoId, {
           cacheDir: tempCacheDir
@@ -269,6 +278,26 @@ describe('module:cache', function () {
             cacheDir: tempCacheDir
           }), false);
         });
+      });
+    });
+
+    describe('#hasExpired', function () {
+      it(testMessages.hasExpired[0], async function () {
+        const expiredCache = {
+          createdDate: Date.now() - (CACHE_EXPIRE_TIME + 1000),
+          videoInfo: { formats: [] }
+        };
+        const result = await hasExpired(expiredCache);
+        assert.strictEqual(result, true);
+      });
+
+      it(testMessages.hasExpired[1], async function () {
+        const validCache = {
+          createdDate: Date.now(),
+          videoInfo: { formats: [] }
+        };
+        const result = await hasExpired(validCache);
+        assert.strictEqual(result, false);
       });
     });
   });
