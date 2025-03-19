@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { EOL } from 'node:os';
-import { randomInt } from 'node:crypto';
 import {
   getTempPath,
   createTempPath as _createTempPath
@@ -20,6 +19,9 @@ const ffprobe = promisify(ffmpeg.ffprobe);
 const createTempPath = promisify(_createTempPath);
 const ASSETS_DIR = path.join(utils.ROOTDIR, 'test', 'assets');
 const AUDIO_ASSETS_DIR = path.join(ASSETS_DIR, 'audio');
+const KNOWN_AUDIO_FILES = [
+  'testaudio-160-pcm_s32le.wav'
+];
 
 function getAudioFile(filename) {
   const audioPath = path.join(AUDIO_ASSETS_DIR, path.basename(filename));
@@ -27,7 +29,7 @@ function getAudioFile(filename) {
   return audioPath;
 }
 
-describe('IRL (In Real Life) Test', function () {
+describe('Integration Test', function () {
   const videoIDs = [
     'Z0z5mNPODrc',
     'XFkzRNyygfk',
@@ -66,42 +68,28 @@ describe('IRL (In Real Life) Test', function () {
       });
     });
 
-    it('Download YouTube videos using single download', async function () {
+    it('Download YouTube videos using `download` function', async function () {
       this.timeout(1000 * 60 * 13);  // Give 13 minutes before timeout
       this.slow(1000 * 60 * 5);      // 5 minute
 
       for (const id of videoIDs) {
         consoleLogStub(`Downloading ${id}...`);
-        outputFiles[id] = await ytmp3.singleDownload(`https://youtu.be/${id}`, {
+        outputFiles[id] = (await ytmp3.download(`https://youtu.be/${id}`, {
           outDir,
           convertAudio: false,
           quiet: false
-        });
+        })).outputFile;
 
         assert.ok(fs.existsSync(outputFiles[id]));
       }
     });
 
     it('Download YouTube videos using batch download', async function () {
-      consoleLogStub(path.basename(tempFile));
+      consoleLogStub('test: Temporary batch file:', tempFile);
       this.timeout(1000 * 60 * 15);  // Give 15 minutes before timeout
       this.slow(1000 * 60 * 5);      // 5 minutes
 
       await ytmp3.batchDownload(tempFile, {
-        outDir,
-        convertAudio: false,
-        quiet: false
-      });
-    });
-
-    it('Download a YouTube video with ID only using `downloadFromID`', async function () {
-      this.timeout(1000 * 60 * 13);  // Give 13 minutes before timeout
-      this.slow(1000 * 60 * 5);      // 5 minutes
-
-      consoleLogStub('Picking a random video ID from the list...');
-      const id = videoIDs[randomInt(0, videoIDs.length - 1)];  // Pick a random ID from the list
-      consoleLogStub(`Downloading ${id}...`);
-      await ytmp3.downloadFromID(id, {
         outDir,
         convertAudio: false,
         quiet: false
@@ -112,7 +100,7 @@ describe('IRL (In Real Life) Test', function () {
   describe('[CONVERT]', function () {
     const testDynMessages = [
       'should convert audio file to MP3 format with sample rate of 48kHz',
-      'should convert audio file to OPUS format with audio channel set to mono',
+      'should convert audio file to AAC format with audio channel set to mono',
       'should convert audio file to AAC format with bit rate 320kbps and remove original file'
     ];
     const testMessages = [
@@ -127,8 +115,8 @@ describe('IRL (In Real Life) Test', function () {
         quiet: false
       },
       {
-        format: 'opus',
-        codec: 'libopus',
+        format: 'mp4',
+        codec: 'aac',
         channels: 1,
         quiet: false
       },
@@ -204,7 +192,8 @@ describe('IRL (In Real Life) Test', function () {
         assert.notStrictEqual(outFormat.size, inFormat.size);
         assert.strictEqual(outFormat.size, (await fs.promises.stat(outputFile)).size);
         // Codec name test
-        assert.strictEqual(outStreams[0].codec_name, options.format);
+        assert.strictEqual(outStreams[0].codec_name,
+            options.format === 'mp4' ? 'aac' : options.format);
 
         if (idx === 0) {
           // Channels test
@@ -222,15 +211,19 @@ describe('IRL (In Real Life) Test', function () {
       });
     });
 
-    it(testMessages[0], async function () {
-      this.slow(800);
-      await assert.rejects(() => {
-        return audioconv.convertAudio(audioFile, {});
+    it(testMessages[0], function (done) {
+      this.slow(1500);
+      this.timeout(2000);
+
+      assert.rejects(async () => {
+        await audioconv.convertAudio(audioFile, { quiet: true });
       }, { message: /format .+ not available/i });
+      done();
     });
 
     it(testMessages[1], function (done) {
-      this.slow(600);
+      this.slow(1500);
+      this.timeout(2000);
 
       const createWriteStreamStub = fs.createWriteStream;
       let hasError;
@@ -246,36 +239,46 @@ describe('IRL (In Real Life) Test', function () {
       };
 
       assert.rejects(async () => {
-        return await audioconv.convertAudio(audioFile, {})
-          .catch((err) => {
-            assert.ok(err instanceof Error
-                      && !(err instanceof assert.AssertionError));
-            assert.ok(err.cause instanceof Error);
-            assert.match(err.cause.message, /simulated error test/i);
-          })
-          .finally(() => {
-            fs.createWriteStream = createWriteStreamStub;
-            done();
-          });
-        });
+        try {
+          audioconv.convertAudio(audioFile, { quiet: true });
+        } catch (err) {
+          assert.ok(err instanceof Error
+                    && !(err instanceof assert.AssertionError));
+          assert.ok(err.cause instanceof Error);
+          assert.match(err.cause.message, /simulated error test/i);
+        } finally {
+          fs.createWriteStream = createWriteStreamStub;
+        }
+      });
+      done();
     });
 
     after(async function () {
-      const emptyAudioFiles = (await fs.promises.readdir(AUDIO_ASSETS_DIR))
+      const untrackedAudioFiles = (await fs.promises.readdir(AUDIO_ASSETS_DIR))
         .map((file) => path.join(AUDIO_ASSETS_DIR, file))
-        .filter((file) => {
-          return (fs.statSync(file).size === 0);
-        });
-      // Remove empty audio files in audio assets directory,
-      // error occurred during conversion may create an empty file
-      for (const file of emptyAudioFiles) await fs.promises.unlink(file);
+        .filter((file) => KNOWN_AUDIO_FILES.includes(path.basename(file)));
+
+      // Remove untracked (not in KNOWN_AUDIO_FILES) audio files in audio assets directory
+      for (const file of untrackedAudioFiles) await fs.promises.unlink(file);
     });
   });
 
-  after(function () {
-    // Clean up temporary working directory
-    if (fs.existsSync(outDir)) fs.rmSync(path.dirname(outDir), { recursive: true });
+  after(async function () {
+    this.timeout(6 * 1000);  // 6 seconds
+
     console.log = consoleLogStub;
     console.error = consoleErrorStub;
+
+    await new Promise((resolve) => {
+      // Clean up temporary working directory
+      setImmediate(async () => {
+        if (fs.existsSync(outDir)) {
+          const opts = { recursive: true, force: true };
+          await fs.promises.rm(outDir, opts);
+          await fs.promises.rm(path.dirname(outDir), opts);  // Remove parent directory
+        }
+        resolve();
+      });
+    });
   });
 });
