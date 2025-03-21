@@ -48,7 +48,7 @@ describe('module:audioconv', function () {
     let fakeFfmpegPath;
     let consoleLog;
     let consoleError;
-    let spawnSyncStub;
+    let execStub;
 
     before(async function () {
       ffmpegPath = process.env.FFMPEG_PATH || '';
@@ -57,7 +57,7 @@ describe('module:audioconv', function () {
         (process.platform === 'win32') ? 'ffmpeg.exe' : 'ffmpeg'
       );
 
-      spawnSyncStub = childProcess.spawnSync;
+      execStub = childProcess.exec;
       consoleLog = console.log;
       consoleError = console.error;
       console.log = () => {};
@@ -83,8 +83,9 @@ describe('module:audioconv', function () {
     it(testMessages.checkFfmpeg[2], async function () {
       delete process.env.FFMPEG_PATH;  // Ensure it is undeclared
       // Override `child_process.spawnSync`
-      childProcess.spawnSync = (command, args) => {
-        return { status: 0 };
+      childProcess.exec = (_command, callback) => {
+        process.nextTick(callback, null, '');
+        return { stdout: '' };
       };
 
       assert.ok(await audioconv.checkFfmpeg(true));
@@ -93,9 +94,10 @@ describe('module:audioconv', function () {
     it(testMessages.checkFfmpeg[3], async function () {
       delete process.env.FFMPEG_PATH;  // Ensure it is undeclared
       // Override `child_process.spawnSync`
-      childProcess.spawnSync = (command, args) => {
-        return { status: 1 };
-      };
+      childProcess.exec = (_command, callback) => {
+        process.nextTick(callback, new Error('Known error'), null);
+        return null;
+      }
 
       assert.equal(await audioconv.checkFfmpeg(true), false);
     });
@@ -103,7 +105,7 @@ describe('module:audioconv', function () {
     after(function () {
       console.log = consoleLog;
       console.error = consoleError;
-      childProcess.spawnSync = spawnSyncStub;
+      childProcess.exec = execStub;
       process.env.FFMPEG_PATH = ffmpegPath;
 
       // Delete the fake ffmpeg binary file
@@ -299,7 +301,7 @@ describe('module:audioconv', function () {
         extnames[1].toUpperCase()}\\)`
       )).test(pb));
       assert.ok((new RegExp(`${info.percent}%`)).test(pb));
-      assert.ok((new RegExp(`${(info.targetSize / 1024).toFixed(2)} MB`)).test(pb));
+      assert.ok((new RegExp(`${(info.targetSize / 1024).toFixed(2)} MiB`)).test(pb));
     });
   });
 
@@ -307,14 +309,14 @@ describe('module:audioconv', function () {
     let fakeAudioFile;
     let consoleLog;
     let consoleError;
-    let spawnSyncStub;
+    let execStub;
     let ffmpegPath;
     let PromiseStub;
 
     before(async function () {
       consoleLog = console.log;
       consoleError = console.error;
-      spawnSyncStub = childProcess.spawnSync;
+      execStub = childProcess.exec;
       ffmpegPath = process.env.FFMPEG_PATH;
       PromiseStub = global.Promise;
 
@@ -333,8 +335,9 @@ describe('module:audioconv', function () {
     });
 
     beforeEach(function () {
-      childProcess.spawnSync = () => {
-        return { status: 0 };
+      childProcess.exec = (_command, callback) => {
+        process.nextTick(callback, null, '');
+        return { stdout: '' };
       };
     });
 
@@ -346,7 +349,10 @@ describe('module:audioconv', function () {
 
     it(testMessages.convertAudio[1], async function () {
       delete process.env.FFMPEG_PATH;
-      childProcess.spawnSync = () => { return { status: 1 } };
+      childProcess.exec = (_command, callback) => {
+        process.nextTick(callback, new Error('Simulated error test'), null);
+        return null;
+      };
 
       await assert.rejects(async () => {
         await audioconv.convertAudio(fakeAudioFile);
@@ -365,7 +371,7 @@ describe('module:audioconv', function () {
     after(function () {
       console.log = consoleLog;
       console.error = consoleError;
-      childProcess.spawnSync = spawnSyncStub;
+      childProcess.exec = execStub;
       process.env.FFMPEG_PATH = ffmpegPath;
       global.Promise = PromiseStub;
 

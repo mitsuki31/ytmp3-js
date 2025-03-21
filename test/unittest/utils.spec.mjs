@@ -15,7 +15,8 @@ describe('module:utils', function () {
       'test done message',
       'test debug message',
       'test warning message',
-      'test error message'
+      'test error message',
+      'test line() function'
     ],
     isNullOrUndefined: [
       'should return true if given argument is a nullable value'
@@ -69,31 +70,61 @@ describe('module:utils', function () {
 
     describe('#info', function () {
       it(testMessages.logger[0], function () {
-        utils.logger.info('test');
+        const columns = process.stdout.columns;
+        utils.logger.info('test');  // Test
+        process.stdout.columns = 70;
+        utils.logger.info('test');  // Test
+        process.stdout.columns = columns;
       });
     });
 
     describe('#done', function () {
       it(testMessages.logger[1], function () {
-        utils.logger.done('test');
+        const columns = process.stdout.columns;
+        utils.logger.done('test');  // Test
+        process.stdout.columns = 70;
+        utils.logger.done('test');  // Test
+        process.stdout.columns = columns;
       });
     });
 
     describe('#debug', function () {
       it(testMessages.logger[2], function () {
-        utils.logger.debug('test');
+        const columns = process.stdout.columns;
+        utils.logger.debug('test');  // Test
+        process.stdout.columns = 70;
+        utils.logger.debug('test');  // Test
+        process.stdout.columns = columns;
       });
     });
 
     describe('#warn', function () {
       it(testMessages.logger[3], function () {
-        utils.logger.warn('test');
+        const columns = process.stdout.columns;
+        utils.logger.warn('test');  // Test
+        process.stdout.columns = 70;
+        utils.logger.warn('test');  // Test
+        process.stdout.columns = columns;
       });
     });
 
     describe('#error', function () {
       it(testMessages.logger[4], function () {
-        utils.logger.error('test');
+        const columns = process.stdout.columns;
+        utils.logger.error('test');  // Test
+        process.stdout.columns = 70;
+        utils.logger.error('test');  // Test
+        process.stdout.columns = columns;
+      });
+    });
+
+    describe('#line', function () {
+      it(testMessages.logger[5], function () {
+        const columns = process.stdout.columns;
+        utils.logger.line();  // Test
+        process.stdout.columns = 70;
+        utils.logger.line();  // Test
+        process.stdout.columns = columns;
       });
     });
 
