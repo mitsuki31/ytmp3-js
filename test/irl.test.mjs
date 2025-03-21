@@ -256,7 +256,7 @@ describe('Integration Test', function () {
     after(async function () {
       const untrackedAudioFiles = (await fs.promises.readdir(AUDIO_ASSETS_DIR))
         .map((file) => path.join(AUDIO_ASSETS_DIR, file))
-        .filter((file) => KNOWN_AUDIO_FILES.includes(path.basename(file)));
+        .filter((file) => !KNOWN_AUDIO_FILES.includes(path.basename(file)));
 
       // Remove untracked (not in KNOWN_AUDIO_FILES) audio files in audio assets directory
       for (const file of untrackedAudioFiles) await fs.promises.unlink(file);
