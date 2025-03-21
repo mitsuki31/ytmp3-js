@@ -119,7 +119,7 @@ describe('module:utils', function () {
     });
 
     describe('#line', function () {
-      it(testMessages.logger[5], () => {
+      it(testMessages.logger[5], function () {
         const columns = process.stdout.columns;
         utils.logger.line();  // Test
         process.stdout.columns = 70;
