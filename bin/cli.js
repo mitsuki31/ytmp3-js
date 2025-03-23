@@ -38,7 +38,7 @@ const TEMPDIR = path.join(path.dirname(getTempPath()), 'ytmp3-js');
 const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
 
 /** Store the file path of cached multiple download URLs. */
-let multipleDlCache = null;
+let tempBatchFile = null;
 
 
 /**
@@ -54,21 +54,30 @@ let multipleDlCache = null;
  * @private
  * @since   1.0.0
  */
-async function createCache(urls) {
-  const cache = await createTempPath(TEMPDIR, {
+async function createTempFile(urls) {
+  const tempFile = await createTempPath(TEMPDIR, {
     asFile: true,
     ext: 'dl',
     maxLen: 20
   });
   // Create write stream for cache file
-  const cacheStream = fs.createWriteStream(cache);
+  const stream = fs.createWriteStream(tempFile);
 
-  // Write URLs to cache
-  urls.forEach(url => cacheStream.write(`${url}${EOL}`));
+  await new Promise(resolve => {
+    const copyUrls = urls.map(url => {
+      return /^https?:\/\//.test(url) ? url : `https://youtu.be/${url}`;
+    });
 
-  // Close the write stream
-  cacheStream.end();
-  return cache;
+    setImmediate(() => {
+      // Write URLs to cache
+      copyUrls.forEach(url => stream.write(`${url}${EOL}`));
+      resolve();
+    });
+  });
+
+  // Close the write stream at the next tick
+  process.nextTick(() => stream.end());
+  return tempFile;
 }
 
 /**
@@ -78,11 +87,11 @@ async function createCache(urls) {
  * @private
  * @since    1.0.0
  */
-async function deleteCache() {
-  if (!multipleDlCache) return false;
-  if (fs.existsSync(multipleDlCache)) {
+async function deleteTempFile() {
+  if (!tempBatchFile) return false;
+  if (fs.existsSync(tempBatchFile)) {
     // Delete the parent directory of the cache file
-    await fs.promises.rm(path.dirname(multipleDlCache), { recursive: true, force: true });
+    await fs.promises.rm(path.dirname(tempBatchFile), { recursive: true, force: true });
   }
   return true;
 }
@@ -144,18 +153,21 @@ async function main() {
         process.exit(1);
       }
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
-      downloadSucceed = !!await ytmp3.batchDownload(DEFAULT_BATCH_FILE, downloadOptions);
+      downloadSucceed = !!(await ytmp3.batchDownload(
+        DEFAULT_BATCH_FILE, downloadOptions));
     } else if ((!urls || (urls && !urls.length)) && batchFile) {
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
-      downloadSucceed = !!await ytmp3.batchDownload(batchFile, downloadOptions);
+      downloadSucceed = !!(await ytmp3.batchDownload(batchFile, downloadOptions));
     } else if (urls.length && !batchFile) {
       if (Array.isArray(urls) && urls.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
-        multipleDlCache = await createCache(urls);
-        downloadSucceed = !!await ytmp3.batchDownload(multipleDlCache, downloadOptions);
+        tempBatchFile = await createTempFile(urls);
+        log.info('Created a temporary file:\x1b[93m',
+          path.basename(tempBatchFile), '\x1b[0m');
+        downloadSucceed = !!(await ytmp3.batchDownload(tempBatchFile, downloadOptions));
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
-        downloadSucceed = !!await ytmp3.singleDownload(urls[0], downloadOptions);
+        downloadSucceed = !!(await ytmp3.download(urls[0], downloadOptions));
       }
     }
   } catch (dlErr) {
@@ -163,7 +175,7 @@ async function main() {
     console.error(dlErr.stack);
     process.exit(1);
   } finally {
-    await deleteCache();
+    await deleteTempFile();
   }
 
   if (downloadSucceed) {
