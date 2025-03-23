@@ -63,11 +63,20 @@ async function createTempFile(urls) {
   // Create write stream for cache file
   const stream = fs.createWriteStream(tempFile);
 
-  // Write URLs to cache
-  urls.forEach(url => stream.write(`${url}${EOL}`));
+  await new Promise(resolve => {
+    const copyUrls = urls.map(url => {
+      return /^https?:\/\//.test(url) ? url : `https://youtu.be/${url}`;
+    });
+
+    setImmediate(() => {
+      // Write URLs to cache
+      copyUrls.forEach(url => stream.write(`${url}${EOL}`));
+      resolve();
+    });
+  });
 
   // Close the write stream at the next tick
-  process.nextTick(stream.end);
+  process.nextTick(() => stream.end());
   return tempFile;
 }
 
@@ -153,6 +162,8 @@ async function main() {
       if (Array.isArray(urls) && urls.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
         tempBatchFile = await createTempFile(urls);
+        log.info('Created a temporary file:\x1b[93m',
+          path.basename(tempBatchFile), '\x1b[0m');
         downloadSucceed = !!(await ytmp3.batchDownload(tempBatchFile, downloadOptions));
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
