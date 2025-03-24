@@ -18,29 +18,41 @@
 **Wiki Homepage**: [[here]](https://github.com/mitsuki31/ytmp3-js/wiki)  
 **API Documentation**: [[here]](https://mitsuki31.github.io/ytmp3-js)
 
-**YTMP3-JS** is a Node.js library designed for effortlessly downloading audio from YouTube videos, whether it's a single URL or multiple URLs, utilizing the [`@distube/ytdl-core`] module. The library also optionally converts these audio files into MP3 format.
+> [!WARNING]  
+> All code in this branch is still in development and preview. Please use the stable release from [NPM registry](https://npmjs.com/package/ytmp3-js).  
+> This beta version will **never** be uploaded to the NPM registry.
 
-This module offers both simple APIs and a command-line interface, allowing you to download audio from a single YouTube URL provided as an input argument or from multiple YouTube URLs listed in a file with ease.
+**YTMP3-JS** is a powerful Node.js tool designed for downloading and converting YouTube audio. It functions as both a command-line application and an API provider, making it flexible for various use cases.
 
-All downloaded audio files are saved in the current directory (unless being overridden with `-o` CLI option), which is relative to the project's root directory. If the [FFmpeg][ffmpeg] library is installed on your system, these files are optionally converted to MP3 format (use the `-C` option to enable the audio conversion behavior).
+Built on top of [`@distube/ytdl-core`], this tool enables seamless audio extraction from YouTube videos, supporting both single and batch downloads. Additionally, it offers optional MP3 conversion for enhanced usability.
+
+Whether you need a simple API for integration into your projects or a CLI for quick downloads, **YTMP3-JS** provides an efficient and user-friendly solution.
+
+> [!TIP]  
+> Passing multiple URLs to the `ytmp3` argument will activate **multiple downloads mode**, enabling batch processing with ease.
 
 > [!WARNING]  
 > This project uses [`fluent-ffmpeg`][fluent-ffmpeg] to convert audio files to the desired codec, specifically MP3. Therefore, it requires the [`ffmpeg`][ffmpeg] library and its binaries to be installed on your system, along with any necessary encoding libraries such as `libmp3lame` for MP3 conversion.
 >
-> However, don't worry if your system does not have [`ffmpeg`][ffmpeg] installed. The download process will not fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in [AAC (Advanced Audio Coding)](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format with a `.m4a` extension.
+> However, if your system does not have [`ffmpeg`][ffmpeg] installed, the download process will never fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in [AAC (Advanced Audio Coding)](https://en.wikipedia.org/wiki/Advanced_Audio_Coding) format with a `.m4a` extension.
 
-## Features
+## Pros
 
-- Download a YouTube single audio or multiple audios and save them to your device with ease and uncomplicated command-line usage.
-- Support batch download using a file containing a list of YouTube URLs (per line).
-- Provide a simple and minimal Node.js library for programmatic use.
-- Easy and automatic conversion of downloaded audio files to specific encoding and format as per your preferences (requires FFmpeg).
+- Easily download a single YouTube audio or multiple audio files with a straightforward command-line interface.
+- Supports batch downloads using a file containing a list of YouTube video URLs or raw video IDs (one per line).
+- Provides a robust API library for programmatic use, extending the functionality of [`@distube/ytdl-core`].
+- Offers automatic conversion of downloaded audio files to your preferred encoding and format (requires [FFmpeg](https://ffmpeg.org)).
+- Supports resuming interrupted downloads from the last downloaded bytes (currently available only for programmatic use).
+- Implements caching for video information to optimize the download process and reduce bandwidth usage.
 
-## Disadvantages
+> [!WARNING]  
+> - The resume download feature is currently in preview and may not work reliably until further improvements.
+> - Cached video information may expire in a short time. The exact cause is still under investigation.
 
-- Unable to continue downloading bytes from the last downloaded bytes.
-- Doesn't support downloading a YouTube playlist.
-- The lack of APIs makes it difficult to integrate them into complex website or bot projects.
+## Cons
+
+- Does not support downloading entire YouTube playlists.
+- Does not support authentication via cookies (feature in development).
 
 ## Getting Started
 
@@ -55,10 +67,10 @@ npm i -g ytmp3-js
 If you've downloaded package from the release asset, you may use local installation like this:
 
 ```bash
-npm i -g /path/to/ytmp3-js.<VERSION>.tgz
+npm i -g ./ytmp3-js.<VERSION>.tgz
 ```
 
-### Command Usage
+### Command Syntax
 
 ```bash
 ytmp3 [options] [[URL ...] | [-f <FILE>]]
@@ -74,40 +86,94 @@ For command-line options with detailed information, please refer to [Command-Lin
 ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
 ```
 
+Or passing only the video ID (`ytmp3` >=2.0.0):
+
+```bash
+ytmp3 abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
+```
+
 In above example, the code is trying to download audio from a single URL and convert it to [FLAC codec](https://en.wikipedia.org/wiki/FLAC) with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to `/home/Music` directory.
 
-If you'd supplied only the `-C` (or `--convertAudio`) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior).
-But only if you've installed [FFmpeg][ffmpeg].
+> [!TIP]  
+> If you'd supplied only the `-C` (or `--convertAudio`) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior). But only if you've installed [FFmpeg][ffmpeg].
+
+> [!NOTE]  
+> Passing options as command-line argument will override particular options in the specified configuration (`-c` flag) or global configuration.
+
+### Customizing Download Process
+
+If you want to change the behavior of the download process, you can provide a custom `options.handler` function to handle the download stream and log messages. The handler function accepts 3 arguments: a `ReadableStream` instance, the video metadata object, and the options object. The handler function can be a synchronous or asynchronous function that returns a promise, both of them are handled properly by this function. But it is recommended to use an asynchronous function, as it might cause to blocking of the main thread if the handler function is synchronous.
+
+**Parameters:**
+
+- stream : [`ReadableStream`]
+- data : [`DLHandlerData`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#DLHandlerData)
+- options : [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadOptions)
+
+**Example on customizing the download process:**
+
+```js
+async function myHandler(stream, metadata, options) {
+  await new Promise((resolve, reject) => {
+    stream
+      .on('progress', (chunk, downloadedBytes, totalBytes) => {
+        // customize this
+      })
+      .on('error', (error) => {
+        // customize this
+      })
+      .on('end', () => {
+        // customize this
+        resolve();  // do not forget to resolve
+      })
+      .pipe(fs.createWriteStream(...));  // output
+  });
+}
+
+await ytmp3.download(..., {
+  handler: myHandler,
+  ...
+});
+```
+
+> [!NOTE]  
+> This feature is not supported on CLI-application, used for programmatic use only.
+
+### Caching Behavior
+
+<!-- TODO: Add `--useCache` flag -->
+By default, video metadata is cached in YTMP3’s cache directory to optimize subsequent downloads. This behavior can be disabled by setting `useCache` to `false`, which forces the function to always fetch fresh metadata from the YouTube server. Disabling this option also prevents the function from creating or updating any cached data for the given video.
+
+#### Cache Expiration
+
+Cached video metadata expires after 2 hours (7200 seconds or 7.2×10⁵ milliseconds). Once expired, the function attempts to verify cache validity by sending a HEAD request to YouTube. If the response status is `200 OK`, the cached data is used instead of fetching new metadata. Otherwise, fresh data is retrieved and the cache is updated with the newest one.
 
 ## Featured APIs
 
-### `singleDownload`
+### `download`
 
 ```ts
-async function singleDownload(
-  inputUrl: string | URL,
-  downloadOptions?: DownloadOptions | Object
-): Promise<string>
+async function download(url: string | URL, options?: DownloadOptions): Promise<DownloadResult>
 ```
 
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~singleDownload)
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~download)
 
 <details>
 <summary>API Details</summary>
 
-Downloads audio from a single YouTube URL and saves it to the output directory (change the output directory with `-o` or `--outDir` option).
+Downloads audio from a YouTube video using the provided video URL or video ID. The downloaded audio file will be saved in the current directory, unless specified by `-o` flag or `outDir` option.
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `inputUrl` | `string \| URL` | The URL of the YouTube video to download audio from. |
-| `downloadOptions` | [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions) \| `Object` | Options to configure the download process. If not specified, it will automatically uses default options. |
+| `inputUrl` | `string` \| [`URL`][node:URL] | A YouTube video URL or video ID to download its audio content. |
+| `downloadOptions` | [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadOptions) | Options to configure the video information retrieval and download process. |
 
 #### Returns
 
-A promise that resolves a string representating the output file when the download completes.  
-**Type:** `Promise<string>`
+Fulfills with an object containing download metadata and file paths.  
+**Type:** [`Promise<DownloadResult>`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadResult)
 
 </details>
 
@@ -117,91 +183,91 @@ A promise that resolves a string representating the output file when the downloa
 
 ```ts
 async function batchDownload(
-  inputFile: string,
-  downloadOptions?: DownloadOptions | Object
-): Promise<string[]>
+  file: string | Buffer<ArrayBufferLike>,
+  options?: BatchDownloadOptions
+): Promise<Record<string, BatchDownloadResult>>
 ```
 
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~batchDownload)
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~batchDownload)
 
 <details>
 <summary>API Details</summary>
 
-Downloads audio from a file containing YouTube URLs and saves them to the output directory (change the output directory with `-o` or `--outDir` option).
+Downloads audio from a file containing YouTube URLs and saves them to the output directory. The downloaded audio files will be saved in the current directory, unless specified by `-o` flag or `outDir` option.
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `inputFile` | `string` | The path to the file containing YouTube URLs. |
-| `downloadOptions` | [`DownloadOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#DownloadOptions) \| `Object` | Options to configure the download process. If not specified, it will automatically uses default options. |
+| `file` | `string` \| [`Buffer<ArrayBufferLike>`](https://nodejs.org/api/buffer.html) | The path to the file containing YouTube URLs. |
+| `options` | [`BatchDownloadOptions`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#BatchDownloadOptions) | Options to configure the download process. If not specified, it will automatically uses default options. |
 
 #### Returns
 
-A promise that resolves to an array of strings representing the successfully downloaded files.  
-**Type:** `Promise<string[]>`
+Fulfills with an object with video IDs as keys and the download result objects as values.  
+**Type:** [`Promise<Record<string, BatchDownloadResult>>`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#BatchDownloadResult)
 
 </details>
 
 ---
 
-### `getVideosInfo`
+### `getInfo`
 
 ```ts
-async function getVideosInfo(
-  ...urls: string | URL
-): Promise<import('@distube/ytdl-core').videoInfo[]>
+function getInfo(
+  url: string | URL,
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject?: false;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise<YTDLVideoInfo>;
+```
+```ts
+function getInfo(
+  url: (string | URL)[],
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject?: false;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise<YTDLVideoInfo[]>;
+```
+```ts
+function getInfo(
+  url: (string | URL) | (string | URL)[],
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject: true;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise<Record<string, YTDLVideoInfo>>;
 ```
 
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-ytmp3.html#~getVideosInfo)
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~getInfo)
 
 <details>
 <summary>API Details</summary>
 
-Retrieves information for multiple YouTube videos sequentially.
+Retrieves the YouTube video information from the given YouTube URL(s) or ID(s).
 
-This function accepts multiple YouTube URLs and retrieves information for each video sequentially. It processes each URL one by one, ensuring that the next URL is processed only after the previous one is complete.
+If the given URL is an array either of `string`s or [`URL`][node:URL] objects, the function will returns an array fullfilled with the video information from each URLs (except `options.asObject` is set to `true`). The function will automatically filter out any nullable values (`null`, `undefined` or an empty string) from the array, if provided.
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `...urls` | `string \| URL` | The YouTube video URLs to fetch information for. Each URL can be either a string or a URL object. |
+| `url` | `string` \| [`URL`][node:URL] \| `(string \| URL)[]` | The YouTube video URL(s) or ID(s) to retrieve its information. |
+| `options` | `ytdl.getInfoOptions` | Options to use when fetching the video information. This options object is extend to the `ytdl.getInfoOptions` object. |
+| `options.asObject` | `boolean` | If set to `true`, the returned value will be an object with video ID as keys and video information object as values. Otherwise, the returned value will be an array of video information objects. This option will be ignored if the `url` is not an array. |
+| `options.useCache` | `boolean` | If set to `true`, the function will use the cache to retrieve the video information. Otherwise, the function will ignore the cache and fetch the video information from the server. This also will make the function to create a new cache file in the YTMP3's cache directory. |
+| `options.verbose` | `boolean` | Whether to print the process retrieval to standard output. Defaults to `false`. |
+
 
 #### Returns
 
-A promise that resolves to an array of video information objects.  
-**Type:** `Promise<import('@distube/ytdl-core').videoInfo[]>`
-
-</details>
-
----
-
-### `checkFfmpeg`
-
-```ts
-async function checkFfmpeg(verbose?: boolean = false): Promise<boolean>
-```
-
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~checkFfmpeg)
-
-<details>
-<summary>API Details</summary>
-
-Checks whether the `ffmpeg` binary is installed on system or not.
-
-First, it checks if the `FFMPEG_PATH` environment variable is set. If it is set, it returns `true`. Otherwise, if not set, it checks if the `ffmpeg` binary is installed on system by directly executing it.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| `verbose` | `boolean \| undefined` | Whether to log verbose messages or not. Defaults to `false`. |
-
-#### Returns
-
-A promise that resolves to a boolean value, `true` if the `ffmpeg` binary installed on system; otherwise, `false`.  
-**Type:** `boolean`
+A promise fulfills with a video information. If the `url` is an array, returned value will be an array of video information(s), or if the `options.asObject` is set to `true`, the returned value will be an object with video ID as keys and video information object as values.  
+**Type:** `Promise.<ytdl.videoInfo | Array.<ytdl.videoInfo> | Record.<string, ytdl.videoInfo>>`
 
 </details>
 
@@ -212,11 +278,12 @@ A promise that resolves to a boolean value, `true` if the `ffmpeg` binary instal
 ```ts
 async function convertAudio(
   inFile: string,
-  options?: ConvertAudioOptions = defaultOptions
-): Promise<void>
+  outFile?: string | AudioConverterOptions,
+  options?: AudioConverterOptions
+): Promise<ConversionResult>
 ```
 
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-audioconv.html#~convertAudio)
+[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/v2/module-audioconv.html#~convertAudio)
 
 <details>
 <summary>API Details</summary>
@@ -232,104 +299,19 @@ If the `ffmpeg` is not installed on the system, this function will aborts immedi
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `inFile` | `string` | The input file path of the audio file to be converted. |
-| `options` | [`ConvertAudioOptions`](https://mitsuki31.github.io/ytmp3-js/global.html#ConvertAudioOptions) \| `undefined` | Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format. |
-
-</details>
-
----
-
-### `extractVideoId`
-
-```ts
-function extractVideoId(url: string | URL): string
-```
-
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.extractVideoId)
-
-<details>
-<summary>API Details</summary>
-
-Extracts the YouTube video ID from given YouTube URL.
-
-The YouTube video ID have exactly 11 characters with allowed symbols are `A-Z`, `a-z`, `0-9`, `_`, and `-`.
-
-Allowed YouTube domains to extract:
-
-- `www.youtube.com`
-- `m.youtube.com`
-- `youtube.com`
-- `youtu.be`
-- `music.youtube.com`
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| `url` | `string \| URL` | The URL to evaluate. |
+| `outFile` | `string` \| [`AudioConverterOptions`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#AudioConverterOptions) | The output file path of the converted audio file. |
+| `options` | [`AudioConverterOptions`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#AudioConverterOptions) \| `undefined` | Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format. |
 
 #### Returns
 
-A string with 11 characters representing the video ID.  
-**Type:** `string`
+Fulfills with an object containing the input and output audio file information.  
+**Type:** [`Promise<ConversionResult>`](https://mitsuki31.github.io/ytmp3-js/v2/global.html#ConversionResult)
 
 </details>
 
 ---
 
-### `validateUrl`
-
-```ts
-function validateUrl(url: string | URL, withId?: boolean = true): boolean
-```
-
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateUrl)
-
-<details>
-<summary>API Details</summary>
-
-Validates the given YouTube URL and optionally validates its video ID.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| `url` | `string \| URL` | The URL to validate. |
-| `withId` | `boolean` | Whether to also validate the video ID within the URL. If `false`, the function will only validate the URL's domain name. Defaults to `true`. |
-
-#### Returns
-
-Returns `true` if the given URL is a valid YouTube URL; otherwise `false`.  
-**Type:** `boolean`
-
-</details>
-
----
-
-### `validateId`
-
-```ts
-function validateId(id: string): boolean
-```
-
-[**[See the implementation]**](https://mitsuki31.github.io/ytmp3-js/module-url-utils-URLUtils.html#.validateId)
-
-<details>
-<summary>API Details</summary>
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| `id` | `string` | The video ID to validate. |
-
-#### Returns
-
-Returns `true` if the given ID correctly represents the YouTube video ID; otherwise `false`.  
-**Type:** `boolean`
-
-</details>
-
----
+There is a lot of APIs you can find in the library, we can't document them all in one place. If you're interested, consider refer to [APIs Homepage](https://mitsuki31.github.io/ytmp3-js).
 
 Refer to [Wiki's Homepage](https://github.com/mitsuki31/ytmp3-js/wiki#example-api-usages) for information on how to use APIs.
 
@@ -340,6 +322,7 @@ This project utilizes the following libraries and APIs:
 - **(Outdated)** [`ytdl-core`] - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.
 - [`@distube/ytdl-core`] - DisTube fork of `ytdl-core`. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.
 - [`fluent-ffmpeg`][fluent-ffmpeg] - A library that fluents `ffmpeg` command-line usage, easy to use Node.js module.
+- ... and a lot more.
 
 Special thanks to the authors and contributors of these libraries for their valuable work.
 
@@ -360,3 +343,4 @@ This project is licensed under MIT License. For more details, see [LICENSE](http
 
 [Wiki-Home]: https://github.com/mitsuki31/ytmp3-js/wiki
 [Command-Line-Options]: https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options
+[node:URL]: https://nodejs.org/api/url.html
