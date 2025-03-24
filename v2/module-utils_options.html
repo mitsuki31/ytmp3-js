@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Module: utils/options</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: utils/options</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>This module provides functions to validate and resolve user input options.</p>
+<p>This module also provide the default options used by the application, they are defined in
+the <code>defaults</code> namespace. Please note, all properties within the namespace are read-only properties.</p></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li><a href="mailto:dhefam31@gmail.com">Ryuu Mitsuki</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+    <dt class="tag-license">License:</dt>
+    <dd class="tag-license"><ul class="dummy"><li>MIT</li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_options.js.html">utils/options.js</a>, <a href="utils_options.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+        <h3 class="subsection-title">Requires</h3>
+
+        <ul>
+            <li><a href="module-utils_type-utils.html">module:utils/type-utils</a></li>
+        </ul>
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Namespaces</h3>
+
+        <dl>
+            <dt><a href="module-utils_options-defaults.html">defaults</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~resolve"><span class="type-signature">(package, inner) </span>resolve<span class="signature">(inOpts, expectedOpts)</span><span class="type-signature"> &rarr; {Record.&lt;string, any>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Resolves and validates input options against expected types and default values.</p>
+<p>This function ensures that only recognized options with the correct types are retained.
+If an option is missing or has an incorrect type, it is replaced with a default value (if specified).</p>
+<h3>How It Works</h3>
+<ul>
+<li><strong>Filters Out Unknown Options</strong>: Only options defined in <code>expectedOpts</code> are included.</li>
+<li><strong>Validates Option Types</strong>: Each option's type is checked against the expected type.</li>
+<li><strong>Supports Multiple Expected Types</strong>:
+<ul>
+<li>If an option accepts multiple types (e.g., <code>'string'</code> or <code>'number'</code>),
+the function iterates through them and assigns the first valid type.</li>
+</ul>
+</li>
+<li><strong>Handles Special Cases</strong>:
+<ul>
+<li><code>'array'</code> is explicitly checked using <code>Array.isArray()</code>.</li>
+<li><code>'function'</code> ensures that the value is callable but <strong>not an ES6 class</strong>.</li>
+<li>If an <strong>expected type is a class</strong>, it checks if the value is an instance of that class.</li>
+</ul>
+</li>
+<li><strong>Fallback to Default Values</strong>: If an option is missing or invalid, the default value is used.</li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Record.&lt;string, any></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The input options to be resolved.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expectedOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Record.&lt;string, Array.&lt;(string|function()|Array.&lt;(string|function()|any)>|any)>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An object defining expected types and default values. With the key being the option name and the value being
+an array defining the expected type(s) and default value.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>2.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_options.js.html">utils/options.js</a>, <a href="utils_options.js.html#line214">line 214</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>An object containing only the valid and resolved options.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Record.&lt;string, any></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption"> Basic usage with primitive types </p>
+    
+    <pre class="prettyprint"><code>const options = resolveOptions(
+  { cacheSize: '10', verbose: true },
+  { cacheSize: ['number', 5], verbose: ['boolean', false] }
+);
+console.log(options);  // { cacheSize: 5, verbose: true }</code></pre>
+
+        <p class="code-caption"> Handling multiple expected types </p>
+    
+    <pre class="prettyprint"><code>const options = resolveOptions(
+  { cacheSize: '10', mode: 'fast' },
+  { cacheSize: [['number', 'string'], 5], mode: ['string', 'default'] }
+);
+console.log(options);  // { cacheSize: '10', mode: 'fast' }</code></pre>
+
+        <p class="code-caption"> Handling class instances </p>
+    
+    <pre class="prettyprint"><code>class CacheHandler {}
+const options = resolveOptions(
+  { handler: new CacheHandler() },
+  { handler: [CacheHandler, null] }
+);
+console.log(options);  // { handler: CacheHandler {} }</code></pre>
+
+        <p class="code-caption"> Handling invalid values </p>
+    
+    <pre class="prettyprint"><code>const options = resolveOptions(
+  { cacheSize: 'not a number' },
+  { cacheSize: ['number', 10] }
+);
+console.log(options); // { cacheSize: 10 } // Falls back to default</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-cache.html">cache</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_info-utils.html">utils/info-utils</a></li><li><a href="module-utils_localep.html">utils/localep</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_options.html">utils/options</a></li><li><a href="module-utils_thumb-utils.html">utils/thumb-utils</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils_info-utils-FormatUtils.html">FormatUtils</a></li><li><a href="module-utils_info-utils-InfoUtils.html">InfoUtils</a></li><li><a href="module-utils_options-defaults.html">defaults</a></li><li><a href="module-utils_thumb-utils-ThumbnailUtils.html">ThumbnailUtils</a></li></ul><h3>Classes</h3><ul><li><a href="CacheValidationError.html">CacheValidationError</a></li><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="IDValidationError.html">IDValidationError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="URLValidationError.html">URLValidationError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></li><li><a href="module-cache-CacheBase64.html">CacheBase64</a></li><li><a href="module-cache-CacheZLib.html">CacheZLib</a></li><li><a href="module-cache-VInfoCache.html">VInfoCache</a></li><li><a href="module-utils_info-utils-DateFormatter.html">DateFormatter</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#STYLE_FMTS">STYLE_FMTS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Mar 25 2025 01:49:48 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

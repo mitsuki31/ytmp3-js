@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: URLUtils</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: URLUtils</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="module-utils_url-utils.html">utils/url-utils</a>~</span>URLUtils</h2>
+        
+            <div class="class-description"><p>A static class that contains utilities for working with YouTube URLs.</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".BASIC_YOUTUBE_DOMAINS"><span class="type-signature">(static, readonly) </span>BASIC_YOUTUBE_DOMAINS<span class="type-signature"> :Readonly.&lt;Array.&lt;string>></span></h4>
+
+
+
+
+<div class="description">
+    <p>A list containing YouTube domains that basically most used for downloading.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;string>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line61">line 61</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><code>URLUtils.VALID_YOUTUBE_DOMAINS</code></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".MAX_ID_LENGTH"><span class="type-signature">(static, readonly) </span>MAX_ID_LENGTH<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Maximum length of YouTube video ID.</p>
+<p>According to YouTube API documentation V3, the <code>videoId</code> is a string but
+does not specified about the length of video IDs was used. However, communities
+says that YouTube video IDs have:</p>
+<ul>
+<li>Exactly 11 characters.</li>
+<li>Allowed characters and symbols: <code>[A-Za-z0-9_-]</code></li>
+</ul>
+<p>More details: <a href="https:%5C/%5C/webapps.stackexchange.com/a/101153">https://webapps.stackexchange.com/a/101153</a></p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>11</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line84">line 84</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".VALID_YOUTUBE_DOMAINS"><span class="type-signature">(static, readonly) </span>VALID_YOUTUBE_DOMAINS<span class="type-signature"> :Readonly.&lt;Array.&lt;string>></span></h4>
+
+
+
+
+<div class="description">
+    <p>A list containing valid known YouTube domains.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;string>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".VIDEO_ID_REGEX"><span class="type-signature">(static, readonly) </span>VIDEO_ID_REGEX<span class="type-signature"> :RegExp</span></h4>
+
+
+
+
+<div class="description">
+    <p>A regular expression for matching the YouTube video ID.</p>
+<p>This regular expression will match exactly 11 characters and can be more.
+If you want strictly parse the YouTube video ID, use <code><code>VIDEO_ID_STRICT_REGEX</code></code> instead.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">RegExp</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line99">line 99</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><code>URLUtils.VIDEO_ID_STRICT_REGEX</code></li>
+        
+            <li><code>URLUtils.MAX_ID_LENGTH</code></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".VIDEO_ID_STRICT_REGEX"><span class="type-signature">(static, readonly) </span>VIDEO_ID_STRICT_REGEX<span class="type-signature"> :RegExp</span></h4>
+
+
+
+
+<div class="description">
+    <p>A regular expression for strictly matching the YouTube video ID.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">RegExp</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line110">line 110</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><code>URLUtils.VIDEO_ID_REGEX</code></li>
+        
+            <li><code>URLUtils.MAX_ID_LENGTH</code></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".YTURL_REGEX"><span class="type-signature">(static, readonly) </span>YTURL_REGEX<span class="type-signature"> :RegExp</span></h4>
+
+
+
+
+<div class="description">
+    <p>A regular expression for matching the YouTube video (excluding video ID).</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">RegExp</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line121">line 121</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><code>URLUtils.YTURL_WITH_ID_REGEX</code></li>
+        
+            <li><code>URLUtils.BASIC_YOUTUBE_DOMAINS</code></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".YTURL_WITH_ID_REGEX"><span class="type-signature">(static, readonly) </span>YTURL_WITH_ID_REGEX<span class="type-signature"> :RegExp</span></h4>
+
+
+
+
+<div class="description">
+    <p>A regular expression for matching the YouTube video.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">RegExp</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line139">line 139</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><code>URLUtils.YTURL_REGEX</code></li>
+        
+            <li><code>URLUtils.BASIC_YOUTUBE_DOMAINS</code></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".extractVideoId"><span class="type-signature">(static) </span>extractVideoId<span class="signature">(url)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Extracts the YouTube video ID from given YouTube URL.</p>
+<p>The YouTube video ID have exactly 11 characters with allowed
+symbols are <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code>, and <code>-</code>.</p>
+<p>Allowed YouTube domains to extract:</p>
+<ul>
+<li><code>www.youtube.com</code></li>
+<li><code>m.youtube.com</code></li>
+<li><code>youtube.com</code></li>
+<li><code>youtu.be</code></li>
+<li><code>music.youtube.com</code></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The YouTube URL to evaluate.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line168">line 168</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the given YouTube URL is neither a string nor <code>URL</code> object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the host name or domain name of given
+YouTube URL is unknown YouTube video domain.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the extractor unable to extract the video ID,
+this can be happen due to incorrect YouTube URL.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="IDExtractorError.html">IDExtractorError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A string with 11 characters representing the YouTube video ID.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".validateId"><span class="type-signature">(static) </span>validateId<span class="signature">(id)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Validates the given YouTube video ID.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The video ID to validate.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line230">line 230</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the given YouTube video ID is not a string.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p><code>true</code> if the given ID correctly represents
+the YouTube video ID; otherwise <code>false</code>.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".validateUrl"><span class="type-signature">(static) </span>validateUrl<span class="signature">(url, withId<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Validates the given YouTube URL and optionally validates its video ID.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">URL</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The YouTube URL to validate.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>withId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to also validate the video ID within the URL.
+If <code>false</code>, the function will only validate the URL's domain name.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="utils_url-utils.js.html">utils/url-utils.js</a>, <a href="utils_url-utils.js.html#line254">line 254</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the given YouTube URL is neither a string nor <code>URL</code> object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p><code>true</code> if the given URL is a valid YouTube URL; otherwise <code>false</code>.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-cache.html">cache</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_info-utils.html">utils/info-utils</a></li><li><a href="module-utils_localep.html">utils/localep</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_options.html">utils/options</a></li><li><a href="module-utils_thumb-utils.html">utils/thumb-utils</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils_info-utils-FormatUtils.html">FormatUtils</a></li><li><a href="module-utils_info-utils-InfoUtils.html">InfoUtils</a></li><li><a href="module-utils_options-defaults.html">defaults</a></li><li><a href="module-utils_thumb-utils-ThumbnailUtils.html">ThumbnailUtils</a></li></ul><h3>Classes</h3><ul><li><a href="CacheValidationError.html">CacheValidationError</a></li><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="IDValidationError.html">IDValidationError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="URLValidationError.html">URLValidationError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></li><li><a href="module-cache-CacheBase64.html">CacheBase64</a></li><li><a href="module-cache-CacheZLib.html">CacheZLib</a></li><li><a href="module-cache-VInfoCache.html">VInfoCache</a></li><li><a href="module-utils_info-utils-DateFormatter.html">DateFormatter</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#STYLE_FMTS">STYLE_FMTS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Mar 25 2025 01:49:48 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

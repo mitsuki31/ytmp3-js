@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils/options.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/options.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file This module provides functions to validate and resolve user input options.
+ *
+ * This module also provide the default options used by the application, they are defined in
+ * the `defaults` namespace. Please note, all properties within the namespace are read-only properties.
+ *
+ * @module   utils/options
+ * @requires utils/type-utils
+ * @author   Ryuu Mitsuki &lt;dhefam31@gmail.com>
+ * @license  MIT
+ * @since    2.0.0
+ */
+
+'use strict';
+
+const { Readable } = require('stream');
+const TypeUtils = require('./type-utils');
+const { InvalidTypeError } = require('../error');
+
+
+/**
+ * A namespace containing all default options used by the application.
+ *
+ * @namespace  module:utils/options~defaults
+ * @public
+ * @since      2.0.0
+ */
+const defaults = {
+  /**
+   * Default options for {@link module:ytmp3~getInfo `getInfo`} function.
+   *
+   * @memberof module:utils/options~defaults
+   * @property {boolean} useCache=true
+   * @property {boolean} asObject=false
+   * @property {boolean} verbose=false
+   */
+  GetInfoOptions: Object.freeze({
+    useCache: true,
+    asObject: false,
+    verbose: false
+  }),
+  /**
+   * Default options for {@link module:ytmp3~download `download`} function.
+   *
+   * @memberof module:utils/options~defaults
+   * @property {string} cwd="."
+   * @property {string} outDir="."
+   * @property {boolean} convertAudio=false
+   * @property {object} converterOptions={}
+   * @property {boolean} quiet=false
+   * @property {Function} handler
+   * @property {boolean} useCache=false
+   */
+  DownloadOptions: Object.freeze({
+    cwd: '.',
+    outDir: '.',
+    outFile: undefined,
+    convertAudio: false,
+    converterOptions: {},
+    quiet: false,
+    handler: () => {},  // Will be override later
+    format: undefined,
+    useCache: true
+  }),
+  AudioConverterOptions: Object.freeze({
+    inputOptions: [],
+    outputOptions: [],
+    format: 'mp3',
+    codec: 'libmp3lame',
+    bitrate: 128,
+    frequency: 44100,
+    channels: 2,
+    deleteOld: false,
+    quiet: false
+  })
+};
+
+const _YTDLChooseFormatOptions = {
+  quality: ['string'],
+  filter: [['string', 'function']],
+  format: ['object']
+};
+
+const _YTDLGetInfoOptions = {
+  lang: ['string'],
+  requestCallback: ['function'],
+  rewriteRequest: ['function'],
+  fetch: ['function'],
+  requestOptions: ['object'],
+  agent: ['object'],
+  playerClients: ['array']
+};
+
+const _YTDLDownloadOptions = {
+  ..._YTDLChooseFormatOptions,
+  ..._YTDLGetInfoOptions,
+  range: ['object'],
+  begin: [['string', 'number', Date]],
+  liveBuffer: ['number'],
+  highWaterMark: ['number'],
+  IPv6Block: ['string'],
+  dlChunkSize: ['number'],
+};
+
+const _FFmpegCommandOptions = {
+  logger: [['object', 'function'], undefined],
+  niceness: ['number', undefined],
+  priority: ['number', undefined],
+  presets: ['string', undefined],
+  preset: ['string', undefined],
+  stdoutLines: ['number', undefined],
+  timeout: ['number', undefined],
+  source: [['string', Readable], undefined],
+  cwd: ['string', undefined],
+};
+
+const _GetInfoOptions = {
+  ..._YTDLGetInfoOptions,
+  useCache: ['boolean', defaults.GetInfoOptions.useCache],
+  asObject: ['boolean', defaults.GetInfoOptions.asObject],
+  verbose: ['boolean', defaults.GetInfoOptions.verbose]
+};
+
+const _DownloadOptions = {
+  ..._YTDLDownloadOptions,
+  ...(Object.entries(_GetInfoOptions)
+    .reduce((acc, val) => {
+      // Exclude the `asObject` option
+      if (val[0] !== 'asObject') acc[val[0]] = val[1];
+      return acc;
+    }, {})
+  ),
+  cwd: ['string', defaults.DownloadOptions.cwd],
+  outDir: ['string', defaults.DownloadOptions.outDir],
+  outFile: ['string', defaults.DownloadOptions.outFile],
+  convertAudio: ['boolean', defaults.DownloadOptions.convertAudio],
+  converterOptions: ['object', defaults.DownloadOptions.converterOptions],
+  quiet: [['boolean', 'string'], defaults.DownloadOptions.quiet],
+  handler: ['function'],
+  format: ['object', defaults.DownloadOptions.format],
+  useCache: ['boolean', defaults.DownloadOptions.useCache]
+};
+
+const _AudioConverterOptions = {
+  inputOptions: [['array', 'string'], defaults.AudioConverterOptions.inputOptions],
+  outputOptions: [['array', 'string'], defaults.AudioConverterOptions.outputOptions],
+  format: ['string', defaults.AudioConverterOptions.format],
+  codec: ['string', defaults.AudioConverterOptions.codec],
+  bitrate: [['number', 'string'], defaults.AudioConverterOptions.bitrate],
+  frequency: ['number', defaults.AudioConverterOptions.frequency],
+  channels: ['number', defaults.AudioConverterOptions.channels],
+  deleteOld: ['boolean', defaults.AudioConverterOptions.deleteOld],
+  quiet: ['boolean', defaults.AudioConverterOptions.quiet]
+};
+
+
+/**
+ * Resolves and validates input options against expected types and default values.
+ *
+ * This function ensures that only recognized options with the correct types are retained.
+ * If an option is missing or has an incorrect type, it is replaced with a default value (if specified).
+ *
+ * ### How It Works
+ * - **Filters Out Unknown Options**: Only options defined in `expectedOpts` are included.
+ * - **Validates Option Types**: Each option's type is checked against the expected type.
+ * - **Supports Multiple Expected Types**: 
+ *   - If an option accepts multiple types (e.g., `'string'` or `'number'`), 
+ *     the function iterates through them and assigns the first valid type.
+ * - **Handles Special Cases**:
+ *   - `'array'` is explicitly checked using `Array.isArray()`.
+ *   - `'function'` ensures that the value is callable but **not an ES6 class**.
+ *   - If an **expected type is a class**, it checks if the value is an instance of that class.
+ * - **Fallback to Default Values**: If an option is missing or invalid, the default value is used.
+ *
+ * @param {Record&lt;string, any>} inOpts - The input options to be resolved.
+ * @param {Record&lt;string, Array&lt;string | Function | Array&lt;string | Function | any> | any>>} expectedOpts -
+ *        An object defining expected types and default values. With the key being the option name and the value being
+ *        an array defining the expected type(s) and default value.
+ *
+ * @returns {Record&lt;string, any>} An object containing only the valid and resolved options.
+ *
+ * @example &lt;caption> Basic usage with primitive types &lt;/caption>
+ * const options = resolveOptions(
+ *   { cacheSize: '10', verbose: true },
+ *   { cacheSize: ['number', 5], verbose: ['boolean', false] }
+ * );
+ * console.log(options);  // { cacheSize: 5, verbose: true }
+ *
+ * @example &lt;caption> Handling multiple expected types &lt;/caption>
+ * const options = resolveOptions(
+ *   { cacheSize: '10', mode: 'fast' },
+ *   { cacheSize: [['number', 'string'], 5], mode: ['string', 'default'] }
+ * );
+ * console.log(options);  // { cacheSize: '10', mode: 'fast' }
+ *
+ * @example &lt;caption> Handling class instances &lt;/caption>
+ * class CacheHandler {}
+ * const options = resolveOptions(
+ *   { handler: new CacheHandler() },
+ *   { handler: [CacheHandler, null] }
+ * );
+ * console.log(options);  // { handler: CacheHandler {} }
+ *
+ * @example &lt;caption> Handling invalid values &lt;/caption>
+ * const options = resolveOptions(
+ *   { cacheSize: 'not a number' },
+ *   { cacheSize: ['number', 10] }
+ * );
+ * console.log(options); // { cacheSize: 10 } // Falls back to default
+ *
+ * @package
+ * @since 2.0.0
+ */
+function resolve(inOpts, expectedOpts, shouldThrow=false) {
+  function _throw(name, actual, expected) {
+    if (!shouldThrow) return;  // Reject to throw if the `shouldThrow` is false
+    const expectedType = typeof expected === 'string' ? expected
+      : (Array.isArray(expected) ? expected.map(TypeUtils.getType).join(' | ')
+        : TypeUtils.getType(expected));
+    throw new InvalidTypeError(`Property with name '${name}' is invalid type`, {
+      actualType: TypeUtils.getType(actual),
+      expectedType
+    });
+  }
+
+  const resolvedOptions = {};
+
+  // Iterate over expected options to filter and validate the input options
+  for (const [key, expectedTypeArray] of Object.entries(expectedOpts)) {
+    const [expectedType, defaultValue] = expectedTypeArray;
+    let isValid = false;
+
+    if (key in inOpts) {
+      const value = inOpts[key];
+
+      // Handle string type checks
+      if (typeof expectedType === 'string') {
+        switch (expectedType) {
+          case 'array':
+            isValid = Array.isArray(value);
+            break;
+          case 'function':  // Any function but not a ES6 class
+            isValid = !TypeUtils.isClass(value);
+            break;
+          default:
+            isValid = typeof value === expectedType;
+        }
+      }
+      // Handle class instance checks
+      else if (TypeUtils.isCallable(expectedType)) {
+        isValid = value instanceof expectedType;
+      }
+      // Handle multiple type checks
+      else if (Array.isArray(expectedType)) {
+        let value;
+
+        for (const type of expectedType) {
+          value = Object.values(resolve(
+            { [key]: inOpts[key] },
+            { [key]: [type] }
+          ))[0];
+          if (typeof value !== 'undefined') break;  // Break loop after found the first expected value
+        }
+        isValid = typeof value !== 'undefined';
+      }
+      resolvedOptions[key] = isValid ? value : defaultValue;  // Assign the value
+      isValid || _throw(key, value, expectedType);  // Optionally throw if any invalid type
+    } else {
+      // No error being thrown here
+      resolvedOptions[key] = defaultValue;
+    }
+  }
+
+  return resolvedOptions;
+}
+
+
+module.exports = {
+  _YTDLChooseFormatOptions,
+  _YTDLGetInfoOptions,
+  _YTDLDownloadOptions,
+  _FFmpegCommandOptions,
+  _GetInfoOptions,
+  _DownloadOptions,
+  _AudioConverterOptions,
+  defaults,
+  resolve,
+  resolveOptions: resolve  // Alias
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-cache.html">cache</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_info-utils.html">utils/info-utils</a></li><li><a href="module-utils_localep.html">utils/localep</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_options.html">utils/options</a></li><li><a href="module-utils_thumb-utils.html">utils/thumb-utils</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils_info-utils-FormatUtils.html">FormatUtils</a></li><li><a href="module-utils_info-utils-InfoUtils.html">InfoUtils</a></li><li><a href="module-utils_options-defaults.html">defaults</a></li><li><a href="module-utils_thumb-utils-ThumbnailUtils.html">ThumbnailUtils</a></li></ul><h3>Classes</h3><ul><li><a href="CacheValidationError.html">CacheValidationError</a></li><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="IDValidationError.html">IDValidationError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="URLValidationError.html">URLValidationError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></li><li><a href="module-cache-CacheBase64.html">CacheBase64</a></li><li><a href="module-cache-CacheZLib.html">CacheZLib</a></li><li><a href="module-cache-VInfoCache.html">VInfoCache</a></li><li><a href="module-utils_info-utils-DateFormatter.html">DateFormatter</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#STYLE_FMTS">STYLE_FMTS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Mar 25 2025 01:49:47 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

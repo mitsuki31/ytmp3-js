@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Module: config</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: config</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>This module handles configuration resolution for the <strong>YTMP3-JS</strong> project.</p>
+<p>This module offers a parser and resolver for the configuration file of YTMP3-JS,
+which can parse both JSON and JS configuration file (support both CommonJS and
+ES module). You can see the <a href="module-config.html#~KNOWN_CONFIG_EXTS"><code><code>KNOWN_CONFIG_EXTS</code></code></a>
+constant to check the supported configuration file's extension names.</p>
+<p>The <a href="module-config.html#~parseConfig"><code><code>parseConfig</code></code></a> function will parse
+and optionally resolve the configuration file containing the download options
+and audio converter options (if defined). Before being resolved, the configuration
+file will be validated first and will throws a <a href="InvalidTypeError.html"><code>InvalidTypeError</code></a> if any known
+configuration options has an invalid type, or throws a <a href="UnknownOptionError.html"><code>UnknownOptionError</code></a> if
+there is an unknown option defined within the configuration object (see the
+<a href="module-config.html#~KNOWN_OPTIONS"><code><code>KNOWN_OPTIONS</code></code></a>).</p></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Ryuu Mitsuki &lt;https://github.com/mitsuki31></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+    <dt class="tag-license">License:</dt>
+    <dd class="tag-license"><ul class="dummy"><li>MIT</li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption"> JSON Configuration File (<code>ytmp3-js.json</code>) </p>
+    
+    <pre class="prettyprint"><code>{
+  "downloadOptions": {
+    "outDir": "/path/to/download/folder",
+    "quiet": false,
+    "convertAudio": true,
+    "converterOptions": {
+      "format": "opus",
+      "codec": "libopus",
+      "channels": 1,
+      "deleteOld": true
+    }
+  }
+}</code></pre>
+
+        <p class="code-caption"> CommonJS Module Configuration File (<code>ytmp3-js.config.cjs</code>) </p>
+    
+    <pre class="prettyprint"><code>module.exports = {
+  downloadOptions: {
+    outDir: '..',
+    convertAudio: false,
+    quiet: true
+  }
+}</code></pre>
+
+        <p class="code-caption"> ES Module Configuration File (<code>ytmp3-js.config.mjs</code>) </p>
+    
+    <pre class="prettyprint"><code>export default {
+  downloadOptions: {
+    cwd: process.env.HOME,
+    outDir: 'downloads',  // $HOME/downloads
+    convertAudio: true
+  },
+  audioConverterOptions: {
+    format: 'mp3',
+    codec: 'libmp3lame',
+    frequency: 48000,
+    bitrate: '128k'
+    deleteOld: true
+  }
+}</code></pre>
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+        <h3 class="subsection-title">Requires</h3>
+
+        <ul>
+            <li><a href="module-ytmp3.html">module:ytmp3</a></li>
+        
+            <li><a href="module-audioconv.html">module:audioconv</a></li>
+        
+            <li><a href="module-utils.html">module:utils</a></li>
+        
+            <li><a href="https://npmjs.com/package/lsfnd">npm:lsfnd</a></li>
+        </ul>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~ERR_FORMAT"><span class="type-signature">(package, inner, constant) </span>ERR_FORMAT<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>A string representating the format of error message.
+Can be formatted using <code>util.format()</code> function.</p>
+<p>First occurrence of <code>'%s'</code> will be intepreted as error message, the second
+as the directory name of configuration file, and the third one as the base name
+of the configuration file.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>'%s\n\tat \x1b[90m%s\n\x1b[1;91m%s\x1b[0m\n'</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line151">line 151</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~KNOWN_CONFIG_EXTS"><span class="type-signature">(package, inner, constant) </span>KNOWN_CONFIG_EXTS<span class="type-signature"> :Readonly.&lt;Array.&lt;('.js'|'.cjs'|'.mjs'|'.config.js'|'.config.mjs'|'.config.cjs'|'.json')>></span></h4>
+
+
+
+
+<div class="description">
+    <p>An array containing all known configuration file's extension names.</p>
+<p><strong>Deprecation Note</strong>:<br>
+For extensions such as, <code>.js</code>, <code>.cjs</code> and <code>.mjs</code>, needs to be concatenated with <code>.config</code>
+to prevent config file lookup confusion in the future. At this time, we won't deleted those
+extension names until next major update, but please consider to change your configuration file's
+extension for future compatibility.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;('.js'|'.cjs'|'.mjs'|'.config.js'|'.config.mjs'|'.config.cjs'|'.json')>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line122">line 122</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~KNOWN_OPTIONS"><span class="type-signature">(package, inner, constant) </span>KNOWN_OPTIONS<span class="type-signature"> :Readonly.&lt;Array.&lt;('downloadOptions'|'audioConverterOptions')>></span></h4>
+
+
+
+
+<div class="description">
+    <p>An array containing all known configuration options.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Readonly.&lt;Array.&lt;('downloadOptions'|'audioConverterOptions')>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~configChecker"><span class="type-signature">(package, inner) </span>configChecker<span class="signature">(params)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Checks the given configuration for validity.</p>
+<p>This function ensures that the configuration object adheres to the expected structure
+and types. It checks for unknown fields and validates the types of known options.
+Throws an error if there any known options is not object type or if there are
+unknown fields defined in the configuration.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The parameters for the function.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#YTMP3Config">YTMP3Config</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The configuration object to be checked.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The file path from which the config object was sourced,
+used for error reporting.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line224">line 224</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If any known options is not object type.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If there are unknown fields in the configuration.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="UnknownOptionError.html">UnknownOptionError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~findGlobalConfig"><span class="type-signature">(async, package, inner) </span>findGlobalConfig<span class="signature">(YTMP3_HOMEDIR<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(string|null)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Asynchronously finds and returns the path to the most appropriate global configuration
+file for the <code>ytmp3-js</code> module.</p>
+<p>The function searches for configuration files in the user's home directory
+(specifically, the <code>~/.ytmp3-js</code> directory -- for more details, see <a href="module-utils.html#~YTMP3_HOMEDIR"><code><code>YTMP3_HOMEDIR</code></code></a>)
+and applies a series of prioritization and validation steps to ensure that the returned
+file is valid and non-empty.</p>
+<p>The function first retrieves a list of configuration files in the specified directory that
+match a set of known file extensions (<a href="module-config.html#~KNOWN_CONFIG_EXTS"><code><code>KNOWN_CONFIG_EXTS</code></code></a>).
+If exactly one file is found, its basename is returned immediately. If multiple configuration
+files are present, the function prioritizes specific configuration file names in the following order:</p>
+<ol>
+<li><code>ytmp3-js.config.cjs</code></li>
+<li><code>ytmp3-js.config.mjs</code></li>
+<li><code>ytmp3-js.config.js</code></li>
+<li><code>ytmp3-js.json</code></li>
+</ol>
+<p>If the prioritized file is empty, the function will iterate through other available files
+until it finds a non-empty file or exhausts the list.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>YTMP3_HOMEDIR</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The directory from where to search the global configuration file.
+Defaults to <a href="module-utils.html#~YTMP3_HOMEDIR"><code><code>YTMP3_HOMEDIR</code></code></a>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line412">line 412</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://npmjs.com/package/lsfnd">npm:lsfnd</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise fullfills with a string representing the absolute path of the selected
+configuration file, or <code>null</code> if no global configuration file is found or if the
+<code>searchDir</code> is not exist and not a directory.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(string|null)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~importConfig"><span class="type-signature">(package, inner) </span>importConfig<span class="signature">(file<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>An alias for <a href="module-config.html#~parseConfig"><code><code>parseConfig</code></code></a> function,
+with <code>resolve</code> parameter is set to <code>true</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A string path refers to configuration file to import and resolve.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line374">line 374</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-config.html#~parseConfig"><code>parseConfig</code></a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#YTMP3Config">YTMP3Config</a></span>
+|
+
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+|
+
+<span class="param-type">Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~parseConfig"><span class="type-signature">(package, inner) </span>parseConfig<span class="signature">(configFile<span class="signature-attributes">non-null</span>, resolve<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>|Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Parses a configuration file and either resolves or validates its contents.</p>
+<p>This function can handle both CommonJS and ES module formats for configuration files.
+When importing an ES module, it returns a <code>Promise</code> that resolves to the configuration
+object. It also supports optional resolution of the configuration.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configFile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>A string path refers to the configuration file.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolve</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Determines whether to resolve the configuration object.
+If set to <code>false</code>, will validate the configuration only.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line294">line 294</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-config.html#~resolveConfig"><code>resolveConfig</code></a></li>
+        
+            <li><a href="module-config.html#~importConfig"><code>importConfig</code></a>
+         (alias for <code>parseConfig(config, true)</code>)</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the given <code>configFile</code> is not a string.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the file extension is not supported or if an error occurs during import.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The configuration object or a <code>Promise</code> that fullfilled with the
+configuration object if an ES module is imported. The returned configuration
+object will be automatically resolved if <code>resolve</code> is set to <code>true</code>.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#YTMP3Config">YTMP3Config</a></span>
+|
+
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+|
+
+<span class="param-type">Promise.&lt;(<a href="global.html#YTMP3Config">YTMP3Config</a>|<a href="global.html#DownloadOptions">DownloadOptions</a>)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption"> Synchronously parse a CommonJS configuration file </p>
+    
+    <pre class="prettyprint"><code>const config = parseConfig('./config.js');
+console.log(config);</code></pre>
+
+        <p class="code-caption"> Asynchronously parse an ES module configuration file </p>
+    
+    <pre class="prettyprint"><code>parseConfig('./config.mjs').then((config) => {
+  console.log(config);
+}).catch((error) => {
+  console.error('Failed to load config:', error);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~parseGlobalConfig"><span class="type-signature">(async, package, inner) </span>parseGlobalConfig<span class="signature">(globConfigPath, parserOptions<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;any>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Parses the global configuration file at the specified path with optional parser options.</p>
+<p>This function validates the type of the configuration file path and parser options, checks
+if the file is readable, and imports the configuration file. The <code>forceRequire</code> option is
+enabled if the file extension is <code>.json</code> unless overridden by the provided options.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>globConfigPath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The path to the global configuration file. Must be a valid string.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parserOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional settings for parsing the configuration file.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRequire</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>If <code>true</code>, forces the use of <code>require()</code> for importing the file,
+even if it's an ES module.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.1.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line497">line 497</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If <code>globConfigPath</code> is not a string or <code>parserOptions</code> is not a plain object.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If the configuration file cannot be accessed.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise fullfills with the parsed configuration data.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;any></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~resolveConfig"><span class="type-signature">(package, inner) </span>resolveConfig<span class="signature">(params)</span><span class="type-signature"> &rarr; {<a href="global.html#DownloadOptions">DownloadOptions</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Resolves the configuration for YTMP3-JS from a given configuration object.</p>
+<p>This function takes a configuration object typically sourced from a config file
+(e.g., <code>ytmp3-js.config.js</code>) and ensures that it adheres to the expected structure
+and types. It specifically resolves the download options and the audio converter
+options, providing fallbacks and handling type checks.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The parameters for the function.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#YTMP3Config">YTMP3Config</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The configuration object to be resolved.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The file path from which the config object was sourced,
+used for error reporting.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+    <dt class="tag-since">Since:</dt>
+    <dd class="tag-since"><ul class="dummy"><li>1.0.0</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="config.js.html">config.js</a>, <a href="config.js.html#line174">line 174</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If any known options is not object type.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="InvalidTypeError.html">InvalidTypeError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The resolved download options and audio converter
+options if provided.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#DownloadOptions">DownloadOptions</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-cache.html">cache</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_info-utils.html">utils/info-utils</a></li><li><a href="module-utils_localep.html">utils/localep</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_options.html">utils/options</a></li><li><a href="module-utils_thumb-utils.html">utils/thumb-utils</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils_info-utils-FormatUtils.html">FormatUtils</a></li><li><a href="module-utils_info-utils-InfoUtils.html">InfoUtils</a></li><li><a href="module-utils_options-defaults.html">defaults</a></li><li><a href="module-utils_thumb-utils-ThumbnailUtils.html">ThumbnailUtils</a></li></ul><h3>Classes</h3><ul><li><a href="CacheValidationError.html">CacheValidationError</a></li><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="IDValidationError.html">IDValidationError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="URLValidationError.html">URLValidationError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></li><li><a href="module-cache-CacheBase64.html">CacheBase64</a></li><li><a href="module-cache-CacheZLib.html">CacheZLib</a></li><li><a href="module-cache-VInfoCache.html">VInfoCache</a></li><li><a href="module-utils_info-utils-DateFormatter.html">DateFormatter</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#STYLE_FMTS">STYLE_FMTS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Mar 25 2025 01:49:47 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

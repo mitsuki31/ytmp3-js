@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3>ytmp3-js 2.0.0-beta</h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>YTMP3-JS</h1>
+<div align="center">
+  <a href="https://ko-fi.com/dhefam31" target="_blank"><img height="50" src="https://storage.ko-fi.com/cdn/kofi1.png?v=3" alt="Buy Me a Coffee at ko-fi.com"></a>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Lint</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/eslint.yml/badge.svg" alt="ESLint"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Unit Testing</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/unittest.yml/badge.svg" alt="Unit Test"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Integration Testing</strong></td>
+<td style="text-align:left"><a href="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml"><img src="https://github.com/mitsuki31/ytmp3-js/actions/workflows/irltest.yml/badge.svg" alt="IRL Test"></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Code Coverage</strong></td>
+<td style="text-align:left"><a href="https://app.codecov.io/gh/mitsuki31/ytmp3-js"><img src="https://img.shields.io/codecov/c/gh/mitsuki31/ytmp3-js?style=for-the-badge&amp;logo=codecov&amp;logoColor=white&amp;label=Coverage&amp;labelColor=DF0200&amp;color=DDDDDD" alt="Code coverage in codecov.io"></a></td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://img.shields.io/npm/l/ytmp3-js?logo=github&amp;logoColor=f9f9f9&amp;label=License&amp;labelColor=yellow&amp;color=white" alt="NPM License">
+<img src="https://img.shields.io/node/v/ytmp3-js?label=Node.js&amp;logo=node.js" alt="Min. Node">
+<img src="https://img.shields.io/npm/unpacked-size/ytmp3-js?label=Unpacked+size&amp;logo=npm" alt="NPM Unpacked Size"></p>
+<p><strong>Wiki Homepage</strong>: <a href="https://github.com/mitsuki31/ytmp3-js/wiki">[here]</a><br>
+<strong>API Documentation</strong>: <a href="https://mitsuki31.github.io/ytmp3-js">[here]</a></p>
+<blockquote>
+<p>[!WARNING]<br>
+All code in this branch is still in development and preview. Please use the stable release from <a href="https://npmjs.com/package/ytmp3-js">NPM registry</a>.<br>
+This beta version will <strong>never</strong> be uploaded to the NPM registry.</p>
+</blockquote>
+<p><strong>YTMP3-JS</strong> is a powerful Node.js tool designed for downloading and converting YouTube audio. It functions as both a command-line application and an API provider, making it flexible for various use cases.</p>
+<p>Built on top of <a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a>, this tool enables seamless audio extraction from YouTube videos, supporting both single and batch downloads. Additionally, it offers optional MP3 conversion for enhanced usability.</p>
+<p>Whether you need a simple API for integration into your projects or a CLI for quick downloads, <strong>YTMP3-JS</strong> provides an efficient and user-friendly solution.</p>
+<blockquote>
+<p>[!TIP]<br>
+Passing multiple URLs to the <code>ytmp3</code> argument will activate <strong>multiple downloads mode</strong>, enabling batch processing with ease.</p>
+</blockquote>
+<blockquote>
+<p>[!WARNING]<br>
+This project uses <a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fluent-ffmpeg</code></a> to convert audio files to the desired codec, specifically MP3. Therefore, it requires the <a href="https://ffmpeg.org"><code>ffmpeg</code></a> library and its binaries to be installed on your system, along with any necessary encoding libraries such as <code>libmp3lame</code> for MP3 conversion.</p>
+<p>However, if your system does not have <a href="https://ffmpeg.org"><code>ffmpeg</code></a> installed, the download process will never fail; instead, the audio conversion will be skipped, and the downloaded audio files will remain in <a href="https://en.wikipedia.org/wiki/Advanced_Audio_Coding">AAC (Advanced Audio Coding)</a> format with a <code>.m4a</code> extension.</p>
+</blockquote>
+<h2>Pros</h2>
+<ul>
+<li>Easily download a single YouTube audio or multiple audio files with a straightforward command-line interface.</li>
+<li>Supports batch downloads using a file containing a list of YouTube video URLs or raw video IDs (one per line).</li>
+<li>Provides a robust API library for programmatic use, extending the functionality of <a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a>.</li>
+<li>Offers automatic conversion of downloaded audio files to your preferred encoding and format (requires <a href="https://ffmpeg.org">FFmpeg</a>).</li>
+<li>Supports resuming interrupted downloads from the last downloaded bytes (currently available only for programmatic use).</li>
+<li>Implements caching for video information to optimize the download process and reduce bandwidth usage.</li>
+</ul>
+<blockquote>
+<p>[!WARNING]</p>
+<ul>
+<li>The resume download feature is currently in preview and may not work reliably until further improvements.</li>
+<li>Cached video information may expire in a short time. The exact cause is still under investigation.</li>
+</ul>
+</blockquote>
+<h2>Cons</h2>
+<ul>
+<li>Does not support downloading entire YouTube playlists.</li>
+<li>Does not support authentication via cookies (feature in development).</li>
+</ul>
+<h2>Getting Started</h2>
+<h3>Installation</h3>
+<pre class="prettyprint source lang-bash"><code>npm i -g ytmp3-js
+</code></pre>
+<hr>
+<p>If you've downloaded package from the release asset, you may use local installation like this:</p>
+<pre class="prettyprint source lang-bash"><code>npm i -g ./ytmp3-js.&lt;VERSION>.tgz
+</code></pre>
+<h3>Command Syntax</h3>
+<pre class="prettyprint source lang-bash"><code>ytmp3 [options] [[URL ...] | [-f &lt;FILE>]]
+</code></pre>
+<h3>Command Line Options</h3>
+<p>For command-line options with detailed information, please refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki/Command-Line-Options">Command-Line Options</a> wiki's page.</p>
+<h3>Example Usage</h3>
+<pre class="prettyprint source lang-bash"><code>ytmp3 https://youtu.be/abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
+</code></pre>
+<p>Or passing only the video ID (<code>ytmp3</code> &gt;=2.0.0):</p>
+<pre class="prettyprint source lang-bash"><code>ytmp3 abcdef123 -o /home/Music -C --format flac --codec flac --frequency 48000
+</code></pre>
+<p>In above example, the code is trying to download audio from a single URL and convert it to <a href="https://en.wikipedia.org/wiki/FLAC">FLAC codec</a> with frequency set to 48000 Hz (equal to 48 KHz) and save the processed audio file to <code>/home/Music</code> directory.</p>
+<blockquote>
+<p>[!TIP]<br>
+If you'd supplied only the <code>-C</code> (or <code>--convertAudio</code>) option, then a downloaded audio file will be automatically converted to MP3 format (which is the default behavior). But only if you've installed <a href="https://ffmpeg.org">FFmpeg</a>.</p>
+</blockquote>
+<blockquote>
+<p>[!NOTE]<br>
+Passing options as command-line argument will override particular options in the specified configuration (<code>-c</code> flag) or global configuration.</p>
+</blockquote>
+<h3>Customizing Download Process</h3>
+<p>If you want to change the behavior of the download process, you can provide a custom <code>options.handler</code> function to handle the download stream and log messages. The handler function accepts 3 arguments: a <code>ReadableStream</code> instance, the video metadata object, and the options object. The handler function can be a synchronous or asynchronous function that returns a promise, both of them are handled properly by this function. But it is recommended to use an asynchronous function, as it might cause to blocking of the main thread if the handler function is synchronous.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>stream : [<code>ReadableStream</code>]</li>
+<li>data : <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#DLHandlerData"><code>DLHandlerData</code></a></li>
+<li>options : <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadOptions"><code>DownloadOptions</code></a></li>
+</ul>
+<p><strong>Example on customizing the download process:</strong></p>
+<pre class="prettyprint source lang-js"><code>async function myHandler(stream, metadata, options) {
+  await new Promise((resolve, reject) => {
+    stream
+      .on('progress', (chunk, downloadedBytes, totalBytes) => {
+        // customize this
+      })
+      .on('error', (error) => {
+        // customize this
+      })
+      .on('end', () => {
+        // customize this
+        resolve();  // do not forget to resolve
+      })
+      .pipe(fs.createWriteStream(...));  // output
+  });
+}
+
+await ytmp3.download(..., {
+  handler: myHandler,
+  ...
+});
+</code></pre>
+<blockquote>
+<p>[!NOTE]<br>
+This feature is not supported on CLI-application, used for programmatic use only.</p>
+</blockquote>
+<h3>Caching Behavior</h3>
+<!-- TODO: Add `--useCache` flag -->
+<p>By default, video metadata is cached in YTMP3’s cache directory to optimize subsequent downloads. This behavior can be disabled by setting <code>useCache</code> to <code>false</code>, which forces the function to always fetch fresh metadata from the YouTube server. Disabling this option also prevents the function from creating or updating any cached data for the given video.</p>
+<h4>Cache Expiration</h4>
+<p>Cached video metadata expires after 2 hours (7200 seconds or 7.2×10⁵ milliseconds). Once expired, the function attempts to verify cache validity by sending a HEAD request to YouTube. If the response status is <code>200 OK</code>, the cached data is used instead of fetching new metadata. Otherwise, fresh data is retrieved and the cache is updated with the newest one.</p>
+<h2>Featured APIs</h2>
+<h3><code>download</code></h3>
+<pre class="prettyprint source lang-ts"><code>async function download(url: string | URL, options?: DownloadOptions): Promise&lt;DownloadResult>
+</code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~download"><strong>[See the implementation]</strong></a></p>
+<details>
+<summary>API Details</summary>
+<p>Downloads audio from a YouTube video using the provided video URL or video ID. The downloaded audio file will be saved in the current directory, unless specified by <code>-o</code> flag or <code>outDir</code> option.</p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inputUrl</code></td>
+<td><code>string</code> | <a href="https://nodejs.org/api/url.html"><code>URL</code></a></td>
+<td>A YouTube video URL or video ID to download its audio content.</td>
+</tr>
+<tr>
+<td><code>downloadOptions</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadOptions"><code>DownloadOptions</code></a></td>
+<td>Options to configure the video information retrieval and download process.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>Fulfills with an object containing download metadata and file paths.<br>
+<strong>Type:</strong> <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#DownloadResult"><code>Promise&lt;DownloadResult&gt;</code></a></p>
+</details>
+<hr>
+<h3><code>batchDownload</code></h3>
+<pre class="prettyprint source lang-ts"><code>async function batchDownload(
+  file: string | Buffer&lt;ArrayBufferLike>,
+  options?: BatchDownloadOptions
+): Promise&lt;Record&lt;string, BatchDownloadResult>>
+</code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~batchDownload"><strong>[See the implementation]</strong></a></p>
+<details>
+<summary>API Details</summary>
+<p>Downloads audio from a file containing YouTube URLs and saves them to the output directory. The downloaded audio files will be saved in the current directory, unless specified by <code>-o</code> flag or <code>outDir</code> option.</p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>file</code></td>
+<td><code>string</code> | <a href="https://nodejs.org/api/buffer.html"><code>Buffer&lt;ArrayBufferLike&gt;</code></a></td>
+<td>The path to the file containing YouTube URLs.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#BatchDownloadOptions"><code>BatchDownloadOptions</code></a></td>
+<td>Options to configure the download process. If not specified, it will automatically uses default options.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>Fulfills with an object with video IDs as keys and the download result objects as values.<br>
+<strong>Type:</strong> <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#BatchDownloadResult"><code>Promise&lt;Record&lt;string, BatchDownloadResult&gt;&gt;</code></a></p>
+</details>
+<hr>
+<h3><code>getInfo</code></h3>
+<pre class="prettyprint source lang-ts"><code>function getInfo(
+  url: string | URL,
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject?: false;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise&lt;YTDLVideoInfo>;
+</code></pre>
+<pre class="prettyprint source lang-ts"><code>function getInfo(
+  url: (string | URL)[],
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject?: false;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise&lt;YTDLVideoInfo[]>;
+</code></pre>
+<pre class="prettyprint source lang-ts"><code>function getInfo(
+  url: (string | URL) | (string | URL)[],
+  options?: import('@distube/ytdl-core').getInfoOptions & {
+    asObject: true;
+    useCache?: boolean;
+    verbose?: boolean;
+  }
+): Promise&lt;Record&lt;string, YTDLVideoInfo>>;
+</code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/v2/module-ytmp3.html#~getInfo"><strong>[See the implementation]</strong></a></p>
+<details>
+<summary>API Details</summary>
+<p>Retrieves the YouTube video information from the given YouTube URL(s) or ID(s).</p>
+<p>If the given URL is an array either of <code>string</code>s or <a href="https://nodejs.org/api/url.html"><code>URL</code></a> objects, the function will returns an array fullfilled with the video information from each URLs (except <code>options.asObject</code> is set to <code>true</code>). The function will automatically filter out any nullable values (<code>null</code>, <code>undefined</code> or an empty string) from the array, if provided.</p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>string</code> | <a href="https://nodejs.org/api/url.html"><code>URL</code></a> | <code>(string | URL)[]</code></td>
+<td>The YouTube video URL(s) or ID(s) to retrieve its information.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><code>ytdl.getInfoOptions</code></td>
+<td>Options to use when fetching the video information. This options object is extend to the <code>ytdl.getInfoOptions</code> object.</td>
+</tr>
+<tr>
+<td><code>options.asObject</code></td>
+<td><code>boolean</code></td>
+<td>If set to <code>true</code>, the returned value will be an object with video ID as keys and video information object as values. Otherwise, the returned value will be an array of video information objects. This option will be ignored if the <code>url</code> is not an array.</td>
+</tr>
+<tr>
+<td><code>options.useCache</code></td>
+<td><code>boolean</code></td>
+<td>If set to <code>true</code>, the function will use the cache to retrieve the video information. Otherwise, the function will ignore the cache and fetch the video information from the server. This also will make the function to create a new cache file in the YTMP3's cache directory.</td>
+</tr>
+<tr>
+<td><code>options.verbose</code></td>
+<td><code>boolean</code></td>
+<td>Whether to print the process retrieval to standard output. Defaults to <code>false</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>A promise fulfills with a video information. If the <code>url</code> is an array, returned value will be an array of video information(s), or if the <code>options.asObject</code> is set to <code>true</code>, the returned value will be an object with video ID as keys and video information object as values.<br>
+<strong>Type:</strong> <code>Promise.&lt;ytdl.videoInfo | Array.&lt;ytdl.videoInfo&gt; | Record.&lt;string, ytdl.videoInfo&gt;&gt;</code></p>
+</details>
+<hr>
+<h3><code>convertAudio</code></h3>
+<pre class="prettyprint source lang-ts"><code>async function convertAudio(
+  inFile: string,
+  outFile?: string | AudioConverterOptions,
+  options?: AudioConverterOptions
+): Promise&lt;ConversionResult>
+</code></pre>
+<p><a href="https://mitsuki31.github.io/ytmp3-js/v2/module-audioconv.html#~convertAudio"><strong>[See the implementation]</strong></a></p>
+<details>
+<summary>API Details</summary>
+<p>Converts an audio file to a specified format using the given options.</p>
+<p>Before performing audio conversion, it first checks the <code>ffmpeg</code> binary by searching on the <code>FFMPEG_PATH</code> environment variable, if set. Otherwise, it force check by calling the <code>ffmpeg</code> command itself on child process.</p>
+<p>If the <code>ffmpeg</code> is not installed on the system, this function will aborts immediately and rejects with an error.</p>
+<h4>Parameters</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inFile</code></td>
+<td><code>string</code></td>
+<td>The input file path of the audio file to be converted.</td>
+</tr>
+<tr>
+<td><code>outFile</code></td>
+<td><code>string</code> | <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#AudioConverterOptions"><code>AudioConverterOptions</code></a></td>
+<td>The output file path of the converted audio file.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#AudioConverterOptions"><code>AudioConverterOptions</code></a> | <code>undefined</code></td>
+<td>Options object for configuring the conversion process. If not provided, it will uses default options and convert audios to MP3 format.</td>
+</tr>
+</tbody>
+</table>
+<h4>Returns</h4>
+<p>Fulfills with an object containing the input and output audio file information.<br>
+<strong>Type:</strong> <a href="https://mitsuki31.github.io/ytmp3-js/v2/global.html#ConversionResult"><code>Promise&lt;ConversionResult&gt;</code></a></p>
+</details>
+<hr>
+<p>There is a lot of APIs you can find in the library, we can't document them all in one place. If you're interested, consider refer to <a href="https://mitsuki31.github.io/ytmp3-js">APIs Homepage</a>.</p>
+<p>Refer to <a href="https://github.com/mitsuki31/ytmp3-js/wiki#example-api-usages">Wiki's Homepage</a> for information on how to use APIs.</p>
+<h2>Acknowledgements</h2>
+<p>This project utilizes the following libraries and APIs:</p>
+<ul>
+<li><strong>(Outdated)</strong> <a href="https://www.npmjs.com/package/ytdl-core"><code>ytdl-core</code></a> - Yet another YouTube downloading module. Written with only Javascript and a node-friendly streaming interface.</li>
+<li><a href="https://www.npmjs.com/package/@distube/ytdl-core"><code>@distube/ytdl-core</code></a> - DisTube fork of <code>ytdl-core</code>. This fork is dedicated to fixing bugs and adding features that are not merged into the original repo as soon as possible.</li>
+<li><a href="https://www.npmjs.com/package/fluent-ffmpeg"><code>fluent-ffmpeg</code></a> - A library that fluents <code>ffmpeg</code> command-line usage, easy to use Node.js module.</li>
+<li>... and a lot more.</li>
+</ul>
+<p>Special thanks to the authors and contributors of these libraries for their valuable work.</p>
+<h2>Contribution</h2>
+<p>Any contributions to this project are welcome :D</p>
+<h2>License</h2>
+<p>This project is licensed under MIT License. For more details, see <a href="https://github.com/mitsuki31/ytmp3-js/blob/master/LICENSE">LICENSE</a> file.</p>
+<!-- Links --></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-audioconv.html">audioconv</a></li><li><a href="module-cache.html">cache</a></li><li><a href="module-config.html">config</a></li><li><a href="module-utils.html">utils</a></li><li><a href="module-utils_info-utils.html">utils/info-utils</a></li><li><a href="module-utils_localep.html">utils/localep</a></li><li><a href="module-utils_logger.html">utils/logger</a></li><li><a href="module-utils_options.html">utils/options</a></li><li><a href="module-utils_thumb-utils.html">utils/thumb-utils</a></li><li><a href="module-utils_type-utils.html">utils/type-utils</a></li><li><a href="module-utils_url-utils.html">utils/url-utils</a></li><li><a href="module-utils_yt-urlfmt.html">utils/yt-urlfmt</a></li><li><a href="module-ytmp3.html">ytmp3</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-utils_info-utils-FormatUtils.html">FormatUtils</a></li><li><a href="module-utils_info-utils-InfoUtils.html">InfoUtils</a></li><li><a href="module-utils_options-defaults.html">defaults</a></li><li><a href="module-utils_thumb-utils-ThumbnailUtils.html">ThumbnailUtils</a></li></ul><h3>Classes</h3><ul><li><a href="CacheValidationError.html">CacheValidationError</a></li><li><a href="GlobalConfigParserError.html">GlobalConfigParserError</a></li><li><a href="IDExtractorError.html">IDExtractorError</a></li><li><a href="IDValidationError.html">IDValidationError</a></li><li><a href="InvalidTypeError.html">InvalidTypeError</a></li><li><a href="URLValidationError.html">URLValidationError</a></li><li><a href="UnknownOptionError.html">UnknownOptionError</a></li><li><a href="UnknownYouTubeDomainError.html">UnknownYouTubeDomainError</a></li><li><a href="module-cache-CacheBase64.html">CacheBase64</a></li><li><a href="module-cache-CacheZLib.html">CacheZLib</a></li><li><a href="module-cache-VInfoCache.html">VInfoCache</a></li><li><a href="module-utils_info-utils-DateFormatter.html">DateFormatter</a></li><li><a href="module-utils_logger-Logger.html">Logger</a></li><li><a href="module-utils_url-utils-URLUtils.html">URLUtils</a></li><li><a href="module-utils-ProgressBar.html">ProgressBar</a></li></ul><h3>Global</h3><ul><li><a href="global.html#STYLE_FMTS">STYLE_FMTS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Mar 25 2025 01:49:47 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
