@@ -1,0 +1,59 @@
+html, *::before, *::after {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Noto Serif", "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-color: #d4d4d4;
+  align-items: center;
+}
+
+.title {
+  display: block;
+  font-family: Poppins, sans-serif;
+  font-size: 2.3rem;
+  font-weight: bold;
+  border-color: green;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+}
+
+.container {
+  display: flex;
+  gap: 10%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.version-box {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255,255,255);
+  background: -moz-linear-gradient(145deg, rgba(255,255,255,1) 10%, rgba(219,219,219,1) 65%, rgba(0,84,228,1) 100%);
+  background: -webkit-linear-gradient(145deg, rgba(255,255,255,1) 10%, rgba(219,219,219,1) 65%, rgba(0,84,228,1) 100%);
+  background: linear-gradient(145deg, rgba(255,255,255,1) 10%, rgba(219,219,219,1) 65%, rgba(0,84,228,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#0054e4",GradientType=1);
+  color: black;
+  font-size: 1.35em;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 20px;
+  box-shadow: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in;
+}
+
+.version-box:hover {
+  transform: scale(1.1);
+  box-shadow: 40px -14px #0054e4cc;
+}
+
