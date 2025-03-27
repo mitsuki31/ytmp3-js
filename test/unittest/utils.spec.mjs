@@ -27,6 +27,15 @@ describe('module:utils', function () {
         'should throw a InvalidTypeError if both arguments are stream'
       ],
       line: 'test line() function',
+      createLogger: [
+        "should create a Logger object with log level 'NONE'",
+        "should create a Logger object with log level 'DEBUG'",
+        "should create a Logger object with log level 'INFO'",
+        "should create a Logger object with log level 'WARNING'",
+        "should create a Logger object with log level 'ERROR'",
+        'should use standard streams (stdout & stderr) if no streams are explicitly provided',
+        'should throw a InvalidTypeError if stdout or stderr is not a writable stream'
+      ]
     },
     isNullOrUndefined: [
       'should return true if given argument is a nullable value'
@@ -73,8 +82,26 @@ describe('module:utils', function () {
   });
 
   describe('~logger', function () {
+    const { LOG_LEVELS } = utils.logger;
+    const EMPTY_LOGGER_REGEX = /^(function\s*\((\.\.\.\w+)?\)|\((\.\.\.\w+)?\)\s*=>)\s*{[\s\n]*};*/;
     const consoleLog = console.log;
     const consoleError = console.error;
+
+    function checkNoCircularRef(logger) {
+      const expectedLogger = {
+        ...utils.logger,
+        stdout: void 0,
+        stderr: void 0,
+        level: void 0
+      };
+      delete expectedLogger.log;
+      delete expectedLogger.logger;
+      delete expectedLogger.createLogger;
+      assert.deepStrictEqual(
+        Object.keys(logger),
+        Object.keys(expectedLogger)
+      );
+    }
 
     before(function () {
       console.log = function () {};
@@ -235,6 +262,55 @@ describe('module:utils', function () {
         process.stdout.columns = 70;
         utils.logger.line();  // Test
         process.stdout.columns = columns;
+      });
+    });
+
+    describe('#createLogger', function () {
+      it(testMessages.logger.createLogger[0], function () { 
+        const logger = utils.logger.createLogger(LOG_LEVELS.DEBUG);
+        checkNoCircularRef(logger);
+      });
+
+      it(testMessages.logger.createLogger[1], function () {
+        const logger = utils.logger.createLogger(LOG_LEVELS.INFO);
+        checkNoCircularRef(logger);
+        assert.match(Function.toString.call(logger.debug), EMPTY_LOGGER_REGEX);
+      });
+
+      it(testMessages.logger.createLogger[2], function () {
+        const logger = utils.logger.createLogger(LOG_LEVELS.WARNING);
+        checkNoCircularRef(logger);
+        ['debug', 'info'].forEach(fn =>
+          assert.match(Function.toString.call(logger[fn]), EMPTY_LOGGER_REGEX));
+      });
+
+      it(testMessages.logger.createLogger[3], function () {
+        const logger = utils.logger.createLogger(LOG_LEVELS.ERROR);
+        checkNoCircularRef(logger);
+        ['debug', 'info', 'warn'].forEach(fn =>
+          assert.match(Function.toString.call(logger[fn]), EMPTY_LOGGER_REGEX));
+      });
+
+      it(testMessages.logger.createLogger[4], function () {
+        const logger = utils.logger.createLogger(LOG_LEVELS.NONE);
+        checkNoCircularRef(logger);
+        ['debug', 'info', 'warn', 'error'].forEach(fn =>
+          assert.match(Function.toString.call(logger[fn]), EMPTY_LOGGER_REGEX));
+      });
+
+      it(testMessages.logger.createLogger[5], function () {
+        const logger = utils.logger.createLogger(LOG_LEVELS.WARNING);
+        assert.deepStrictEqual(logger.stdout, process.stdout);
+        assert.deepStrictEqual(logger.stderr, process.stderr);
+      });
+
+      it(testMessages.logger.createLogger[6], function () {
+        ['stdout', 'stderr'].forEach(prop => {
+          assert.throws(() => {
+            const randomPath = getTempPath(TMPDIR, 10) + '.tmp';
+            utils.logger.createLogger(LOG_LEVELS.DEBUG, { [prop]: randomPath });
+          }, InvalidTypeError);
+        });
       });
     });
 
