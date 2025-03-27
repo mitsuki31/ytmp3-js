@@ -4,20 +4,30 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getTempPath } from '@mitsuki31/temppath';
 
+import error from '../../lib/error.js';
 import utils from '../../lib/utils/index.js';
+const { InvalidTypeError } = error;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('module:utils', function () {
+  let TMPDIR;
   const testMessages = {
-    logger: [
-      'test info message',
-      'test done message',
-      'test debug message',
-      'test warning message',
-      'test error message',
-      'test line() function'
-    ],
+    logger: {
+      info: 'test info() log function',
+      done: 'test done() log function',
+      debug: 'test debug() log function',
+      warning: 'test warning() log function',
+      error: 'test error() log function',
+      write: [
+        'should not use styling text if stream is not TTY (i.e., a file)',
+        'should use default prefix if not explicitly provided',
+        'should throw a Error if the given stream already closed before writing',
+        // both arguments (prefix and stream) cannot be a WritableStream in one-place
+        'should throw a InvalidTypeError if both arguments are stream'
+      ],
+      line: 'test line() function',
+    },
     isNullOrUndefined: [
       'should return true if given argument is a nullable value'
     ],
@@ -57,19 +67,22 @@ describe('module:utils', function () {
     ]
   };
 
+  before(async function () {
+    TMPDIR = path.resolve(utils.ROOTDIR, 'tmp');
+    if (!fs.existsSync(TMPDIR)) await fs.promises.mkdir(TMPDIR);
+  });
+
   describe('~logger', function () {
-    let consoleLog = null;
-    let consoleError = null;
+    const consoleLog = console.log;
+    const consoleError = console.error;
 
     before(function () {
-      consoleLog = console.log;
-      consoleError = console.error;
       console.log = function () {};
       console.error = function () {};
     });
 
     describe('#info', function () {
-      it(testMessages.logger[0], function () {
+      it(testMessages.logger.info, function () {
         const columns = process.stdout.columns;
         utils.logger.info('test');  // Test
         process.stdout.columns = 70;
@@ -79,7 +92,7 @@ describe('module:utils', function () {
     });
 
     describe('#done', function () {
-      it(testMessages.logger[1], function () {
+      it(testMessages.logger.done, function () {
         const columns = process.stdout.columns;
         utils.logger.done('test');  // Test
         process.stdout.columns = 70;
@@ -89,7 +102,7 @@ describe('module:utils', function () {
     });
 
     describe('#debug', function () {
-      it(testMessages.logger[2], function () {
+      it(testMessages.logger.debug, function () {
         const columns = process.stdout.columns;
         utils.logger.debug('test');  // Test
         process.stdout.columns = 70;
@@ -99,7 +112,7 @@ describe('module:utils', function () {
     });
 
     describe('#warn', function () {
-      it(testMessages.logger[3], function () {
+      it(testMessages.logger.warning, function () {
         const columns = process.stdout.columns;
         utils.logger.warn('test');  // Test
         process.stdout.columns = 70;
@@ -109,7 +122,7 @@ describe('module:utils', function () {
     });
 
     describe('#error', function () {
-      it(testMessages.logger[4], function () {
+      it(testMessages.logger.error, function () {
         const columns = process.stdout.columns;
         utils.logger.error('test');  // Test
         process.stdout.columns = 70;
@@ -118,8 +131,105 @@ describe('module:utils', function () {
       });
     });
 
+    describe('#write', function () {
+      const createWriteStreamStub = fs.createWriteStream;
+
+      before(function () {
+        fs.createWriteStream = (path, options) => {
+          const stream = createWriteStreamStub(path, options);
+          // Close the stream at the next tick
+          process.nextTick(() => stream.close());
+          return stream;
+        };
+      })
+
+      it(testMessages.logger.write[0], function (done) {
+        this.timeout(5 * 1000);  // 5s
+        this.slow(2 * 1000);     // 2s
+
+        let stream;
+
+        async function postWrite(err) {
+          if (err instanceof Error) {
+            process.nextTick(() => done(err));
+            return;
+          }
+
+          assert.notStrictEqual(
+            (await fs.promises.readFile(stream.path, 'utf8')).trim().length,
+            0
+          );
+          await fs.promises.rm(stream.path);
+          done();
+        }
+
+        try {
+          stream = createWriteStreamStub(getTempPath(TMPDIR) + '.tmp');
+          utils.logger.write('Hello from test', stream);
+        } catch (err) {
+          throw err;
+        } finally {
+          setImmediate(() => stream && stream.close(postWrite));
+        }
+      });
+
+      it(testMessages.logger.write[1], function (done) {
+        const logMessage = 'Hello from test';
+        const matchRegex = new RegExp(`\\[[0-9.:]+\\]::.+${logMessage}`);
+        let stream;
+        let contents;
+
+        async function postWrite(err) {
+          if (err instanceof Error) {
+            process.nextTick(() => done(err));
+            return;
+          }
+
+          contents = await fs.promises.readFile(stream.path, 'utf8');
+          assert.match(contents, matchRegex);
+
+          // Clean up
+          await fs.promises.rm(stream.path);
+          done();
+        }
+
+        try {
+          stream = createWriteStreamStub(getTempPath(TMPDIR) + '.tmp');
+          utils.logger.write(logMessage, stream);
+        } catch (err) {
+          throw err;
+        } finally {
+          setImmediate(() => stream && stream.close(postWrite));
+        }
+      });
+
+      it(testMessages.logger.write[2], function () {
+        const stream = fs.createWriteStream(getTempPath(TMPDIR) + '.tmp');
+        try {
+          utils.logger.write('Hello from test', stream);
+        } catch (err) {
+          assert.ok(err instanceof Error);
+          assert.match(err.message, /stream[\s\w]*is[\s\w]*closed/i);
+        } finally {
+          // Just to make sure the stream is closed
+          stream.closed || stream.close();
+        }
+      });
+
+      it(testMessages.logger.write[3], function () {
+        const stream = fs.createWriteStream(getTempPath(TMPDIR) + '.tmp');
+        assert.throws(() => {
+          utils.logger.write('Hello from test', stream, stream);
+        }, InvalidTypeError);
+      });
+
+      after(function () {
+        fs.createWriteStream = createWriteStreamStub;
+      });
+    });
+
     describe('#line', function () {
-      it(testMessages.logger[5], function () {
+      it(testMessages.logger.line, function () {
         const columns = process.stdout.columns;
         utils.logger.line();  // Test
         process.stdout.columns = 70;
