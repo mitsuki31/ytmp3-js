@@ -38,7 +38,7 @@ jobs:
     - name: Run coverage
       run: npm run coverage:no-dltest
     - name: Upload coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         name: codecov-alltests@${{ matrix.os }}
         fail_ci_if_error: true
