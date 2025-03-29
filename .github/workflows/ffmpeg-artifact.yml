@@ -43,16 +43,17 @@ jobs:
       continue-on-error: true
 
     - name: Fetch FFmpeg from sources
-      if: ${{ steps.dl-artifact.outcome == 'failure' }}
+      if: steps.dl-artifact.outcome == 'failure'
       uses: FedericoCarboni/setup-ffmpeg@v3
       id: dl-ffmpeg
       with:
         ffmpeg-version: ${{ env.FFMPEG_VERSION }}
-        linking-type: static
         architecture: ${{ env.FFMPEG_ARCH }}
 
     - name: Upload FFmpeg to artifact
-      if: ${{ steps.dl-artifact.outcome == 'failure' && steps.dl-ffmpeg.outcome == 'success' }}
+      if: >-
+        steps.dl-artifact.outcome == 'failure' &&
+        steps.dl-ffmpeg.outcome == 'success'
       uses: actions/upload-artifact@v4
       id: ul-artifact
       with:
@@ -64,7 +65,9 @@ jobs:
 
     - name: Post Fetch FFmpeg from artifact
       id: post-dl-artifact
-      if: ${{ steps.dl-artifact.outcome == 'success' || steps.dl-ffmpeg.outcome == 'success' }}
+      if: >-
+        steps.dl-artifact.outcome == 'success' ||
+        steps.dl-ffmpeg.outcome == 'success'
       run: |
         local ffmpegPath=''
         if [ "${{ steps.dl-artifact.outcome }}" = 'success' ]; then
@@ -72,8 +75,11 @@ jobs:
         elif [ "${{ steps.dl-ffmpeg.outcome }}" = 'success' ]; then
           ffmpegPath="${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}"
         fi
+        local ffmpegVersion=$(ffmpeg -version 2>&- | sed -nE 's/^(ffmpeg\s*)?version\s*([0-9.]+)\s*.*/\2/p')
         echo "ffmpeg-path=$ffmpegPath" >> "$GITHUB_OUTPUT"
-        echo "ffmpeg-version=$(ffmpeg -version 2>&- | sed -nE 's/^(ffmpeg\s*)?version\s*([0-9.]+)\s*.*/\2/p')" >> "$GITHUB_OUTPUT"
+        echo "ffmpeg-version=$ffmpegVersion" >> "$GITHUB_OUTPUT"
+        unset ffmpegPath
+        unset ffmpegVersion
       shell: bash
 
     - name: Post Upload FFmpeg to artifact
