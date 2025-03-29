@@ -1,0 +1,86 @@
+name: FFmpeg Artifact
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Run every 3 hours in a day
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: FFmpeg version
+        default: latest
+        required: false
+      arch:
+        type: string
+        description: FFmpeg architecture
+        default: x64
+        required: false
+
+env:
+  FFMPEG_VERSION: ${{ inputs.version || 'latest' }}
+  FFMPEG_ARCH: ${{ inputs.arch || 'x64' }}
+
+jobs:
+  ffmpeg-artifact:
+    name: FFmpeg Artifact / ffmpeg-${{ env.FFMPEG_VERSION }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ Ubuntu, Windows, macOS ]
+
+    outputs:
+      ffmpeg-path: ${{ steps.post-dl-artifact.outputs.ffmpeg-path }}
+      ffmpeg-version: ${{ steps.post-dl-artifact.outputs.ffmpeg-version }}
+
+    steps:
+    - name: Fetch FFmpeg from artifact
+      uses: actions/download-artifact@v4
+      id: dl-artifact
+      with:
+        name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}
+      continue-on-error: true
+
+    - name: Fetch FFmpeg from sources
+      if: ${{ steps.dl-artifact.outcome == 'failure' }}
+      uses: FedericoCarboni/setup-ffmpeg@v3
+      id: dl-ffmpeg
+      with:
+        ffmpeg-version: ${{ env.FFMPEG_VERSION }}
+        linking-type: static
+        architecture: ${{ env.FFMPEG_ARCH }}
+
+    - name: Upload FFmpeg to artifact
+      if: ${{ steps.dl-artifact.outcome == 'failure' && steps.dl-ffmpeg.outcome == 'success' }}
+      uses: actions/upload-artifact@v4
+      id: ul-artifact
+      with:
+        name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
+        path: ${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}
+        compression-level: 0  # NOTE: Fastest for binary files
+        retention-days: 90
+        if-no-files-found: error
+
+    - name: Post Fetch FFmpeg from artifact
+      id: post-dl-artifact
+      if: ${{ steps.dl-artifact.outcome == 'success' || steps.dl-ffmpeg.outcome == 'success' }}
+      run: |
+        local ffmpegPath=''
+        if [ "${{ steps.dl-artifact.outcome }}" = 'success' ]; then
+          ffmpegPath="${{ steps.dl-artifact.outputs.download-path }}"
+        elif [ "${{ steps.dl-ffmpeg.outcome }}" = 'success' ]; then
+          ffmpegPath="${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}"
+        fi
+        echo "ffmpeg-path=$ffmpegPath" >> "$GITHUB_OUTPUT"
+        echo "ffmpeg-version=$(ffmpeg -version 2>&- | sed -nE 's/^(ffmpeg\s*)?version\s*([0-9.]+)\s*.*/\2/p')" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Post Upload FFmpeg to artifact
+      id: post-ul-artifact
+      if: ${{ steps.ul-artifact.outcome == 'success' }}
+      run: |
+        echo "Artifact Name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}"
+        echo "Artifact URL: ${{ steps.ul-artifact.outputs.artifact-url }}"
+        echo "Artifact SHA-256: ${{ steps.ul-artifact.outputs.artifact-digest }}"
+
