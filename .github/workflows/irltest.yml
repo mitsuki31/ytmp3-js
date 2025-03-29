@@ -2,44 +2,73 @@ name: IRL Test
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: [ master ]
   schedule:
     - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
+  workflow_run:
+    workflows: [ 'FFmpeg Artifact' ]
+    types: [ completed ]
 
 jobs:
   irltest:
-    name: IRL Test (${{ matrix.os }}, Node v${{ matrix.node-ver }})
+    name: IRL Test (${{ matrix.os }}, Node v${{ matrix.node-version }})
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        node-ver: [ 18.x, 20.x ]
+        node-version: [ 18.x, 20.x ]
 
     env:
       FFMPEG_VERSION: 7.0.2
+      NODE_ENV: development
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup Node v${{ matrix.node-ver }}
+
+    - name: Setup Node.js / ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-ver }}
-        cache: 'npm'
-    - name: Setup FFmpeg v${{ env.FFMPEG_VERSION }}
+        node-version: ${{ matrix.node-version }}
+        cache: npm
+
+    - name: Verify FFmpeg v${{ env.FFMPEG_VERSION }} installation
+      if: github.event.workflow_run.conclusion == 'success'
+      id: check-ffmpeg
+      run: |
+        local ffmpegPath="${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}"
+        if [ -d "$ffmpegPath" ]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "available=false" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - name: Fetch FFmpeg v${{ env.FFMPEG_VERSION }} from artifact
+      if: steps.check-ffmpeg.outputs.available == 'false'
+      id: dl-ffmpeg-artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}
+
+    # Run this job only if the FFmpeg artifact is not available
+    - name: Fetch FFmpeg v${{ env.FFMPEG_VERSION }} from sources
+      if: '!cancelled()'
       uses: FedericoCarboni/setup-ffmpeg@v3
-      id: setup-ffmpeg
+      id: dl-ffmpeg
       with:
         ffmpeg-version: ${{ env.FFMPEG_VERSION }}
-        linking-type: static
         architecture: x64
-        github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+
     - name: Clean install the project
       run: npm ci
+
     - name: Run IRL Test
       # FIXME: This test is only specific to conversion tests and should be fixed in the future.
       #        This is due to YouTube restricts download YouTube videos in cloud CI environments
       #        and bots automation, unless handled by proxies.
-      run: npm run test:irl -- -g "\\[CONVERT\\]"
+      run: npm run test:irl:no-dltest
