@@ -1,4 +1,5 @@
 name: IRL Test
+description: Integration tests workflow
 
 on:
   pull_request:
@@ -6,20 +7,91 @@ on:
   schedule:
     - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
+    inputs:
+      os:
+        description: Operating system to run tests (will use latest version)
+        type: choice
+        options: [ Ubuntu, Windows, macOS, All ]
+        default: All
+        required: false
+      node-version:
+        description: Node.js version
+        type: choice
+        options: [ 18.x, 20.x, 21.x, 22.x, 23.x, latest, All ]
+        default: All
+        required: false
+      ffmpeg-version:
+        description: FFmpeg version to use (set to 'latest' to use the latest release)
+        type: string
+        default: latest
+        required: false
+      ffmpeg-arch:
+        description: FFmpeg architecture to use
+        type: choice
+        options: [ x86, x64 ]
+        default: x64
+        required: false
 
 jobs:
+  parse-inputs:
+    name: Parse Inputs
+    runs-on: ubuntu-latest
+
+    outputs:
+      matrix-node-version: ${{ steps.node-version-parser.outputs.matrix }}
+      matrix-os: ${{ steps.os-parser.outputs.matrix }}
+
+    steps:
+    - id: node-version-parser
+      run: |
+        versions=("$EXPECTED_INPUTS")
+        if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
+          versions=("$INPUT")
+        fi
+        # Generate JSON output
+        matrix_json="{ \"include\": ["
+        for version in "${versions[@]}"; do
+          matrix_json+="{ \"node-version\": \"$version\" },"
+        done
+        # Remove the trailing comma and close JSON object
+        matrix_json="${matrix_json%,}] }"
+        echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
+      env:
+        INPUT: ${{ inputs.node-version }}
+        EXPECTED_INPUTS: "18.x 20.x 21.x 22.x 23.x latest"
+
+    - id: os-parser
+      run: |
+        os_list=("$EXPECTED_INPUTS")
+        if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
+          os_list=("$INPUT")
+        fi
+        # Generate JSON output
+        matrix_json="{ \"include\": ["
+        for os in "${os_list[@]}"; do
+          matrix_json+="{ \"os\": \"$os\" },"
+        done
+        # Remove the trailing comma and close JSON object
+        matrix_json="${matrix_json%,}] }"
+        echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
+      env:
+        INPUT: ${{ inputs.os }}
+        EXPECTED_INPUTS: "Ubuntu Windows macOS"
+
   irltest:
-    name: IRL Test (${{ matrix.os }}, Node v${{ matrix.node-version }})
+    name: IRL Test (${{ matrix.os }}, node-${{ matrix.node-version }})
     runs-on: ${{ matrix.os }}
+    needs: [ parse-inputs ]
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        node-version: [ 18.x, 20.x ]
+        os: ${{ fromJSON(needs.parse-inputs.outputs.matrix-os) }}
+        node-version: ${{ fromJSON(needs.parse-inputs.outputs.matrix-node-version) }}
 
     env:
-      FFMPEG_VERSION: 7.0.2
+      FFMPEG_VERSION: ${{ inputs.ffmpeg-version || 7.0.2 }}
+      FFMPEG_ARCH: ${{ inputs.ffmpeg-arch || x64 }}
       NODE_ENV: development
 
     steps:
@@ -32,24 +104,36 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: npm
 
-    # Will always fetch from the artifact
-    - name: Fetch FFmpeg from artifact
-      if: always()
-      id: dl-ffmpeg-artifact
-      uses: actions/download-artifact@v4
+    - name: Fetch FFmpeg from cache
+      uses: actions/cache/restore@v4
+      id: ffmpeg-cache-restore
       with:
-        name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
-        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
       continue-on-error: true
 
-    # Run this job only if the job above is failed or cancelled
+    # Run this job only if the FFmpeg cache is not available
     - name: Fetch FFmpeg from sources
-      if: ${{ !success() || steps.dl-ffmpeg-artifact.outcome == 'failure' }}
-      uses: FedericoCarboni/setup-ffmpeg@v3
+      if: >-
+        ${{
+          failure()
+          || steps.ffmpeg-cache-restore.outcome != 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit != true
+        }}
       id: dl-ffmpeg
+      uses: FedericoCarboni/setup-ffmpeg@v3
       with:
         ffmpeg-version: ${{ env.FFMPEG_VERSION }}
-        architecture: x64
+        architecture: ${{ env.FFMPEG_ARCH }}
+        github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+
+    - name: Store FFmpeg to cache
+      if: ${{ !failure() || steps.dl-ffmpeg.outcome == 'success' }}
+      id: ffmpeg-cache-save
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
 
     - name: Clean install the project
       run: npm ci
