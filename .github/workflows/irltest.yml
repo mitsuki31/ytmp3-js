@@ -90,8 +90,8 @@ jobs:
         node-version: ${{ fromJSON(needs.parse-inputs.outputs.matrix-node-version) }}
 
     env:
-      FFMPEG_VERSION: ${{ inputs.ffmpeg-version || 7.0.2 }}
-      FFMPEG_ARCH: ${{ inputs.ffmpeg-arch || x64 }}
+      FFMPEG_VERSION: ${{ inputs.ffmpeg-version || '7.0.2' }}
+      FFMPEG_ARCH: ${{ inputs.ffmpeg-arch || 'x64' }}
       NODE_ENV: development
 
     steps:
