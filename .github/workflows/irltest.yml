@@ -55,6 +55,8 @@ jobs:
         done
         # Remove the trailing comma and close JSON object
         matrix_json="${matrix_json%,}] }"
+        matrix_json="$(echo "$matrix_json" | jq .)"
+        echo "$matrix_json"  # For debugging
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
       env:
         INPUT: ${{ inputs.node-version }}
@@ -73,6 +75,8 @@ jobs:
         done
         # Remove the trailing comma and close JSON object
         matrix_json="${matrix_json%,}] }"
+        matrix_json="$(echo "$matrix_json" | jq .)"
+        echo "$matrix_json"  # For debugging
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
       env:
         INPUT: ${{ inputs.os }}
