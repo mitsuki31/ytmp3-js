@@ -6,9 +6,6 @@ on:
   schedule:
     - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
-  workflow_run:
-    workflows: [ 'FFmpeg Artifact' ]
-    types: [ completed ]
 
 jobs:
   irltest:
@@ -35,29 +32,19 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: npm
 
-    - name: Verify FFmpeg v${{ env.FFMPEG_VERSION }} installation
-      if: github.event.workflow_run.conclusion == 'success'
-      id: check-ffmpeg
-      run: |
-        local ffmpegPath="${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}"
-        if [ -d "$ffmpegPath" ]; then
-          echo "available=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "available=false" >> "$GITHUB_OUTPUT"
-        fi
-      shell: bash
-
-    - name: Fetch FFmpeg v${{ env.FFMPEG_VERSION }} from artifact
-      if: steps.check-ffmpeg.outputs.available == 'false'
+    # Will always fetch from the artifact
+    - name: Fetch FFmpeg from artifact
+      if: always()
       id: dl-ffmpeg-artifact
       uses: actions/download-artifact@v4
       with:
         name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
         path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}
+      continue-on-error: true
 
-    # Run this job only if the FFmpeg artifact is not available
-    - name: Fetch FFmpeg v${{ env.FFMPEG_VERSION }} from sources
-      if: '!cancelled()'
+    # Run this job only if the job above is failed or cancelled
+    - name: Fetch FFmpeg from sources
+      if: ${{ !success() || steps.dl-ffmpeg-artifact.outcome == 'failure' }}
       uses: FedericoCarboni/setup-ffmpeg@v3
       id: dl-ffmpeg
       with:

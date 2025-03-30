@@ -18,7 +18,7 @@ on:
 
 jobs:
   ffmpeg-artifact:
-    name: FFmpeg Artifact / ${{ inputs.version || 'latest' }}
+    name: FFmpeg Artifact / ${{ matrix.os }} / ffmpeg-${{ inputs.version || 'latest' }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
