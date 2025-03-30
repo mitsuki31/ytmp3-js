@@ -38,15 +38,15 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      matrix-node-version: ${{ steps.node-version-parser.outputs.matrix }}
-      matrix-os: ${{ steps.os-parser.outputs.matrix }}
+      matrix-node-version: "${{ steps.node-version-parser.outputs.matrix }}"
+      matrix-os: "${{ steps.os-parser.outputs.matrix }}"
 
     steps:
     - id: node-version-parser
       run: |
-        versions=("$EXPECTED_INPUTS")
+        declare -a versions=($EXPECTED_INPUTS)
         if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
-          versions=("$INPUT")
+          versions=("$INPUT")  # As a single entry
         fi
         # Generate JSON output
         matrix_json="{ \"include\": ["
@@ -55,18 +55,18 @@ jobs:
         done
         # Remove the trailing comma and close JSON object
         matrix_json="${matrix_json%,}] }"
-        matrix_json="$(echo "$matrix_json" | jq .)"
-        echo "$matrix_json"  # For debugging
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
+        matrix_json="$(echo $matrix_json | jq .)"
+        echo "$matrix_json"  # For debugging
       env:
         INPUT: ${{ inputs.node-version }}
         EXPECTED_INPUTS: "18.x 20.x 21.x 22.x 23.x latest"
 
     - id: os-parser
       run: |
-        os_list=("$EXPECTED_INPUTS")
+        declare -a os_list=($EXPECTED_INPUTS)
         if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
-          os_list=("$INPUT")
+          os_list=("$INPUT")  # As a single entry
         fi
         # Generate JSON output
         matrix_json="{ \"include\": ["
@@ -75,9 +75,9 @@ jobs:
         done
         # Remove the trailing comma and close JSON object
         matrix_json="${matrix_json%,}] }"
-        matrix_json="$(echo "$matrix_json" | jq .)"
-        echo "$matrix_json"  # For debugging
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
+        matrix_json="$(echo $matrix_json | jq .)"
+        echo "$matrix_json"  # For debugging
       env:
         INPUT: ${{ inputs.os }}
         EXPECTED_INPUTS: "Ubuntu Windows macOS"
