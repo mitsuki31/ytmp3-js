@@ -121,6 +121,7 @@ jobs:
       if: >-
         ${{
           !failure()
+          || !cancelled()
           || (steps.ffmpeg-cache-restore.outputs.cache-hit == false
             && steps.dl-ffmpeg.outcome == 'success' && steps.dl-ffmpeg.outcome != 'cancelled')
         }}

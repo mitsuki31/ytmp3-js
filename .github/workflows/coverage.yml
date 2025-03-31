@@ -2,48 +2,143 @@ name: Codecov Coverage
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ master ]
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
 jobs:
-  coverage:
-    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') || github.actor != 'dependabot[bot]' }}
-    name: ${{ matrix.os }} / Node.js ${{ matrix.node-version }}
+  build:
+    if: >-
+      ${{
+        (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
+          || github.actor != 'dependabot[bot]'
+      }}
+    name: Build ${{ matrix.os }} / node-${{ matrix.node-version }}
     runs-on: ${{ matrix.os }}-latest
 
     strategy:
       matrix:
         os: [ Ubuntu, Windows, macOS ]
-        node-version: [ 20.x ]
+        node-version: [ 21.x ]
+
+    env:
+      FFMPEG_VERSION: latest
+      FFMPEG_ARCH: x64
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: Setup Node.js / ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Setup FFmpeg
-      uses: FedericoCarboni/setup-ffmpeg@v3
-      id: setup-ffmpeg
+        cache: npm
+
+    - name: Fetch FFmpeg from cache
+      uses: actions/cache/restore@v4
+      id: ffmpeg-cache-restore
       with:
-        ffmpeg-version: release
-        linking-type: static
-        architecture: x64
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
+      continue-on-error: true
+
+    # Run this job only if the FFmpeg cache is not available
+    - name: Fetch FFmpeg from sources
+      if: >-
+        ${{
+          failure()
+          || steps.ffmpeg-cache-restore.outcome != 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == false
+        }}
+      id: dl-ffmpeg
+      uses: FedericoCarboni/setup-ffmpeg@v3
+      with:
+        ffmpeg-version: ${{ env.FFMPEG_VERSION }}
+        architecture: ${{ env.FFMPEG_ARCH }}
         github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+
+    - name: Store FFmpeg to cache
+      if: >-
+        ${{
+          !failure()
+          || !cancelled()
+          || (steps.ffmpeg-cache-restore.outputs.cache-hit == false
+            && steps.dl-ffmpeg.outcome == 'success' && steps.dl-ffmpeg.outcome != 'cancelled')
+        }}
+      id: ffmpeg-cache-save
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
+
+    - name: Post Fetch FFmpeg from cache
+      if: >-
+        ${{
+          steps.ffmpeg-cache-restore.outcome == 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == true
+        }}
+      id: post-ffmpeg-cache-restore
+      run: |
+        name='ffmpeg'
+        if [[ ${{ runner.os }} == 'Windows' ]]; then name+='.exe'; fi
+        ffmpeg_bin="$(find "$RUNNER_TOOL_CACHE/ffmpeg/$FFMPEG_VERSION" -type f -name $name)"
+        if [[ -n $ffmpeg_bin ]]; then
+          echo "PATH=$PATH:$(dirname $ffmpeg_bin)" >> "$GITHUB_ENV"
+          echo "ffmpeg-path=$ffmpeg_bin" >> "$GITHUB_OUTPUT"  # For fallback
+        fi
+      shell: bash
+      env:
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
+
     - name: Clean install the project
       run: npm ci
-    - name: Run coverage
+
+    - name: Run Coverage Test
+      # FIXME: This test is only specific to conversion tests and should be fixed in the future.
+      #        This is due to YouTube restricts download YouTube videos in cloud CI environments
+      #        and bots automation, unless handled by proxies.
       run: npm run coverage:no-dltest
+      env:
+        FFMPEG_PATH: ${{ steps.post-ffmpeg-cache-restore.outputs.ffmpeg-path }}
+
+    - name: Upload coverage to artifact
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./coverage
+        name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
+        overwrite: true
+
+  coverage:
+    if: >-
+      ${{
+        (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
+          || github.actor != 'dependabot[bot]'
+      }}
+    name: Coverage ${{ matrix.os }} / node-${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}-latest
+    needs: [ build ]
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ Ubuntu, Windows, macOS ]
+        node-version: [ 21.x ]
+
+    steps:
+    - name: Download coverage from artifact
+      uses: actions/download-artifact@v4
+      with:
+        path: ./coverage
+        name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
+
     - name: Upload coverage
       uses: codecov/codecov-action@v4
       with:
         name: codecov-alltests@${{ matrix.os }}
         fail_ci_if_error: true
         env_vars: os,node-version
-        directory: './coverage'
+        directory: ./coverage
         flags: all,${{ matrix.os }}
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true
