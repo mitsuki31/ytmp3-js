@@ -1,4 +1,5 @@
 name: IRL Test
+description: Integration tests workflow
 
 on:
   pull_request:
@@ -6,20 +7,82 @@ on:
   schedule:
     - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
+    inputs:
+      os:
+        description: Operating system to run tests (will use latest version)
+        type: choice
+        options: [ Ubuntu, Windows, macOS, All ]
+        default: All
+        required: false
+      node-version:
+        description: Node.js version
+        type: choice
+        options: [ 18.x, 20.x, 21.x, 22.x, 23.x, latest, All ]
+        default: All
+        required: false
+      ffmpeg-version:
+        description: FFmpeg version to use (set to 'latest' to use the latest release)
+        type: string
+        default: latest
+        required: false
+      ffmpeg-arch:
+        description: FFmpeg architecture to use
+        type: choice
+        options: [ x86, x64 ]
+        default: x64
+        required: false
 
 jobs:
+  parse-inputs:
+    name: Parse Inputs
+    runs-on: ubuntu-latest
+
+    outputs:
+      matrix-result: ${{ steps.parser.outputs.result }}
+
+    steps:
+    - id: parser
+      run: |
+        declare -a versions=($VERSIONS)
+        declare -a os_list=($OS_LIST)
+        [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "All" ]] && \
+          versions=("$INPUT_VERSION")  # As a single entry
+        [[ -n "$INPUT_OS" && "$INPUT_OS" != 'All' ]] && \
+          os_list=("$INPUT_OS")  # As a single entry
+
+        matrix_json='{ "include": ['
+        for os in ${os_list[@]}; do
+          matrix_prop=''  # reset the value
+          for version in ${versions[@]}; do
+            matrix_prop+='{ '
+            matrix_prop+="\"os\": \"$os\", \"node-version\": \"$version\""
+            matrix_prop+=' }, '
+          done
+          matrix_prop=${matrix_prop%, }
+          matrix_json+="$matrix_prop,"
+        done
+        matrix_json="${matrix_json%,} ] }"
+        echo "result=$matrix_json" >> "$GITHUB_OUTPUT"
+        echo "$matrix_json" | jq .  # For debugging
+      env:
+        INPUT_OS: ${{ inputs.os }}
+        INPUT_VERSION: ${{ inputs.node-version }}
+        OS_LIST: "Ubuntu Windows macOS"
+        VERSIONS: "18.x 20.x 21.x 22.x 23.x latest"
+
   irltest:
-    name: IRL Test (${{ matrix.os }}, Node v${{ matrix.node-version }})
-    runs-on: ${{ matrix.os }}
+    name: IRL Test (${{ matrix.os }}, node-${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}-latest
+    needs: [ parse-inputs ]
 
     strategy:
       fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        node-version: [ 18.x, 20.x ]
+      matrix: ${{ fromJSON(needs.parse-inputs.outputs.matrix-result) }}
 
     env:
-      FFMPEG_VERSION: 7.0.2
+      # Replace with 'release' if the input ffmpeg-version is set to 'latest'
+      FFMPEG_VERSION: ${{ (inputs.ffmpeg-version == 'latest' && 'release' || inputs.ffmpeg-version) || '7.0.2' }}
+      FFMPEG_ARCH: ${{ inputs.ffmpeg-arch || 'x64' }}
       NODE_ENV: development
 
     steps:
@@ -32,24 +95,86 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: npm
 
-    # Will always fetch from the artifact
-    - name: Fetch FFmpeg from artifact
-      if: always()
-      id: dl-ffmpeg-artifact
-      uses: actions/download-artifact@v4
+    - name: Fetch FFmpeg from cache
+      uses: actions/cache/restore@v4
+      id: ffmpeg-cache-restore
       with:
-        name: ${{ runner.os }}-ffmpeg-${{ env.FFMPEG_VERSION }}-${{ runner.arch }}
-        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}/${{ runner.arch }}
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
       continue-on-error: true
 
-    # Run this job only if the job above is failed or cancelled
+    # Run this job only if the FFmpeg cache is not available
     - name: Fetch FFmpeg from sources
-      if: ${{ !success() || steps.dl-ffmpeg-artifact.outcome == 'failure' }}
-      uses: FedericoCarboni/setup-ffmpeg@v3
+      if: >-
+        ${{
+          failure()
+          || steps.ffmpeg-cache-restore.outcome != 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == false
+        }}
       id: dl-ffmpeg
+      uses: FedericoCarboni/setup-ffmpeg@v3
       with:
         ffmpeg-version: ${{ env.FFMPEG_VERSION }}
-        architecture: x64
+        architecture: ${{ env.FFMPEG_ARCH }}
+        github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+
+    - name: Change the FFmpeg installation
+      if: ${{ env.FFMPEG_VERSION == 'release' }}
+      id: ffmpeg-repair
+      run: |
+        if [[ -d "${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}" ]]; then
+          old_path="${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}"
+          new_path="$RUNNER_TOOL_CACHE/ffmpeg/release"
+          version="$(basename $(dirname "$old_path"))"
+          echo "::notice::Old FFmpeg Path: $old_path"
+          echo "::notice::New FFmpeg Path: $new_path"
+          # Move the directory
+          mkdir -p "$new_path"
+          mv -v "$old_path" "$new_path"
+          path="$new_path"
+          # Update the environment variables
+          if [[ ${{ runner.os }} == 'Windows' ]]; then path="$(cygpath -w "$path")"; fi
+          echo "PATH=$PATH:$path" >> "$GITHUB_ENV"
+          # Outputs
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+          echo "version=$(basename $version)" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+      env:
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
+
+    - name: Store FFmpeg to cache
+      if: >-
+        ${{
+          !failure()
+          || !cancelled()
+          || (steps.ffmpeg-cache-restore.outputs.cache-hit == false
+            && steps.dl-ffmpeg.outcome == 'success' && steps.dl-ffmpeg.outcome != 'cancelled')
+        }}
+      id: ffmpeg-cache-save
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
+        key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
+
+    - name: Post Fetch FFmpeg from cache
+      if: >-
+        ${{
+          steps.ffmpeg-cache-restore.outcome == 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == true
+        }}
+      id: post-ffmpeg-cache-restore
+      run: |
+        name='ffmpeg'
+        if [[ ${{ runner.os }} == 'Windows' ]]; then name+='.exe'; fi
+        ffmpeg_bin="$(find "$RUNNER_TOOL_CACHE/ffmpeg/$FFMPEG_VERSION" -type f -name $name)"
+        if [[ -n $ffmpeg_bin ]]; then
+          echo "PATH=$PATH:$(dirname $ffmpeg_bin)" >> "$GITHUB_ENV"
+          echo "ffmpeg-path=$ffmpeg_bin" >> "$GITHUB_OUTPUT"  # For fallback
+        fi
+      shell: bash
+      env:
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
 
     - name: Clean install the project
       run: npm ci
@@ -59,3 +184,5 @@ jobs:
       #        This is due to YouTube restricts download YouTube videos in cloud CI environments
       #        and bots automation, unless handled by proxies.
       run: npm run test:irl:no-dltest
+      env:
+        FFMPEG_PATH: ${{ steps.post-ffmpeg-cache-restore.outputs.ffmpeg-path }}
