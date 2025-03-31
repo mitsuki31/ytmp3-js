@@ -58,6 +58,31 @@ jobs:
         architecture: ${{ env.FFMPEG_ARCH }}
         github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
 
+    - name: Change the FFmpeg installation
+      if: ${{ env.FFMPEG_VERSION == 'release' }}
+      id: ffmpeg-repair
+      run: |
+        if [[ -d "${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}" ]]; then
+          old_path="${{ steps.dl-ffmpeg.outputs.ffmpeg-path }}"
+          new_path="$RUNNER_TOOL_CACHE/ffmpeg/release"
+          version="$(basename $(dirname "$old_path"))"
+          echo "::notice::Old FFmpeg Path: $old_path"
+          echo "::notice::New FFmpeg Path: $new_path"
+          # Move the directory
+          mkdir -p "$new_path"
+          mv -v "$old_path" "$new_path"
+          path="$new_path"
+          # Update the environment variables
+          if [[ ${{ runner.os }} == 'Windows' ]]; then path="$(cygpath -w "$path")"; fi
+          echo "PATH=$PATH:$path" >> "$GITHUB_ENV"
+          # Outputs
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+          echo "version=$(basename $version)" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+      env:
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
+
     - name: Store FFmpeg to cache
       if: >-
         ${{
@@ -109,13 +134,13 @@ jobs:
         name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
         overwrite: true
 
-  coverage:
+  upload:
     if: >-
       ${{
         (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
           || github.actor != 'dependabot[bot]'
       }}
-    name: Coverage ${{ matrix.os }} / node-${{ matrix.node-version }}
+    name: Upload Coverage 
     runs-on: ${{ matrix.os }}-latest
     needs: [ build ]
 
