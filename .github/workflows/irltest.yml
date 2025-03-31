@@ -38,60 +38,46 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      matrix-node-version: "${{ steps.node-version-parser.outputs.matrix }}"
-      matrix-os: "${{ steps.os-parser.outputs.matrix }}"
+      matrix-result: ${{ steps.parser.outputs.result }}
 
     steps:
-    - id: node-version-parser
+    - id: parser
       run: |
-        declare -a versions=($EXPECTED_INPUTS)
-        if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
-          versions=("$INPUT")  # As a single entry
-        fi
-        # Generate JSON output
-        matrix_json='['
-        for version in "${versions[@]}"; do
-          matrix_json+="{ \"node-version\": \"$version\" },"
-        done
-        # Remove the trailing comma and close JSON object
-        matrix_json="${matrix_json%,}]"
-        echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
-        matrix_json="$(echo $matrix_json | jq .)"
-        echo "$matrix_json"  # For debugging
-      env:
-        INPUT: ${{ inputs.node-version }}
-        EXPECTED_INPUTS: "18.x 20.x 21.x 22.x 23.x latest"
+        declare -a versions=($VERSIONS)
+        declare -a os_list=($OS_LIST)
+        [[ -n "$INPUT_VERSION" && "$INPUT_VERSION" != "All" ]] && \
+          versions=("$INPUT_VERSION")  # As a single entry
+        [[ -n "$INPUT_OS" && "$INPUT_OS" != 'All' ]] && \
+          os_list=("$INPUT_OS")  # As a single entry
 
-    - id: os-parser
-      run: |
-        declare -a os_list=($EXPECTED_INPUTS)
-        if [[ -n "$INPUT" && "$INPUT" != "All" ]]; then
-          os_list=("$INPUT")  # As a single entry
-        fi
-        # Generate JSON output
-        matrix_json='['
-        for os in "${os_list[@]}"; do
-          matrix_json+="{ \"os\": \"$os\" },"
+        matrix_json='{ "include": ['
+        for os in ${os_list[@]}; do
+          matrix_prop=''  # reset the value
+          for version in ${versions[@]}; do
+            matrix_prop+='{ '
+            matrix_prop+="\"os\": \"$os\", \"node-version\": \"$version\""
+            matrix_prop+=' }, '
+          done
+          matrix_prop=${matrix_prop%, }
+          matrix_json+="$matrix_prop,"
         done
-        # Remove the trailing comma and close JSON object
-        matrix_json="${matrix_json%,}]"
-        echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
-        matrix_json="$(echo $matrix_json | jq .)"
-        echo "$matrix_json"  # For debugging
+        matrix_json="${matrix_json%,} ] }"
+        echo "result=$matrix_json" >> "$GITHUB_OUTPUT"
+        echo "$matrix_json" | jq .  # For debugging
       env:
-        INPUT: ${{ inputs.os }}
-        EXPECTED_INPUTS: "Ubuntu Windows macOS"
+        INPUT_OS: ${{ inputs.os }}
+        INPUT_VERSION: ${{ inputs.node-version }}
+        OS_LIST: "Ubuntu Windows macOS"
+        VERSIONS: "18.x 20.x 21.x 22.x 23.x latest"
 
   irltest:
     name: IRL Test (${{ matrix.os }}, node-${{ matrix.node-version }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     needs: [ parse-inputs ]
 
     strategy:
       fail-fast: false
-      matrix:
-        os: ${{ fromJSON(needs.parse-inputs.outputs.matrix-os) }}
-        node-version: ${{ fromJSON(needs.parse-inputs.outputs.matrix-node-version) }}
+      matrix: ${{ fromJSON(needs.parse-inputs.outputs.matrix-result) }}
 
     env:
       FFMPEG_VERSION: ${{ inputs.ffmpeg-version || '7.0.2' }}
