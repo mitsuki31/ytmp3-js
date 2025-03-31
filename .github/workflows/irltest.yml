@@ -108,7 +108,7 @@ jobs:
         ${{
           failure()
           || steps.ffmpeg-cache-restore.outcome != 'success'
-          || steps.ffmpeg-cache-restore.outputs.cache-hit != true
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == false
         }}
       id: dl-ffmpeg
       uses: FedericoCarboni/setup-ffmpeg@v3
@@ -118,7 +118,12 @@ jobs:
         github-token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
 
     - name: Store FFmpeg to cache
-      if: ${{ !failure() || steps.dl-ffmpeg.outcome == 'success' }}
+      if: >-
+        ${{
+          !failure()
+          || (steps.ffmpeg-cache-restore.outputs.cache-hit == false
+            && steps.dl-ffmpeg.outcome == 'success')
+        }}
       id: ffmpeg-cache-save
       uses: actions/cache/save@v4
       with:
