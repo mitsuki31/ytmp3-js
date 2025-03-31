@@ -80,7 +80,8 @@ jobs:
       matrix: ${{ fromJSON(needs.parse-inputs.outputs.matrix-result) }}
 
     env:
-      FFMPEG_VERSION: ${{ inputs.ffmpeg-version || '7.0.2' }}
+      # Replace with 'release' if the input ffmpeg-version is set to 'latest'
+      FFMPEG_VERSION: ${{ (inputs.ffmpeg-version == 'latest' && 'release' || inputs.ffmpeg-version) || '7.0.2' }}
       FFMPEG_ARCH: ${{ inputs.ffmpeg-arch || 'x64' }}
       NODE_ENV: development
 

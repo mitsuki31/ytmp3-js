@@ -22,7 +22,7 @@ jobs:
         node-version: [ 21.x ]
 
     env:
-      FFMPEG_VERSION: latest
+      FFMPEG_VERSION: release
       FFMPEG_ARCH: x64
 
     steps:
