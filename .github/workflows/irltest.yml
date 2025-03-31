@@ -122,13 +122,32 @@ jobs:
         ${{
           !failure()
           || (steps.ffmpeg-cache-restore.outputs.cache-hit == false
-            && steps.dl-ffmpeg.outcome == 'success')
+            && steps.dl-ffmpeg.outcome == 'success' && steps.dl-ffmpeg.outcome != 'cancelled')
         }}
       id: ffmpeg-cache-save
       uses: actions/cache/save@v4
       with:
         path: ${{ runner.tool_cache }}/ffmpeg/${{ env.FFMPEG_VERSION }}
         key: ffmpeg-${{ runner.os }}-${{ runner.arch }}-${{ env.FFMPEG_VERSION }}
+
+    - name: Post Fetch FFmpeg from cache
+      if: >-
+        ${{
+          steps.ffmpeg-cache-restore.outcome == 'success'
+          || steps.ffmpeg-cache-restore.outputs.cache-hit == true
+        }}
+      id: post-ffmpeg-cache-restore
+      run: |
+        name='ffmpeg'
+        if [[ ${{ runner.os }} == 'Windows' ]]; then name+='.exe'; fi
+        ffmpeg_bin="$(find "$RUNNER_TOOL_CACHE/ffmpeg/$FFMPEG_VERSION" -type f -name $name)"
+        if [[ -n $ffmpeg_bin ]]; then
+          echo "PATH=$PATH:$(dirname $ffmpeg_bin)" >> "$GITHUB_ENV"
+          echo "ffmpeg-path=$ffmpeg_bin" >> "$GITHUB_OUTPUT"  # For fallback
+        fi
+      shell: bash
+      env:
+        RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
 
     - name: Clean install the project
       run: npm ci
@@ -138,3 +157,5 @@ jobs:
       #        This is due to YouTube restricts download YouTube videos in cloud CI environments
       #        and bots automation, unless handled by proxies.
       run: npm run test:irl:no-dltest
+      env:
+        FFMPEG_PATH: ${{ steps.post-ffmpeg-cache-restore.outputs.ffmpeg-path }}
