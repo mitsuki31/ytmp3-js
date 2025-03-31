@@ -49,12 +49,12 @@ jobs:
           versions=("$INPUT")  # As a single entry
         fi
         # Generate JSON output
-        matrix_json="{ \"include\": ["
+        matrix_json='['
         for version in "${versions[@]}"; do
           matrix_json+="{ \"node-version\": \"$version\" },"
         done
         # Remove the trailing comma and close JSON object
-        matrix_json="${matrix_json%,}] }"
+        matrix_json="${matrix_json%,}]"
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
         matrix_json="$(echo $matrix_json | jq .)"
         echo "$matrix_json"  # For debugging
@@ -69,12 +69,12 @@ jobs:
           os_list=("$INPUT")  # As a single entry
         fi
         # Generate JSON output
-        matrix_json="{ \"include\": ["
+        matrix_json='['
         for os in "${os_list[@]}"; do
           matrix_json+="{ \"os\": \"$os\" },"
         done
         # Remove the trailing comma and close JSON object
-        matrix_json="${matrix_json%,}] }"
+        matrix_json="${matrix_json%,}]"
         echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
         matrix_json="$(echo $matrix_json | jq .)"
         echo "$matrix_json"  # For debugging
