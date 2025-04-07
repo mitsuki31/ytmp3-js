@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import childProcess from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 import { getTempPath } from '@mitsuki31/temppath';
 
 import audioconv from '../../lib/audioconv.js';
@@ -295,7 +296,7 @@ describe('module:audioconv', function () {
         targetSize: 4502
       };
       const extnames = ['m4a', 'mp3'];
-      const pb = audioconv.createConversionProgress(info, extnames);
+      const pb = stripVTControlCharacters(audioconv.createConversionProgress(info, extnames));
       assert.ok((new RegExp(`\\(${
         extnames[0].toUpperCase()} >> ${
         extnames[1].toUpperCase()}\\)`
