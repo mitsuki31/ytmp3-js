@@ -19,9 +19,11 @@ describe('module:options', function () {
       'should reject incorrect class instance types',
       'should handle multiple expected types correctly',
       'should fallback when multiple expected types do not match',
-      'should throw `InvalidTypeError` if the `shouldThrow` is true',
-      'should not throw an error when shouldThrow is false',
-      'should throw an InvalidTypeError with correct details'
+      'should throw `InvalidTypeError` if `shouldThrow` is set to true',
+      'should not throw an error if `shouldThrow` is set to false',
+      'should throw an InvalidTypeError with correct details',
+      'should use specified default values if `useDefault` is set to true',
+      'should not use specified default values if `useDefault` is set to false'
     ]
   };
 
@@ -154,9 +156,24 @@ describe('module:options', function () {
         assert.match(err.message, /test.+invalid type/i);
         assert.deepStrictEqual(JSON.parse(JSON.stringify(err)), {
           actualType: 'number',
-          expectedType: 'string'
+          expectedType: 'string',
+          symbolName: 'test'
         });
       }
+    });
+
+    it(testMessages.resolve[13], function () {
+      const inOpts = { errorFoo: new Error('foo') };
+      const expectedOpts = { errorFoo: [TypeError, 'foo'] };
+      const result = resolve(inOpts, expectedOpts, false, true);
+      assert.strictEqual(result.errorFoo, 'foo');
+    });
+
+    it(testMessages.resolve[14], function () {
+      const inOpts = { errorFoo: new Error('foo') };
+      const expectedOpts = { errorFoo: [TypeError, 'foo'] };
+      const result = resolve(inOpts, expectedOpts, false, false);
+      assert.strictEqual(typeof result.errorFoo, 'undefined');
     });
   });
 });
