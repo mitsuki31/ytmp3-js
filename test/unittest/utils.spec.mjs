@@ -12,6 +12,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('module:utils', function () {
   let TMPDIR;
+  let logFile;
+  let loggerStub;
+
   const testMessages = {
     logger: {
       info: 'test info() log function',
@@ -33,8 +36,12 @@ describe('module:utils', function () {
         "should create a Logger object with log level 'INFO'",
         "should create a Logger object with log level 'WARNING'",
         "should create a Logger object with log level 'ERROR'",
+        "should fallback to 'INFO' level if given log level is unspecified or invalid",
         'should use standard streams (stdout & stderr) if no streams are explicitly provided',
-        'should throw a InvalidTypeError if stdout or stderr is not a writable stream'
+        'should include the defined immutable properties when enumerated',
+        'should throw a InvalidTypeError if stdout or stderr is not a writable stream',
+        'should not interfere with each other when multiple loggers are created',
+        'should create a Logger object with stdout and stderr streams redirected to files'
       ]
     },
     isNullOrUndefined: [
@@ -78,14 +85,32 @@ describe('module:utils', function () {
 
   before(async function () {
     TMPDIR = path.resolve(utils.ROOTDIR, 'tmp');
-    if (!fs.existsSync(TMPDIR)) await fs.promises.mkdir(TMPDIR);
+    logFile = path.join(TMPDIR, 'utils@logger', 'output.log');
+    loggerStub = utils.Logger;
+
+    if (!fs.existsSync(path.dirname(logFile))) {
+      await fs.promises.mkdir(path.dirname(logFile), { recursive: true });
+    }
+    logFile = fs.createWriteStream(logFile, { flags: 'w' });
+
+    // Redirect all outputs to specified log file
+    // WARNING: THIS IS NOT RECOMMENDED WAY TO DO IN PRODUCTION USE,
+    //          CONSIDER USE `Logger.createLogger()` INSTEAD.
+    utils.Logger.stdout = logFile;
+    utils.Logger.stderr = logFile;
   });
 
-  describe('~logger', function () {
-    const { LOG_LEVELS } = utils.logger;
+  after(async function () {
+    utils.Logger = loggerStub;
+    logFile.closed || logFile.close();
+    if (fs.existsSync(logFile.path)) {
+      await fs.promises.rm(path.dirname(logFile.path), { recursive: true });
+    }
+  });
+
+  describe('~Logger', function () {
     const EMPTY_LOGGER_REGEX = /^(function\s*\((\.\.\.\w+)?\)|\((\.\.\.\w+)?\)\s*=>)\s*{[\s\n]*};*/;
-    const consoleLog = console.log;
-    const consoleError = console.error;
+    let LOG_LEVELS;
 
     function checkNoCircularRef(logger) {
       const expectedLogger = {
@@ -104,8 +129,7 @@ describe('module:utils', function () {
     }
 
     before(function () {
-      console.log = function () {};
-      console.error = function () {};
+      LOG_LEVELS = utils.Logger.LOG_LEVELS;
     });
 
     describe('#info', function () {
@@ -142,9 +166,9 @@ describe('module:utils', function () {
       it(testMessages.logger.warning, function () {
         const columns = process.stdout.columns;
         utils.logger.warn('test');  // Test
-        process.stdout.columns = 70;
+        process.stderr.columns = 70;
         utils.logger.warn('test');  // Test
-        process.stdout.columns = columns;
+        process.stderr.columns = columns;
       });
     });
 
@@ -152,20 +176,25 @@ describe('module:utils', function () {
       it(testMessages.logger.error, function () {
         const columns = process.stdout.columns;
         utils.logger.error('test');  // Test
-        process.stdout.columns = 70;
+        process.stderr.columns = 70;
         utils.logger.error('test');  // Test
-        process.stdout.columns = columns;
+        process.stderr.columns = columns;
       });
     });
 
     describe('#write', function () {
-      const createWriteStreamStub = fs.createWriteStream;
+      let createWriteStreamStub;
 
       before(function () {
+        createWriteStreamStub = fs.createWriteStream;
+
         fs.createWriteStream = (path, options) => {
           const stream = createWriteStreamStub(path, options);
+          stream.once('ready', () => fs.rmSync(stream.path));
           // Close the stream at the next tick
-          process.nextTick(() => stream.close());
+          process.nextTick(() => {
+            stream.close();
+          });
           return stream;
         };
       })
@@ -196,7 +225,7 @@ describe('module:utils', function () {
         } catch (err) {
           throw err;
         } finally {
-          setImmediate(() => stream && stream.close(postWrite));
+          if (stream && !stream.closed) stream.close(postWrite);
         }
       });
 
@@ -226,7 +255,7 @@ describe('module:utils', function () {
         } catch (err) {
           throw err;
         } finally {
-          setImmediate(() => stream && stream.close(postWrite));
+          if (stream && !stream.closed) stream.close(postWrite);
         }
       });
 
@@ -266,7 +295,7 @@ describe('module:utils', function () {
     });
 
     describe('#createLogger', function () {
-      it(testMessages.logger.createLogger[0], function () { 
+      it(testMessages.logger.createLogger[0], function () {
         const logger = utils.logger.createLogger(LOG_LEVELS.DEBUG);
         checkNoCircularRef(logger);
       });
@@ -299,12 +328,25 @@ describe('module:utils', function () {
       });
 
       it(testMessages.logger.createLogger[5], function () {
+        const logger = utils.logger.createLogger();  // Should fallback to INFO
+        assert.strictEqual(logger.level, 'INFO');
+        assert.strictEqual(LOG_LEVELS[logger.level], LOG_LEVELS.INFO);
+      });
+
+      it(testMessages.logger.createLogger[6], function () {
         const logger = utils.logger.createLogger(LOG_LEVELS.WARNING);
         assert.deepStrictEqual(logger.stdout, process.stdout);
         assert.deepStrictEqual(logger.stderr, process.stderr);
       });
 
-      it(testMessages.logger.createLogger[6], function () {
+      it(testMessages.logger.createLogger[7], function () {
+        const logger = utils.logger.createLogger('DEBUG');
+        const keys = Object.keys(logger);
+        const expectedKeys = ['stdout', 'stderr', 'level'];
+        assert.strictEqual(keys.filter(k => expectedKeys.includes(k)).length, expectedKeys.length);
+      });
+
+      it(testMessages.logger.createLogger[8], function () {
         ['stdout', 'stderr'].forEach(prop => {
           assert.throws(() => {
             const randomPath = getTempPath(TMPDIR, 10) + '.tmp';
@@ -312,11 +354,45 @@ describe('module:utils', function () {
           }, InvalidTypeError);
         });
       });
-    });
 
-    after(function () {
-      console.log = consoleLog;
-      console.error = consoleError;
+      it(testMessages.logger.createLogger[9], function () {
+        const logger1 = utils.logger.createLogger('INFO');
+        const logger2 = utils.logger.createLogger('ERROR');
+        assert.notStrictEqual(logger1.level, logger2.level);
+        assert.notDeepStrictEqual(logger1, logger2);
+      });
+
+      it(testMessages.logger.createLogger[10], function (done) {
+        const stdout = fs.createWriteStream(path.join(TMPDIR, 'utils@logger', 'stdout.log'));
+        const stderr = fs.createWriteStream(path.join(TMPDIR, 'utils@logger', 'stderr.log'));
+
+        try {
+          const logger = utils.logger.createLogger(LOG_LEVELS.INFO, { stdout, stderr });
+          assert.strictEqual(logger.level, 'INFO');
+          assert.deepStrictEqual(logger.stdout, stdout);
+          assert.deepStrictEqual(logger.stderr, stderr);
+
+          // Write tests
+          logger.debug('debug test');  // Will not be written to file due to log level
+          logger.info('info test');
+          logger.warn('warning test');
+          logger.error('error test');
+
+          const stdoutContents = fs.promises.readFile(stdout.path, 'utf8');
+          const stderrContents = fs.promises.readFile(stderr.path, 'utf8');
+
+          Promise.all([stdoutContents, stderrContents]).then(([stdoutStr, stderrStr]) => {
+            assert.match(stdoutStr, /\[[0-9:.]+\]::\[INFO\] info test\n/);
+            assert.match(stderrStr, /\[[0-9:.]+\]::\[WARNING\] warning test\n\[[0-9:.]+\]::\[ERROR\] error test/);
+          });
+        } catch (err) {
+          assert.fail(err);
+        } finally {
+          stdout.closed || stdout.close(() => fs.rmSync(stdout.path));
+          stderr.closed || stderr.close(() => fs.rmSync(stderr.path));
+          done();
+        }
+      });
     });
   });
 
@@ -453,7 +529,7 @@ describe('module:utils', function () {
 
     it(testMessages.createDirIfNotExist[2], function () {
       return new Promise((resolve) => {
-        assert.rejects(() => utils.createDirIfNotExist([ 'foo' ]), TypeError);
+        assert.rejects(() => utils.createDirIfNotExist(['foo']), TypeError);
         resolve();
       });
     });
@@ -466,7 +542,7 @@ describe('module:utils', function () {
 
   describe('#createDirIfNotExistSync', function () {
     let tempDir;
-    
+
     before(function () {
       tempDir = getTempPath(path.join(utils.ROOTDIR, 'tmp'), 20);
     });
