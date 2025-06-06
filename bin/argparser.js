@@ -5,7 +5,6 @@
  * @requires  audioconv
  * @requires  config
  * @requires  utils
- * @requires  ytmp3
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @since     1.1.0
  * @license   MIT
@@ -28,6 +27,7 @@
  * @since   1.0.0
  */
 
+const path = require('node:path');
 const {
   SUPPRESS,
   ZERO_OR_MORE,
@@ -38,9 +38,11 @@ const {
 
 const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
 const {
+  colors: { style: $c },
   dropNullAndUndefined,
   isPlainObject,
-  isNullOrUndefined
+  isNullOrUndefined,
+  Logger
 } = require('../lib/utils');
 const {
   importConfig,
@@ -49,11 +51,11 @@ const {
 } = require('../lib/config');
 const { resolveDlOptions } = require('../lib/ytmp3');
 const pkg = require('../package.json');
+const { getGlob } = require('../lib/env');
 
+const log = getGlob('logger', Logger);
 
-// Windows: "C:\Users\...\AppData\Local\Temp\ytmp3-js"
-// Linux: "/home/usr/tmp/ytmp3-js"
-// Termux Android: "/data/data/com.termux/files/usr/tmp/ytmp3-js"
+log.debug(`Retrieving project metadata from ${$c([0, 'BY'], 'package.json')} ...`);
 const author = {
   name: pkg.author.split(' <')[0],
   email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
@@ -72,6 +74,7 @@ const __version__ = (() => {
 const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
   new Date().getFullYear()} ${author.name} (${author.website})\n`;
 
+log.debug(`Initiating ${$c([0, 'BY'], path.basename(__filename, '.js'))} module ...`);
 
 /**
  * Initializes the argument parser for command-line options.
@@ -270,7 +273,7 @@ function initParser() {
  * @param {Object} params.options - The options object containing various configuration
  *                                  settings from command-line argument parser.
  *
- * @returns {FilteredOptions} A frozen object with the filtered and processed options.
+ * @returns {Promise<FilteredOptions>} A frozen object with the filtered and processed options.
  *
  * @description
  * This function performs the following steps:
