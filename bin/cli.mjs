@@ -31,7 +31,6 @@ import {
 import __utils from '../lib/utils/index.js';
 import * as __env from '../lib/env.js';
 import cleanUp from '../lib/runtime/pre-exit.js';
-import pkg from '../package.json' with { type: 'json' };
 
 const __argparser = await presetupStatus.then(async () => {
   return await import('./argparser.js');
@@ -41,13 +40,17 @@ const createTempPath = promisify(_createTempPath);
 
 const { Logger, captureStdoutSync, colors: { style: $c } } = __utils;
 const {
-  __version__,
-  __copyright__,
   initParser,
   filterOptions
 } = __argparser;
 const { getGlob } = __env;
+
 const log = getGlob('logger', Logger);
+const {
+  versionStr,
+  copyright: copyrightStr,
+  dependencies: pkgDeps,
+} = getGlob('$__metadata__$', {});
 const LOG_FILE = getGlob('logFile', null);
 const NO_COLOR = getGlob('noColor', false);
 
@@ -124,7 +127,7 @@ async function deleteTempFile() {
 function printHeader() {
   const hasColumns = typeof log.stdout?.columns === 'number' && log.stdout.columns > 0;
   const totalWidth = hasColumns ? log.stdout.columns : 82;
-  const version = util.stripVTControlCharacters(__version__.trimEnd()).replace(/(\[|\])/g, '');
+  const version = util.stripVTControlCharacters(versionStr.trimEnd()).replace(/(\[|\])/g, '');
   const useEquals = totalWidth / 1.5 > 72;
 
   const centerText = `Starting ${version}`;
@@ -177,20 +180,23 @@ async function main() {
   }
   // Version
   if (version === 1) {
-    process.stdout.write(__version__);
-    LOG_FILE && log.write(__version__, '');
+    process.stdout.write(versionStr);
+    LOG_FILE && log.write(versionStr, '');
     return;
   } else if (version >= 2) {
     // If got '-VV' or '--version --version', then verbosely print this module
     // version and all dependencies' version
-    const deps = Object.keys(pkg.dependencies);
-    process.stdout.write(__version__);
-    LOG_FILE && log.write(__version__, '');
+    const deps = Object.keys(pkgDeps);
+    process.stdout.write(versionStr);
+    LOG_FILE && log.write(versionStr, '');
     for (const dep of deps) {
       const realpathDep = path.join(import.meta.dirname, '..', 'node_modules', dep);
       const str = `\x1b[1m  ${
         ((deps.indexOf(dep) !== deps.length - 1) ? '├── ' : '└── ')
-      }${dep} :: v${JSON.parse(fs.readFileSync(realpathDep + '/package.json')).version}\x1b[0m\n`;
+      }${dep} :: v${
+        JSON.parse(fs.readFileSync(realpathDep + '/package.json'))?.version
+          ?? pkgDeps[dep].replace(/^./, '')
+      }\x1b[0m\n`;
       process.stdout.write(str);
       LOG_FILE && log.write(str, '');
     }
@@ -198,7 +204,7 @@ async function main() {
   }
   // Copyright
   if (copyright) {
-    log.write(__copyright__, '');
+    log.write(copyrightStr, '');
     return;
   }
   // Print configuration
