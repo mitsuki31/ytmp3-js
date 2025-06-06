@@ -49,7 +49,7 @@
     "url": "https://ko-fi.com/dhefam31"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=21.7.0"
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.15.9",
