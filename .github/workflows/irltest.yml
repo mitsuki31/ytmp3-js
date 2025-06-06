@@ -17,7 +17,7 @@ on:
       node-version:
         description: Node.js version
         type: choice
-        options: [ 18.x, 20.x, 21.x, 22.x, 23.x, latest, All ]
+        options: [ 22.x, 23.x, latest, All ]
         default: All
         required: false
       ffmpeg-version:
@@ -68,7 +68,7 @@ jobs:
         INPUT_OS: ${{ inputs.os }}
         INPUT_VERSION: ${{ inputs.node-version }}
         OS_LIST: "Ubuntu Windows macOS"
-        VERSIONS: "18.x 20.x 21.x 22.x 23.x latest"
+        VERSIONS: "22.x 23.x latest"
 
   irltest:
     name: IRL Test (${{ matrix.os }}, node-${{ matrix.node-version }})
