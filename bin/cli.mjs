@@ -11,34 +11,57 @@
  * @since     0.1.0
  */
 
-'use strict';
+/* global process, setImmediate, URL, console */
 
-const fs = require('fs');      // File system module
-const path = require('path');  // Path module
-const { EOL } = require('os');
-const { promisify } = require('util');
-const {
+// ! WARN: CALL PRE-SETUP FIRST BEFORE SETUP FROM THIS MODULE
+import * as __presetup from '../lib/runtime/pre-setup.js';
+const presetupStatus = __presetup.setupAll();
+
+
+import fs from 'node:fs';
+import path from 'node:path';
+import util from 'node:util';
+import { EOL } from 'node:os';
+import { promisify, inspect } from 'node:util';
+import {
   getTempPath,
-  createTempPath: _createTempPath
-} = require('@mitsuki31/temppath');
+  createTempPath as _createTempPath
+} from '@mitsuki31/temppath';
+
+import __utils from '../lib/utils/index.js';
+import * as __env from '../lib/env.js';
+import cleanUp from '../lib/runtime/pre-exit.js';
+import pkg from '../package.json' with { type: 'json' };
+
+const __argparser = await presetupStatus.then(async () => {
+  return await import('./argparser.js');
+});
+
 const createTempPath = promisify(_createTempPath);
 
-const { logger: log } = require('../lib/utils');
-const ytmp3 = require('../lib/ytmp3');
-const pkg = require('../package.json');
+const { Logger, captureStdoutSync, colors: { style: $c } } = __utils;
 const {
   __version__,
   __copyright__,
   initParser,
   filterOptions
-} = require('./argparser');
-
+} = __argparser;
+const { getGlob } = __env;
+const log = getGlob('logger', Logger);
+const LOG_FILE = getGlob('logFile', null);
+const NO_COLOR = getGlob('noColor', false);
 
 const TEMPDIR = path.join(path.dirname(getTempPath()), 'ytmp3-js');
-const DEFAULT_BATCH_FILE = path.join(__dirname, 'downloads.txt');
+const DEFAULT_BATCH_FILE = path.join(import.meta.dirname, 'downloads.txt');
 
 /** Store the file path of cached multiple download URLs. */
 let tempBatchFile = null;
+let argparser = null;
+let error = null;
+
+// Import ytmp3-js module only after this module imports
+import ytmp3 from '../lib/ytmp3.js';
+import { ArgumentError, ArgumentTypeError } from 'argparse';
 
 
 /**
@@ -76,8 +99,9 @@ async function createTempFile(urls) {
   });
 
   // Close the write stream at the next tick
-  process.nextTick(() => stream.end());
-  return tempFile;
+  return new Promise(resolve => {
+    process.nextTick(() => stream.close(() => resolve(tempFile)));
+  });
 }
 
 /**
@@ -90,10 +114,31 @@ async function createTempFile(urls) {
 async function deleteTempFile() {
   if (!tempBatchFile) return false;
   if (fs.existsSync(tempBatchFile)) {
+    log.info('Cleaning up temporary file ...');
     // Delete the parent directory of the cache file
     await fs.promises.rm(path.dirname(tempBatchFile), { recursive: true, force: true });
   }
   return true;
+}
+
+function printHeader() {
+  const hasColumns = typeof log.stdout?.columns === 'number' && log.stdout.columns > 0;
+  const totalWidth = hasColumns ? log.stdout.columns : 82;
+  const version = util.stripVTControlCharacters(__version__.trimEnd()).replace(/(\[|\])/g, '');
+  const useEquals = totalWidth / 1.5 > 72;
+
+  const centerText = `Starting ${version}`;
+  const textWithSpaces = ` ${centerText} `;
+  const equalsLength = Math.max(2, Math.floor((totalWidth - textWithSpaces.length) / 2));
+
+  const leftEquals = useEquals ? '='.repeat(equalsLength / 3 + 1) : '';
+  const rightEquals = useEquals
+    ? '='.repeat((totalWidth - (leftEquals.length + textWithSpaces.length)) / 3.1)
+    : '';
+
+  log.line();
+  log.info(`${$c([0, 'BG'], leftEquals)}${$c([0, '^', 'BC'], textWithSpaces)}${$c([0, 'BG'], rightEquals)}`);
+  log.line();
 }
 
 /**
@@ -102,43 +147,75 @@ async function deleteTempFile() {
  * @since   1.0.0
  */
 async function main() {
+  log.debug('Building the command-line argument parser ...');
+  argparser = initParser();
+  const argv = process.argv.slice(2);
+  log.debug(`Using arguments: ${inspect(argv.join(' '), {
+    compact: false,
+    colors: true
+  })}`);
+  log.debug('Filtering user arguments ...');
   const {
     urls,
     batchFile,
+    help,
     version,
     copyright,
-    downloadOptions,
-    printConfig
-  } = await filterOptions({
-    options: initParser().parse_intermixed_args()
-  });
+    parsedOptions,
+    parsedOptionsAll,
+    printConfig,
+    printConfigAll,
+  } = await filterOptions({ options: argparser.parse_intermixed_args() });
 
+  const HELP = captureStdoutSync(() => argparser.print_help());
+
+  // Help
+  if (help) {
+    process.stdout.write(HELP);
+    LOG_FILE && log.write(HELP, '');
+    return;
+  }
   // Version
   if (version === 1) {
     process.stdout.write(__version__);
+    LOG_FILE && log.write(__version__, '');
     return;
   } else if (version >= 2) {
     // If got '-VV' or '--version --version', then verbosely print this module
     // version and all dependencies' version
     const deps = Object.keys(pkg.dependencies);
     process.stdout.write(__version__);
+    LOG_FILE && log.write(__version__, '');
     for (const dep of deps) {
-      process.stdout.write(`\x1b[1m  ${
+      const realpathDep = path.join(import.meta.dirname, '..', 'node_modules', dep);
+      const str = `\x1b[1m  ${
         ((deps.indexOf(dep) !== deps.length - 1) ? '├── ' : '└── ')
-      }${dep} :: v${require(dep + '/package.json').version}\x1b[0m\n`);
+      }${dep} :: v${JSON.parse(fs.readFileSync(realpathDep + '/package.json')).version}\x1b[0m\n`;
+      process.stdout.write(str);
+      LOG_FILE && log.write(str, '');
     }
     return;
   }
   // Copyright
   if (copyright) {
-    process.stdout.write(__copyright__);
+    log.write(__copyright__, '');
     return;
   }
   // Print configuration
-  if (printConfig) {
-    console.log(downloadOptions);
+  if (printConfig && !printConfigAll) {
+    log.write(inspect(parsedOptions, { colors: !NO_COLOR, compact: false }) + '\n', '');
     return;
   }
+  if (printConfigAll) {
+    log.write(inspect(parsedOptionsAll, { colors: !NO_COLOR, compact: false }) + '\n', '');
+    return;
+  }
+
+  // Send internet connectivity status to user
+  const connected = getGlob('hasConnectivity', false);
+  const w = [(connected ? 'connected' : 'disconnected'), (connected ? 'to' : 'from')];
+  log.info(
+    `Device has been ${$c([0, (connected ? 'BG' : 'BR')], w[0])} ${w[1]} the internet provider`);
 
   let downloadSucceed = false;
   try {
@@ -150,40 +227,107 @@ async function main() {
         log.error(`Cannot find \x1b[93m${
           defaultBatchFileBase}\x1b[0m at current directory`);
         log.error('Aborted');
-        process.exit(1);
+        return;
       }
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
       downloadSucceed = !!(await ytmp3.batchDownload(
-        DEFAULT_BATCH_FILE, downloadOptions));
+        DEFAULT_BATCH_FILE, parsedOptionsAll));
     } else if ((!urls || (urls && !urls.length)) && batchFile) {
       log.info('\x1b[95mMode: \x1b[97mBatch Download\x1b[0m');
-      downloadSucceed = !!(await ytmp3.batchDownload(batchFile, downloadOptions));
+      downloadSucceed = !!(await ytmp3.batchDownload(batchFile, parsedOptionsAll));
     } else if (urls.length && !batchFile) {
       if (Array.isArray(urls) && urls.length > 1) {
         log.info('\x1b[95mMode: \x1b[97mMultiple Downloads\x1b[0m');
         tempBatchFile = await createTempFile(urls);
         log.info('Created a temporary file:\x1b[93m',
           path.basename(tempBatchFile), '\x1b[0m');
-        downloadSucceed = !!(await ytmp3.batchDownload(tempBatchFile, downloadOptions));
+        downloadSucceed = !!(await ytmp3.batchDownload(tempBatchFile, parsedOptionsAll));
       } else {
         log.info('\x1b[95mMode: \x1b[97mSingle Download\x1b[0m');
-        downloadSucceed = !!(await ytmp3.download(urls[0], downloadOptions));
+        downloadSucceed = !!(await ytmp3.download(urls[0], parsedOptionsAll));
       }
     }
   } catch (dlErr) {
     log.error(dlErr.message);
-    console.error(dlErr.stack);
-    process.exit(1);
+    if (!error) error = dlErr;
+    LOG_FILE
+      && console.error(dlErr.message);  // We'll always send the error message to stderr even log file used
+    return;
   } finally {
     await deleteTempFile();
   }
 
   if (downloadSucceed) {
-    log.info(`Downloaded files saved at \x1b[93m${downloadOptions.outDir}\x1b[0m`);
+    log.info(`Downloaded files saved at \x1b[93m${parsedOptionsAll.outDir}\x1b[0m`);
   }
 }
 
 
-if (require.main === module) {
-  main();
+async function driverFunc() {
+  printHeader();
+
+  // Before execute the main function, attach clean up hooks to several signals
+  log.debug('Attaching clean up hooks into termination signals ...');
+  ['SIGINT', 'SIGTERM'].forEach((signal) => {
+    process.prependOnceListener(signal, async function ytmp3CleanUp() {
+      if (signal === 'SIGINT') {
+        process.stdout.write('\u001b[2K\r');
+        log.warn(`${$c([0, '^', 'BB'], '<Ctrl-C>')} has been pressed, interrupting ...`);
+      }
+      log.line();
+      await cleanUp().then(() => process.exit(signal));
+    });
+  });
+
+  try {
+    await main();
+  } catch (err) {
+    error = err instanceof Error ? err : error;
+    log.error(err.message);
+    // Do not log the error stack if the error is from argument parser
+    if (!(err instanceof ArgumentError || err instanceof ArgumentTypeError)) {
+      err.stack && log.error('Error stack: ' + util.inspect(
+        err.stack.split('\n').slice(1).map(e => e.replace(/[ ]{2,}/g, '').trim()),
+        { colors: true, compact: false }
+      ));
+    }
+  }
+
+  if (error instanceof Error) {
+    const stack = (error.stack ?? '')
+      .split('\n')
+      .slice(1)
+      .map(str => str.replace(/[ ]{2}/g, '').trim());
+
+    log.line();
+    log.error($c([0, '^', 'BR'], 'Last known error:'));
+    if (!(error instanceof ArgumentError || error instanceof ArgumentTypeError)) {
+      log.error(util.format(
+        $c([0, 'BR'], `${error.message}: `) + '%s',
+        util.inspect(
+          { ...error, message: error.message, stack },
+          { colors: true, compact: false }
+        )
+      ));
+    } else {
+      log.error($c([0, 'BR'], `${error.name}: ${error.message}`));
+      const usage = captureStdoutSync(() => {
+        argparser.print_usage();
+      });
+      log.write($c([0, '^'], usage), '', log.stderr);
+    }
+  }
+
+  log.line();
+  await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
+    log.info('Exiting application ...');
+    process.exit(Number(error?.errno ?? !!error));
+  });
 }
+
+
+if (import.meta.url === process.argv[1]
+    || import.meta.url === new URL(process.argv[1], 'file://').href) {
+  (async () => await driverFunc())();
+}
+
