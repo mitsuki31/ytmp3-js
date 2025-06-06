@@ -38,7 +38,6 @@ const {
 
 const { splitOptions } = require('../lib/audioconv');
 const {
-  colors: { style: $c },
   dropNullAndUndefined,
   isPlainObject,
   isNullOrUndefined,
@@ -48,38 +47,22 @@ const {
   _AudioConverterOptions,
   _AudioConverterOptions$N,
   _DownloadOptions,
-  Logger
 } = require('../lib/utils');
 const {
   importConfig,
   findGlobalConfig,
   parseGlobalConfig
 } = require('../lib/config');
-const pkg = require('../package.json');
 const { getGlob } = require('../lib/env');
 
-const log = getGlob('logger', Logger);
-
-log.debug(`Retrieving project metadata from ${$c([0, 'BY'], 'package.json')} ...`);
-const author = {
-  name: pkg.author.split(' <')[0],
-  email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
-  website: /\((https?:\/\/.+)\)/m.exec(pkg.author)[1]
-};
-
-const __version__ = (() => {
-  // eslint-disable-next-line prefer-const
-  let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
-  rel = (rel && rel.length !== 0)
-    ? rel.charAt(0).toUpperCase() + rel.substring(1)  // Capitalize first letter
-    : 'Stable';
-  return `\x1b[1m[${pkg.name.toUpperCase()}] v${ver} \x1b[2m${rel}\x1b[0m\n`;
-})();
-
-const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
-  new Date().getFullYear()} ${author.name} (${author.website})\n`;
-
-log.debug(`Initiating ${$c([0, 'BY'], path.basename(__filename, '.js'))} module ...`);
+const {
+  author,
+  name: projName,
+  title: projTitle,
+  description: projDescription,
+  homepageUrl,
+  repository: { url: repositoryUrl },
+} = getGlob('$__metadata__$', {});
 
 /**
  * Initializes the argument parser for command-line options.
@@ -91,17 +74,17 @@ log.debug(`Initiating ${$c([0, 'BY'], path.basename(__filename, '.js'))} module 
  */
 function initParser() {
   const parser = new ArgumentParser({
-    prog: pkg.title
-      ? pkg.title.toLowerCase()
-      : (pkg.name ? pkg.name.replace('-js', '') : 'ytmp3'),
-    description: pkg.description,
+    prog: projTitle
+      ? projTitle.toLowerCase()
+      : (projName ? projName.replace('-js', '') : 'ytmp3'),
+    description: projDescription,
     // eslint-disable-next-line camelcase
     formatter_class: RawDescriptionHelpFormatter,
     epilog: `
       Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).
       
-      \x1b[1;91m::\x1b[0m \x1b[1;96m[Homepage]\x1b[0m\thttps://mitsuki31.github.io/ytmp3-js
-      \x1b[1;91m::\x1b[0m \x1b[1;95m[GitHub]\x1b[0m\thttps://github.com/mitsuki31/ytmp3-js
+      \x1b[1;91m::\x1b[0m \x1b[1;96m[Homepage]\x1b[0m\t${homepageUrl}
+      \x1b[1;91m::\x1b[0m \x1b[1;95m[GitHub]\x1b[0m\t${repositoryUrl.replace(/^git\+|\.git$/g, '')}
     `.trim().replace(/[ ]{2,}/g, ''),
     // eslint-disable-next-line camelcase
     add_help: false,  // Use custom help argument
@@ -266,12 +249,12 @@ function initParser() {
     action: 'store_true'
   });
   parser.add_argument('--print-config', {
-    help: 'Show currently used configuration and exit. Useful for debugging',
+    help: 'Show current used configuration and exit. Useful for debugging',
     action: 'store_true',
     dest: 'printConfig'
   });
   parser.add_argument('--print-config-all', {
-    help: 'Show currently all used configuration and exit. Useful for debugging',
+    help: 'Show all current used configuration and exit. Useful for debugging',
     action: 'store_true',
     dest: 'printConfigAll'
   });
@@ -454,9 +437,6 @@ async function filterOptions({ options }) {
 
 
 module.exports = {
-  author,
-  __version__,
-  __copyright__,
   initParser,
   filterOptions
 };
