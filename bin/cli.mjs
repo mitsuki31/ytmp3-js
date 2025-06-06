@@ -6,7 +6,9 @@
  * @requires  utils
  * @requires  ytmp3
  * @requires  bin/argparser
- * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
+ * @requires  runtime/pre-setup
+ * @requires  runtime/pre-exit
+ * @author    Ryuu Mitsuki <{@link https://github.com/mitsuki31}>
  * @license   MIT
  * @since     0.1.0
  */

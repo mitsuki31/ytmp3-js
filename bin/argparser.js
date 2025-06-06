@@ -5,7 +5,7 @@
  * @requires  audioconv
  * @requires  config
  * @requires  utils
- * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
+ * @author    Ryuu Mitsuki <{@link https://github.com/mitsuki31}>
  * @since     1.1.0
  * @license   MIT
  */
