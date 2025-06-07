@@ -42,6 +42,7 @@ import {
 const createTempPath = promisify(_createTempPath);
 
 import * as __env from '../lib/env.js';
+import * as __error from '../lib/error.js';
 import __utils from '../lib/utils/index.js';
 import cleanUp from '../lib/runtime/pre-exit.js';
 
@@ -51,6 +52,7 @@ const {
   filterOptions
 } = __argparser;
 const { getGlob } = __env;
+const { getExitCodeFromSignal } = __error;
 
 const log = getGlob('logger', Logger);
 const {
@@ -284,7 +286,10 @@ async function driverFunc() {
         log.warn(`${$c([0, '^', 'BB'], '<Ctrl-C>')} has been pressed, interrupting ...`);
       }
       log.line();
-      await cleanUp().then(() => process.exit(signal));
+      await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
+        log.info('Exiting application ...');
+        process.exit(getExitCodeFromSignal(signal));
+      });
     });
   });
 
