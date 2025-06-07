@@ -13,32 +13,37 @@
  * @since     0.1.0
  */
 
-/* global process, setImmediate, URL, console */
+/* global process, setImmediate, console */
+
+// We need `require` function to import module synchronously
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 // ! WARN: CALL PRE-SETUP FIRST BEFORE SETUP FROM THIS MODULE
-import * as __presetup from '../lib/runtime/pre-setup.js';
-const presetupStatus = __presetup.setupAll();
+let __argparser;
+let ytmp3;
 
+await (require('../lib/runtime/pre-setup')).setupAll().then(() => {
+  // ! WARN: KEEP IMPORT THESE MODULES SYNCHRONOUSLY, SETUP LIFECYCLE WILL RUIN OTHERWISE!
+  __argparser = require('./argparser');
+  ytmp3 = require('../lib/ytmp3');
+});
 
 import fs from 'node:fs';
 import path from 'node:path';
 import util from 'node:util';
 import { EOL } from 'node:os';
 import { promisify, inspect } from 'node:util';
+import { ArgumentError, ArgumentTypeError } from 'argparse';
 import {
   getTempPath,
   createTempPath as _createTempPath
 } from '@mitsuki31/temppath';
-
-import __utils from '../lib/utils/index.js';
-import * as __env from '../lib/env.js';
-import cleanUp from '../lib/runtime/pre-exit.js';
-
-const __argparser = await presetupStatus.then(async () => {
-  return await import('./argparser.js');
-});
-
 const createTempPath = promisify(_createTempPath);
+
+import * as __env from '../lib/env.js';
+import __utils from '../lib/utils/index.js';
+import cleanUp from '../lib/runtime/pre-exit.js';
 
 const { Logger, captureStdoutSync, colors: { style: $c } } = __utils;
 const {
@@ -63,10 +68,6 @@ const DEFAULT_BATCH_FILE = path.join(import.meta.dirname, 'downloads.txt');
 let tempBatchFile = null;
 let argparser = null;
 let error = null;
-
-// Import ytmp3-js module only after this module imports
-import ytmp3 from '../lib/ytmp3.js';
-import { ArgumentError, ArgumentTypeError } from 'argparse';
 
 
 /**
@@ -311,9 +312,10 @@ async function driverFunc() {
     log.error($c([0, '^', 'BR'], 'Last known error:'));
     if (!(error instanceof ArgumentError || error instanceof ArgumentTypeError)) {
       log.error(util.format(
-        $c([0, 'BR'], `${error.message}: `) + '%s',
+        $c([0, 'BR'], `${util.stripVTControlCharacters(error.message)}: `) + '%s',
         util.inspect(
-          { ...error, message: error.message, stack },
+          // Message property should clean from ANSI code for better readability
+          { ...error, message: util.stripVTControlCharacters(error.message), stack },
           { colors: true, compact: false }
         )
       ));
