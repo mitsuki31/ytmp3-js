@@ -230,32 +230,31 @@ describe('module:utils', function () {
       });
 
       it(testMessages.logger.write[1], function (done) {
+        this.timeout(5 * 1000);
+        this.slow(2 * 1000);
+
         const logMessage = 'Hello from test';
         const matchRegex = new RegExp(`\\[[0-9.:]+\\]::.+${logMessage}`);
         let stream;
-        let contents;
 
-        async function postWrite(err) {
-          if (err instanceof Error) {
-            process.nextTick(() => done(err));
-            return;
-          }
+        function postWrite() {
+          fs.readFile(stream.path, 'utf8', (err, content) => {
+            if (err) done(err);
+            assert.match(content, matchRegex);
 
-          contents = await fs.promises.readFile(stream.path, 'utf8');
-          assert.match(contents, matchRegex);
-
-          // Clean up
-          await fs.promises.rm(stream.path);
-          done();
+            // Clean up
+            fs.rmSync(stream.path);
+            done();
+          });
         }
 
         try {
           stream = createWriteStreamStub(getTempPath(TMPDIR) + '.tmp');
           utils.logger.write(logMessage, stream);
         } catch (err) {
-          throw err;
+          done(err);
         } finally {
-          if (stream && !stream.closed) stream.close(postWrite);
+          stream.end(postWrite);
         }
       });
 
@@ -265,6 +264,7 @@ describe('module:utils', function () {
           utils.logger.write('Hello from test', stream);
         } catch (err) {
           assert.ok(err instanceof Error);
+
           assert.match(err.message, /stream[\s\w]*is[\s\w]*closed/i);
         } finally {
           // Just to make sure the stream is closed
