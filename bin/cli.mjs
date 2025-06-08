@@ -22,11 +22,17 @@ const require = createRequire(import.meta.url);
 // ! WARN: CALL PRE-SETUP FIRST BEFORE SETUP FROM THIS MODULE
 let __argparser;
 let ytmp3;
+const { setupAll, TRUTHY } = require('../lib/runtime/pre-setup.js');
+const DEBUG = ['YTMP3__DEBUG', 'DEBUG'].some(env =>
+  process.env[env] && TRUTHY.includes(process.env[env].toLowerCase()));
 
-await (require('../lib/runtime/pre-setup')).setupAll().then(() => {
+DEBUG && console.time('[ytmp3-js CLI]');
+await setupAll().then(() => {
+  DEBUG && console.timeLog('[ytmp3-js CLI]', 'Pre-setup completed!');
   // ! WARN: KEEP IMPORT THESE MODULES SYNCHRONOUSLY, SETUP LIFECYCLE WILL RUIN OTHERWISE!
   __argparser = require('./argparser');
   ytmp3 = require('../lib/ytmp3');
+  DEBUG && console.timeLog('[ytmp3-js CLI]', 'Core module loaded!');
 });
 
 import fs from 'node:fs';
@@ -275,21 +281,22 @@ async function main() {
 
 
 async function driverFunc() {
+  DEBUG && console.timeLog('[ytmp3-js CLI]', 'Starting application ...');
+
   printHeader();
 
   // Before execute the main function, attach clean up hooks to several signals
   log.debug('Attaching clean up hooks into termination signals ...');
-  ['SIGINT', 'SIGTERM'].forEach((signal) => {
+  ['SIGINT', 'SIGTERM', 'beforeExit'].forEach((signal) => {
     process.prependOnceListener(signal, async function ytmp3CleanUp() {
       if (signal === 'SIGINT') {
         process.stdout.write('\u001b[2K\r');
         log.warn(`${$c([0, '^', 'BB'], '<Ctrl-C>')} has been pressed, interrupting ...`);
       }
       log.line();
-      await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
-        log.info('Exiting application ...');
-        process.exit(getExitCodeFromSignal(signal));
-      });
+      __env.setInterrupted();  // Set the interrupted flag to true
+      if (signal === 'beforeExit') log.debug('beforeExit event triggered, cleaning up ...');
+      await cleanUp(getExitCodeFromSignal(signal));
     });
   });
 
@@ -333,10 +340,15 @@ async function driverFunc() {
     }
   }
 
+  DEBUG && console.timeLog('[ytmp3-js CLI]', 'Exiting application ...');
   log.line();
-  await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
-    log.info('Exiting application ...');
-    process.exit(Number(error?.errno ?? !!error));
+  // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
+  await cleanUp(Number(error?.errno ?? !!error)).then(() => {
+    DEBUG && console.timeEnd('[ytmp3-js CLI]');
+
+    log.debug(`Application was ${__env.hasInterrupted() ? 'interrupted by user' : 'naturally exited'}`);
+    log.info(`Exiting application${__env.hasInterrupted() ? ' (interrupted)' : ''} ...`);
+    process.exit(process.exitCode ?? 0);
   });
 }
 
