@@ -279,17 +279,15 @@ async function driverFunc() {
 
   // Before execute the main function, attach clean up hooks to several signals
   log.debug('Attaching clean up hooks into termination signals ...');
-  ['SIGINT', 'SIGTERM'].forEach((signal) => {
+  ['SIGINT', 'SIGTERM', 'beforeExit'].forEach((signal) => {
     process.prependOnceListener(signal, async function ytmp3CleanUp() {
       if (signal === 'SIGINT') {
         process.stdout.write('\u001b[2K\r');
         log.warn(`${$c([0, '^', 'BB'], '<Ctrl-C>')} has been pressed, interrupting ...`);
       }
       log.line();
-      await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
-        log.info('Exiting application ...');
-        process.exit(getExitCodeFromSignal(signal));
-      });
+      if (signal === 'beforeExit') log.debug('beforeExit event triggered, cleaning up ...');
+      await cleanUp(getExitCodeFromSignal(signal));
     });
   });
 
@@ -334,10 +332,8 @@ async function driverFunc() {
   }
 
   log.line();
-  await cleanUp().then(() => { // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
-    log.info('Exiting application ...');
-    process.exit(Number(error?.errno ?? !!error));
-  });
+  await cleanUp(Number(error?.errno ?? !!error)); // ! NOTE: IT IS MANDATORY TO CALL THIS FUNCTION BEFORE EXIT
+  log.info('Exiting application ...');
 }
 
 
