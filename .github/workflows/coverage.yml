@@ -158,7 +158,7 @@ jobs:
         name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
 
     - name: Upload coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         name: codecov-alltests@${{ matrix.os }}
         fail_ci_if_error: true
