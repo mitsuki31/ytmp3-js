@@ -29,7 +29,7 @@ module.exports = [
     files: [
       'index.js',
       'lib/**/*.js',
-      'bin/**/*',
+      'bin/**/*.js',
       'eslint.config.js'
     ],
     languageOptions: {

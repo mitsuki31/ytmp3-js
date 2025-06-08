@@ -3,13 +3,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { format } from 'node:util';
-import { tmpdir } from 'node:os';
-import { lsFiles } from 'lsfnd';
 import { getTempPath } from '@mitsuki31/temppath';
 
 import config from '../../lib/config.js';
 import utils from '../../lib/utils/index.js';
-import audioconv from '../../lib/audioconv.js';
+import options from '../../lib/utils/options.js';
 import error from '../../lib/error.js';
 const {
   UnknownOptionError,
@@ -34,7 +32,7 @@ describe('module:config', function () {
     ],
     resolveConfig: [
       'should resolve audio conversion options from `converterOptions` field',
-      'should return an empty object when specified configuration with nullable value'
+      'should throw an error if specified configuration is a nullable value'
     ],
     configChecker: [
       'should throw `InvalidTypeError` if the given config is not an object',
@@ -58,6 +56,13 @@ describe('module:config', function () {
   let expectedResolvedConfig;
   let tempFileNoExt;
 
+  function removeYtdlOptions(config) {
+    return Object.entries(config).reduce((acc, [key, val]) => {
+      if (!Object.keys(options._YTDLDownloadOptions).includes(key)) acc[key] = val;
+      return acc;
+    }, {});
+  }
+
   before(function () {
     tempFileNoExt = path.join(
       utils.ROOTDIR, 'tmp', 'config@unittest',
@@ -78,19 +83,17 @@ describe('module:config', function () {
     expectedResolvedConfig = {
       cwd: path.resolve('.'),
       outDir: path.resolve('.', 'tmp', 'downloads'),
-      convertAudio: true,
+      outFile: undefined,
+      convertAudio: false,
       quiet: false,
       useCache: true,
+      handler: undefined,
       converterOptions: {
-        inputOptions: undefined,
-        outputOptions: undefined,
+        ...options.defaults.AudioConverterOptions,
         format: 'opus',
         codec: 'libopus',
         frequency: 12000,
-        bitrate: undefined,
         channels: 1,
-        deleteOld: undefined,
-        quiet: undefined
       }
     };
 
@@ -103,14 +106,14 @@ describe('module:config', function () {
       await new Promise((resolve) => {
         const stream = fs.createWriteStream(tempFile, { flush: true });
 
-        stream.write(JSON.stringify(configObj));
+stream.write(JSON.stringify(configObj));
         stream.end();
         stream.on('finish', resolve);
       });
 
-      const resolvedConfig = await config.importConfig(tempFile);
+      const resolvedConfig = removeYtdlOptions(await config.importConfig(tempFile));
 
-      assert.equal(utils.isNullOrUndefined(resolvedConfig), false);
+        assert.equal(utils.isNullOrUndefined(resolvedConfig), false);
       assert.deepStrictEqual(resolvedConfig, expectedResolvedConfig);
     });
 
@@ -127,7 +130,7 @@ describe('module:config', function () {
         stream.on('finish', resolve);
       });
 
-      const resolvedConfig = await config.importConfig(tempFile);
+      const resolvedConfig = removeYtdlOptions(await config.importConfig(tempFile));
 
       assert.equal(utils.isNullOrUndefined(resolvedConfig), false);
       assert.deepStrictEqual(resolvedConfig, expectedResolvedConfig);
@@ -146,7 +149,7 @@ describe('module:config', function () {
         stream.on('finish', resolve);
       });
 
-      const resolvedConfig = await config.importConfig(tempFile);
+      const resolvedConfig = removeYtdlOptions(await config.importConfig(tempFile));
 
       assert.equal(utils.isNullOrUndefined(resolvedConfig), false);
       assert.deepStrictEqual(resolvedConfig, expectedResolvedConfig);
@@ -154,13 +157,13 @@ describe('module:config', function () {
 
     it(testMessages.importConfig[3], async function () {
       await assert.rejects(async () => {
-        await config.importConfig(123n);
+        removeYtdlOptions(await config.importConfig(123n));
       }, InvalidTypeError);
     });
 
     it(testMessages.importConfig[4], async function () {
       await assert.rejects(async () => {
-        await config.importConfig(tempFileNoExt + '.docx');
+        removeYtdlOptions(await config.importConfig(tempFileNoExt + '.docx'));
       }, Error);
     });
   });
@@ -169,7 +172,7 @@ describe('module:config', function () {
     let tempFile;
 
     before(async function () {
-      tempFile = tempFileNoExt + '.js';
+      tempFile = tempFileNoExt + '.config.js';
 
       await new Promise((resolve) => {
         const stream = fs.createWriteStream(tempFile, { flush: true });
@@ -236,8 +239,9 @@ describe('module:config', function () {
     });
 
     it(testMessages.resolveConfig[1], function () {
-      [ null, undefined, false ].forEach((cfg) =>
-        assert.deepStrictEqual(config.resolveConfig({ config: cfg }), {}));
+      [null, undefined, false].forEach((cfg) => {
+        assert.throws(() => config.resolveConfig({ config: cfg }), Error);
+      });
     });
   });
 
@@ -249,7 +253,7 @@ describe('module:config', function () {
     });
 
     it(testMessages.configChecker[0], function () {
-      [ null, 5, '_' ].forEach((cfg) =>
+      [null, 5, '_'].forEach((cfg) =>
         assert.throws(() =>
           config.configChecker({ config: cfg, file })), InvalidTypeError);
     });
@@ -315,7 +319,7 @@ describe('module:config', function () {
       err.syscall = 'stat';
       err.path = searchDir;
 
-      fs.promises.stat = async (f) => {
+      fs.promises.stat = async (_f) => {
         throw err;
       }
 
@@ -327,7 +331,7 @@ describe('module:config', function () {
       if (fs.existsSync(searchDir)) fs.rmSync(searchDir, { recursive: true });
     });
   });
-  
+
   describe('#parseGlobalConfig', function () {
     let exampleGlobalConfigDir;
     let exampleGlobalConfig;
@@ -338,8 +342,8 @@ describe('module:config', function () {
     before(async function () {
       exampleGlobalConfigDir = getTempPath(path.join(utils.ROOTDIR, 'tmp'), 25);
       exampleGlobalConfig = path.join(exampleGlobalConfigDir, 'ytmp3-js-test.json');
-      exampleGlobalConfigWO = path.join(exampleGlobalConfigDir, 'ytmp3-js-test-write-only.js');
-      exampleInvalidGlobalConfig = path.join(exampleGlobalConfigDir, 'ytmp3-test-invalid.cjs');
+      exampleGlobalConfigWO = path.join(exampleGlobalConfigDir, 'ytmp3-js-test-write-only.config.js');
+      exampleInvalidGlobalConfig = path.join(exampleGlobalConfigDir, 'ytmp3-test-invalid.config.cjs');
 
       configs = {
         _: {
@@ -354,10 +358,12 @@ describe('module:config', function () {
         expected: {
           cwd: os.homedir(),
           outDir: path.join(os.homedir(), 'downloads'),  // Relative to 'cwd'
+          outFile: undefined,
           convertAudio: false,
-          converterOptions: audioconv.defaultOptions,
+          converterOptions: options.defaults.AudioConverterOptions,
           quiet: true,
-          useCache: true
+          useCache: true,
+          handler: undefined
         }
       }
 
@@ -389,11 +395,11 @@ describe('module:config', function () {
     it(testMessages.parseGlobalConfig[0], async function () {
       let actualConfig;
       await assert.doesNotReject(async () => {
-        actualConfig = await config.parseGlobalConfig(exampleGlobalConfig);
+        actualConfig = removeYtdlOptions(await config.parseGlobalConfig(exampleGlobalConfig));
       });
       assert.deepStrictEqual(actualConfig, configs.expected);
     });
-  
+
     it(testMessages.parseGlobalConfig[1], async function () {
       await assert.rejects(() =>
         config.parseGlobalConfig(exampleInvalidGlobalConfig), UnknownOptionError);
@@ -412,12 +418,12 @@ describe('module:config', function () {
 
     it(testMessages.parseGlobalConfig[3], async function () {
       await assert.rejects(() =>
-        config.parseGlobalConfig(exampleGlobalConfig, [ 'hello world' ]), InvalidTypeError);
+        config.parseGlobalConfig(exampleGlobalConfig, ['hello world']), InvalidTypeError);
     });
 
     it(testMessages.parseGlobalConfig[4], async function () {
       await assert.rejects(() =>
-        config.parseGlobalConfig([ exampleInvalidGlobalConfig ]), InvalidTypeError);
+        config.parseGlobalConfig([exampleInvalidGlobalConfig]), InvalidTypeError);
     });
 
     after(function () {

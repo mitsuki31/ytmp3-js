@@ -2,7 +2,9 @@ name: Unit Test
 
 on:
   push:
-    paths: [ "test/unittest/**/*" ]
+    paths:
+      - "lib/**/*"
+      - "test/unittest/**/*"
   pull_request:
     branches: [ "master" ]
 
@@ -12,9 +14,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        node-ver: [ 18.x, 20.x ]
+        node-ver: [ 22.x ]
 
     steps:
     - name: Checkout

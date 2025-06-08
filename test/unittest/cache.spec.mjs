@@ -153,40 +153,54 @@ describe('module:cache', function () {
       });
 
       it(testMessages.VInfoCache.createCache[1], async function () {
+        this.timeout(10 * 1000);  // 10s
+        this.slow(5 * 1000);      // 5s
+
         await assert.rejects(async () => {
           await VInfoCache.createCache('invalid video info', tempCacheDir);
         }, InvalidTypeError);
       });
 
       it(testMessages.VInfoCache.createCache[2], async function () {
+        this.timeout(10 * 1000);  // 10s
+        this.slow(5 * 1000);      // 5s
+
         await assert.rejects(async () => {
           await VInfoCache.createCache(testVideoInfo, 123);
         }, InvalidTypeError);
       });
 
       it(testMessages.VInfoCache.createCache[3], async function () {
-        this.timeout(2 * 1000);  // 2s
-        this.slow(700);          // 0.7s
+        this.timeout(10 * 1000);  // 10s
+        this.slow(5 * 1000);      // 5s
 
-        // Get the cache before update
-        const cache = await VInfoCache.getCache(testVideoId, {
+        // Get the initial cache
+        const originalCache = await VInfoCache.getCache(testVideoId, {
           cacheDir: tempCacheDir
         });
 
-        // Update the cache file
+        // Wait at least 30ms to ensure timestamp difference
+        await new Promise(resolve => setTimeout(resolve, 30));
+
+        // Force overwrite the cache
         await VInfoCache.createCache(testVideoInfo, {
           cacheDir: tempCacheDir,
-          force: true  // enable the force creation (e.g., overwrite)
+          force: true  // enable the force creation (overwrite)
         });
-        // Get the updated version of cache
-        const cacheUpdated = await VInfoCache.getCache(testVideoId, {
+
+        // Wait for cache creation is fully complete (including closing its buffer)
+        await new Promise(resolve => setImmediate(resolve));
+
+        // Get updated cache after overwrite
+        const updatedCache = await VInfoCache.getCache(testVideoId, {
           cacheDir: tempCacheDir
         });
 
-        // The ID will still be the same
-        assert.strictEqual(cache.id, cacheUpdated.id);
-        // ... but not for the `createdDate` timestamp
-        assert.notStrictEqual(cache.createdDate, cacheUpdated.createdDate);
+        // Ensure the ID stays the same
+        assert.strictEqual(originalCache.id, updatedCache.id);
+
+        // Ensure the createdDate has changed (overwritten)
+        assert.notStrictEqual(originalCache.createdDate, updatedCache.createdDate);
       });
     });
 

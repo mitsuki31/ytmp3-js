@@ -5,8 +5,7 @@
  * @requires  audioconv
  * @requires  config
  * @requires  utils
- * @requires  ytmp3
- * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
+ * @author    Ryuu Mitsuki <{@link https://github.com/mitsuki31}>
  * @since     1.1.0
  * @license   MIT
  */
@@ -28,6 +27,7 @@
  * @since   1.0.0
  */
 
+const path = require('node:path');
 const {
   SUPPRESS,
   ZERO_OR_MORE,
@@ -36,42 +36,33 @@ const {
   RawDescriptionHelpFormatter
 } = require('argparse');
 
-const { resolveOptions: resolveACOptions } = require('../lib/audioconv');
+const { splitOptions } = require('../lib/audioconv');
 const {
   dropNullAndUndefined,
   isPlainObject,
-  isNullOrUndefined
+  isNullOrUndefined,
+  resolveOptions,
+  mergeOptions,
+  AllSupportedOptions,
+  _AudioConverterOptions,
+  _AudioConverterOptions$N,
+  _DownloadOptions,
 } = require('../lib/utils');
 const {
   importConfig,
   findGlobalConfig,
   parseGlobalConfig
 } = require('../lib/config');
-const { resolveDlOptions } = require('../lib/ytmp3');
-const pkg = require('../package.json');
+const { getGlob } = require('../lib/env');
 
-
-// Windows: "C:\Users\...\AppData\Local\Temp\ytmp3-js"
-// Linux: "/home/usr/tmp/ytmp3-js"
-// Termux Android: "/data/data/com.termux/files/usr/tmp/ytmp3-js"
-const author = {
-  name: pkg.author.split(' <')[0],
-  email: /<(\w+@[a-z0-9.]+)>/m.exec(pkg.author)[1],
-  website: /\((https?:\/\/.+)\)/m.exec(pkg.author)[1]
-};
-
-const __version__ = (() => {
-  // eslint-disable-next-line prefer-const
-  let [ ver, rel ] = (pkg.version || '0.0.0-dev').split('-');
-  rel = (rel && rel.length !== 0)
-    ? rel.charAt(0).toUpperCase() + rel.substring(1)  // Capitalize first letter
-    : 'Stable';
-  return `\x1b[1m[${pkg.name.toUpperCase()}] v${ver} \x1b[2m${rel}\x1b[0m\n`;
-})();
-
-const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
-  new Date().getFullYear()} ${author.name} (${author.website})\n`;
-
+const {
+  author,
+  name: projName,
+  title: projTitle,
+  description: projDescription,
+  homepageUrl,
+  repository: { url: repositoryUrl },
+} = getGlob('$__metadata__$', {});
 
 /**
  * Initializes the argument parser for command-line options.
@@ -83,20 +74,22 @@ const __copyright__ = `${pkg.name} - Copyright (c) 2023-${
  */
 function initParser() {
   const parser = new ArgumentParser({
-    prog: pkg.title
-      ? pkg.title.toLowerCase()
-      : (pkg.name ? pkg.name.replace('-js', '') : 'ytmp3'),
-    description: pkg.description,
+    prog: projTitle
+      ? projTitle.toLowerCase()
+      : (projName ? projName.replace('-js', '') : 'ytmp3'),
+    description: projDescription,
     // eslint-disable-next-line camelcase
     formatter_class: RawDescriptionHelpFormatter,
     epilog: `
       Developed by \x1b[93m${author.name}\x1b[0m (${author.website}).
       
-      \x1b[1;91m::\x1b[0m \x1b[1;96m[Homepage]\x1b[0m\thttps://mitsuki31.github.io/ytmp3-js
-      \x1b[1;91m::\x1b[0m \x1b[1;95m[GitHub]\x1b[0m\thttps://github.com/mitsuki31/ytmp3-js
+      \x1b[1;91m::\x1b[0m \x1b[1;96m[Homepage]\x1b[0m\t${homepageUrl}
+      \x1b[1;91m::\x1b[0m \x1b[1;95m[GitHub]\x1b[0m\t${repositoryUrl.replace(/^git\+|\.git$/g, '')}
     `.trim().replace(/[ ]{2,}/g, ''),
     // eslint-disable-next-line camelcase
-    add_help: false  // Use custom help argument
+    add_help: false,  // Use custom help argument
+    // eslint-disable-next-line camelcase
+    exit_on_error: false,
   });
 
   // ==== Download Options ==== //
@@ -241,7 +234,8 @@ function initParser() {
   // :: help
   parser.add_argument('-h', '-?', '--help', {
     help: 'Show this help message and exit',
-    action: 'help'
+    action: 'store_true',
+    dest: 'help'
   });
   // :: version
   parser.add_argument('-V', '--version', {
@@ -255,13 +249,33 @@ function initParser() {
     action: 'store_true'
   });
   parser.add_argument('--print-config', {
-    help: 'Show currently used configuration and exit. Useful for debugging',
+    help: 'Show current used configuration and exit. Useful for debugging',
     action: 'store_true',
     dest: 'printConfig'
+  });
+  parser.add_argument('--print-config-all', {
+    help: 'Show all current used configuration and exit. Useful for debugging',
+    action: 'store_true',
+    dest: 'printConfigAll'
   });
 
   return parser;
 }
+
+function resolveCwdOutdir(source, replacer) {
+  const src = {
+    cwd: (isNullOrUndefined(source.cwd) || source.cwd === '.') ? undefined : source.cwd,
+    outDir: (isNullOrUndefined(source.outDir) || source.outDir === '.') ? undefined : source.outDir
+  };
+  const rpc = {
+    cwd: (isNullOrUndefined(replacer.cwd) || replacer.cwd === '.') ? undefined : replacer.cwd,
+    outDir: (isNullOrUndefined(replacer.outDir) || replacer.outDir === '.') ? undefined : replacer.outDir
+  };
+
+  const result = mergeOptions(src, rpc);
+  return mergeOptions(source, result);
+}
+
 
 /**
  * Filters and processes the provided options object for use in the download and conversion process.
@@ -270,7 +284,7 @@ function initParser() {
  * @param {Object} params.options - The options object containing various configuration
  *                                  settings from command-line argument parser.
  *
- * @returns {FilteredOptions} A frozen object with the filtered and processed options.
+ * @returns {Promise<FilteredOptions>} A frozen object with the filtered and processed options.
  *
  * @description
  * This function performs the following steps:
@@ -302,101 +316,127 @@ async function filterOptions({ options }) {
 
   // Deep copy the options and remove unspecified options,
   // especially for 'cwd' and 'outDir'
-  let optionsCopy = dropNullAndUndefined(
-    JSON.parse(JSON.stringify(options)));
+  const optionsCopy = dropNullAndUndefined({ ...options });
 
   const { noConfig, noQuiet } = optionsCopy;
   let { quiet } = optionsCopy;
-  // We need to extract the quiet option first and delete it
-  // if not, `audioconv.resolveOptions()` function will throw an error
-  delete optionsCopy.quiet;
-  delete optionsCopy.noConfig;  // No longer used
-  delete optionsCopy.noQuiet;  // No longer used
 
   // Reset the quiet level to zero if the `--no-quiet` is specified
   if (noQuiet) quiet = 0;
 
-  // Look up for global configuration file and parse if available
-  const globalConfigFile = await findGlobalConfig();  // ! Can be null
-  // Only parse the global configuration file if `--no-config` option is disabled
-  const globalConfig = (globalConfigFile && !noConfig)
-    ? await parseGlobalConfig(globalConfigFile)
-    : null;
-  const dlOptionsFromGlobalConfig = { ...(globalConfig || {}) };
-  const acOptionsFromGlobalConfig = globalConfig?.converterOptions || {};
-  if (dlOptionsFromGlobalConfig.converterOptions) {
-    delete dlOptionsFromGlobalConfig.converterOptions;
+  let dlOptionsFromGlobalConfig = {};
+  let acOptionsFromGlobalConfig = {};
+  let dlOptionsFromConfig = {};
+  let acOptionsFromConfig = {};
+
+  if (!noConfig) {
+    // Look up for global configuration file and parse if available
+    const globalConfigFile = await findGlobalConfig();  // ! Can be null
+    // Only parse the global configuration file if `--no-config` option not specified
+    const globalConfig = globalConfigFile
+      ? await parseGlobalConfig(globalConfigFile)
+      : null;
+    if (globalConfig) {
+      dlOptionsFromGlobalConfig = globalConfig;
+      acOptionsFromGlobalConfig = globalConfig.converterOptions || {};
+      delete dlOptionsFromGlobalConfig.converterOptions;
+    }
+
+    // Extract and resolve the download options from configuration file if given
+    const userConfig = optionsCopy.config ? importConfig(optionsCopy.config) : null;
+    if (userConfig) {
+      // Await the download options if it is a promise
+      if (userConfig instanceof Promise) {
+        dlOptionsFromConfig = await userConfig;
+      }
+      dlOptionsFromConfig = userConfig;
+      acOptionsFromConfig = userConfig.converterOptions || {};
+      delete dlOptionsFromConfig.converterOptions;
+    }
+  } else {
+    dlOptionsFromGlobalConfig = resolveOptions({}, _DownloadOptions, false, true);
+    acOptionsFromConfig = resolveOptions({}, _AudioConverterOptions, false, true);
   }
 
-  // Override options and resolve unspecified options
-  // if global config is available
-  if (!isNullOrUndefined(globalConfig) && !noConfig) {
-    optionsCopy = {
-      ...optionsCopy,
-      cwd: isNullOrUndefined(optionsCopy.cwd)
-        ? globalConfig.cwd : optionsCopy.cwd,
-      outDir: isNullOrUndefined(optionsCopy.outDir)
-        ? globalConfig.outDir : optionsCopy.outDir,
-      convertAudio: isNullOrUndefined(optionsCopy.convertAudio)
-        ? globalConfig.convertAudio : optionsCopy.convertAudio,
-      quiet: optionsCopy.quiet === 0
-        ? globalConfig.quiet : optionsCopy.quiet,
-    };
-  }
+  const dlOptionsFromCLI = resolveOptions(optionsCopy, _DownloadOptions, false, false);
+  const acOptionsFromCLI = resolveOptions(
+    optionsCopy,
+    Object.entries(_AudioConverterOptions$N).reduce((acc, [key, val]) => {
+      acc[key] = [val[0]];
+      return acc;
+    }, {}),
+    false,
+    false
+  );
 
-  optionsCopy.convertAudio = isNullOrUndefined(optionsCopy.convertAudio)
-    ? false : optionsCopy.convertAudio;
-  // Set to an empty array for clarity that the options is empty and unspecified
-  optionsCopy.inputOptions = isNullOrUndefined(optionsCopy.inputOptions)
-    ? [] : optionsCopy.inputOptions;
-  optionsCopy.outputOptions = isNullOrUndefined(optionsCopy.outputOptions)
-    ? [] : optionsCopy.outputOptions;
+  let inputOptions = null;
+  let outputOptions = null;
+  [acOptionsFromGlobalConfig, acOptionsFromConfig, acOptionsFromCLI].forEach(config => {
+    if (!isNullOrUndefined(config.inputOptions) && inputOptions === null) {
+      inputOptions = splitOptions(Array.isArray(config.inputOptions)
+        ? config.inputOptions.join(' ')
+        : config.inputOptions
+      );
+      if (!inputOptions.length) inputOptions = null;
+    }
+    if (!isNullOrUndefined(config.outputOptions) && outputOptions === null) {
+      outputOptions = splitOptions(Array.isArray(config.outputOptions)
+        ? config.outputOptions.join(' ')
+        : config.outputOptions
+      );
+      if (!outputOptions.length) outputOptions = null;
+    }
+  });
 
-  // Extract and resolve the download options from configuration file if given
-  // and only if the `--no-config` option is disabled
-  let dlOptionsFromConfig = optionsCopy.config && !noConfig
-    ? importConfig(optionsCopy.config)
-    : {};
-  // Await the download options if it is a promise
-  if (dlOptionsFromConfig instanceof Promise) {
-    dlOptionsFromConfig = await dlOptionsFromConfig;
-  }
-  const acOptionsFromConfig = dlOptionsFromConfig.converterOptions || {};
-  delete optionsCopy.config;  // No longer needed
-  delete dlOptionsFromConfig.converterOptions;  // No longer needed
+  // Merge options and resolve the `cwd` amd `outDir` property
+  const downloadOptions = mergeOptions(
+    mergeOptions(dlOptionsFromGlobalConfig, dlOptionsFromConfig),
+    dlOptionsFromCLI
+  );
+  const converterOptions = mergeOptions(
+    mergeOptions(acOptionsFromGlobalConfig, acOptionsFromConfig),
+    acOptionsFromCLI
+  );
+
+  // Resolving paths
+  downloadOptions.cwd = path.resolve(path.normalize(downloadOptions.cwd));
+  downloadOptions.outDir = path.resolve(resolveCwdOutdir(
+    resolveCwdOutdir(dlOptionsFromGlobalConfig, dlOptionsFromConfig),
+    dlOptionsFromCLI
+  ).outDir);
+
+  const parsedOptionsAll = Object.fromEntries(Object.entries({
+    ...downloadOptions,
+    converterOptions: Object.fromEntries(Object.entries({
+      ...converterOptions,
+      inputOptions: inputOptions || [],
+      outputOptions: outputOptions || [],
+      quiet: quiet >= 2
+    }).sort()),
+    quiet: quiet >= 1
+  }).sort());
+  const parsedOptions = Object.entries(parsedOptionsAll)
+    .sort()
+    .reduce((acc, [key, val]) => {
+      if (AllSupportedOptions.includes(key)) acc[key] = val;
+      return acc;
+    }, {});
 
   return Object.freeze({
     urls: optionsCopy.URL,
     batchFile: optionsCopy.file,
+    help: optionsCopy.help,
     version: optionsCopy.version,
     copyright: optionsCopy.copyright,
     printConfig: optionsCopy.printConfig,
-    downloadOptions: {
-      ...resolveDlOptions({ downloadOptions: {
-        ...dlOptionsFromGlobalConfig,  // Download options from global config
-        // Download options from config file can be overriden with download
-        // options from the command-line
-        ...dlOptionsFromConfig || {},
-        ...(resolveDlOptions({ downloadOptions: optionsCopy }))
-      }}),
-      converterOptions: {
-        ...resolveACOptions({
-          ...acOptionsFromGlobalConfig,  // Audio conversion options from global config
-          ...dropNullAndUndefined(acOptionsFromConfig),
-          ...dropNullAndUndefined(optionsCopy)
-        }, false), 
-        quiet: quiet >= 2
-      },
-      quiet: quiet >= 1
-    }
+    printConfigAll: optionsCopy.printConfigAll,
+    parsedOptions,
+    parsedOptionsAll,
   });
 }
 
 
 module.exports = {
-  author,
-  __version__,
-  __copyright__,
   initParser,
   filterOptions
 };
