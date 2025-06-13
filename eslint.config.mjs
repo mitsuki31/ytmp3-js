@@ -1,0 +1,38 @@
+/**
+ * ESLint flat configuration for production environment.
+ */
+
+// @ts-check
+
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import tseslintPlugin from '@typescript-eslint/eslint-plugin';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.strict,
+  tseslint.configs.stylistic,
+  {
+    name: '@ytmp3-js/production',
+    plugins: {
+      tseslint: tseslintPlugin,
+    },
+    ignores: [
+      'docs/',
+      'test/',
+      'coverage/',
+      'config/example/**/*.{mjs,js,json}',
+      'jsdoc.config.js',
+      'eslint.config.*',
+      '.mocharc.js',
+    ],
+    files: [
+      'index.ts',
+      'src/**/*.ts',
+      'bin/**/*.ts',
+    ],
+    linterOptions: {
+      reportUnusedDisableDirectives: true
+    },
+  },
+);
