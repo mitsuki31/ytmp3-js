@@ -1,0 +1,35 @@
+{
+  "extends": [ "@tsconfig/node14/tsconfig.json" ],
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": true,
+    "outDir": "./build",
+    "listEmittedFiles": true,
+  
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+  
+    "baseUrl": ".",
+    "paths": {
+      "#/*": [ "./src/*" ],
+      "#utils/*": [ "./src/utils/*" ],
+      "#runtime/*": [ "./src/runtime/*" ],
+      "#error": [ "./src/error.ts" ],
+      "#globals": [ "./src/globals.ts" ],
+      "#colors": [ "./src/vendor/colors.ts" ]
+    },
+  },
+  "include": [
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "**/node_modules/",
+    "build/"
+  ]
+}
