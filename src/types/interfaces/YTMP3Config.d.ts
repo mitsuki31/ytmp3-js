@@ -5,7 +5,7 @@
  * @since     5.0.0
  */
 
-import type { SessionOptions } from 'youtubei.js';
+import type { ClientType, SessionOptions } from 'youtubei.js';
 import type { AudioConverterOptions, DeveloperOptions, DownloadOptions } from '#/types/ytmp3';
 
 /**
@@ -43,7 +43,10 @@ export interface YTMP3Config {
    *
    * @see {@link https://ytjs.dev/guide/getting-started.html#configuration-options | YouTube.js: Configuration Options}
    */
-  innertubeConfig?: SessionOptions;
+  innertubeConfig?: {
+    // Add string literal types support for better flexibility for users
+    [K in keyof SessionOptions]?: K extends "client_type" ? (`${ClientType}` | ClientType) : SessionOptions[K];
+  };
   /**
    * Developer options.
    * This is reserved for YTMP3-JS developers and debugging purposes.
