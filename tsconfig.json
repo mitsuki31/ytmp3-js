@@ -1,13 +1,14 @@
 {
   "extends": [ "@tsconfig/node14/tsconfig.json" ],
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": false,
     "sourceMap": true,
     "outDir": "./build",
     "listEmittedFiles": true,
+    "removeComments": false,
+    "esModuleInterop": true,
   
     "strict": true,
     "noUnusedLocals": true,
