@@ -86,11 +86,11 @@ export {
  * @public
  * @since 5.0.0
  */
-export function createLogger(level: LogLevel.DEBUG, options?: CreateLoggerOptions): Logger$Debug;
-export function createLogger(level: LogLevel.INFO, options?: CreateLoggerOptions): Logger$Info;
-export function createLogger(level: LogLevel.WARNING, options?: CreateLoggerOptions): Logger$Warning;
-export function createLogger(level: LogLevel.ERROR, options?: CreateLoggerOptions): Logger$Error;
-export function createLogger(level: LogLevel.NONE, options?: CreateLoggerOptions): Logger$None;
+export function createLogger(level: LogLevel.DEBUG | 'DEBUG', options?: CreateLoggerOptions): Logger$Debug;
+export function createLogger(level: LogLevel.INFO | 'INFO', options?: CreateLoggerOptions): Logger$Info;
+export function createLogger(level: LogLevel.WARNING | 'WARNING', options?: CreateLoggerOptions): Logger$Warning;
+export function createLogger(level: LogLevel.ERROR | 'ERROR', options?: CreateLoggerOptions): Logger$Error;
+export function createLogger(level: LogLevel.NONE | 'NONE', options?: CreateLoggerOptions): Logger$None;
 export function createLogger<L extends keyof typeof LogLevel>(level: LogLevel | L, options?: CreateLoggerOptions): Logger {
   const stdout = options?.stdout ?? process.stdout as ConsoleStreamLike;
   const stderr = options?.stderr ?? process.stderr;
