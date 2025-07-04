@@ -5,6 +5,9 @@
  * @since     5.0.0
  */
 
+import type { YTMP3Config } from './interfaces/YTMP3Config';
+import type { DeveloperOptions } from './interfaces/options/DeveloperOptions';
+
 /** Represents the resolved configuration for YTMP3-JS */
 export type ResolvedYTMP3Config = { [K in keyof YTMP3Config]-?: YTMP3Config[K] };
 /** @private */
