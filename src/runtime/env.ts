@@ -76,10 +76,10 @@ export function setInterrupted(enabled?: boolean): void {
  * @internal
  * @since 5.0.0
  */
-export function getGlob<T extends keyof YTMP3GlobalState, U>(name: T, fallback?: U): YTMP3GlobalState[T] | U | undefined {
+export function getGlob<T extends keyof YTMP3GlobalState, U = undefined>(name: T, fallback?: U): NonNullable<YTMP3GlobalState[T]> | U {
   return hasSetup()
-    ? ((global as Required<AugmentedGlobal>)[YTMP3_SYMBOL][name] ?? fallback)
-    : fallback;
+    ? ((global as Required<AugmentedGlobal>)[YTMP3_SYMBOL][name] ?? fallback as U)
+    : fallback as U;
 }
 
 /**
