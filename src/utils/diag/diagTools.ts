@@ -27,7 +27,7 @@ import type { NoParamAsyncFunction, NoParamFunction } from '#/types/utils';
  * @since 5.0.0
  */
 export function logError(fmt: string | null, error: Error, logger: Logger): void {
-  fmt = fmt || error.message + ' %s';
+  fmt = fmt?.replace(/\s*%s$/, ' %s') || error.message + ' %s';
   logger.error(util.format(fmt,
     // @ts-expect-error: This spread always overwrites this property
     util.inspect({ name: error.name, message: error.message, ...error },
