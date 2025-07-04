@@ -327,12 +327,20 @@ function configChecker({ config, file }: { config: YTMP3Config, file?: string })
  */
 export function parseConfig(
   configFile: string,
-  options?: ConfigParserOptions & { forceRequire?: boolean }
-): Promise<ResolvedYTMP3Config | YTMP3Config>;
+  options: ConfigParserOptions & { onlyCheck?: boolean, forceRequire?: boolean }
+): ResolvedYTMP3Config | Promise<ResolvedYTMP3Config>;
 export function parseConfig(
   configFile: string,
-  options: ConfigParserOptions & { forceRequire: true }
-): ResolvedYTMP3Config | YTMP3Config;
+  options: ConfigParserOptions & { onlyCheck: true, forceRequire?: boolean }
+): YTMP3Config | Promise<YTMP3Config>;
+export function parseConfig(
+  configFile: string,
+  options: ConfigParserOptions & { onlyCheck?: boolean, forceRequire: true }
+): ResolvedYTMP3Config;
+export function parseConfig(
+  configFile: string,
+  options: ConfigParserOptions & { onlyCheck: true, forceRequire: true }
+): YTMP3Config;
 export function parseConfig(
   configFile: string,
   options?: ConfigParserOptions,
@@ -405,9 +413,14 @@ export function parseConfig(
  * @since    1.0.0
  * @see      {@link parseConfig}
  */
-export function importConfig(file: string, options?: ConfigParserOptions & { forceRequire?: boolean }): Promise<ResolvedYTMP3Config | YTMP3Config>;
-export function importConfig(file: string, options: ConfigParserOptions & { forceRequire: true }): ResolvedYTMP3Config | YTMP3Config;
-export function importConfig(file: string, options?: ConfigParserOptions) {
+export function importConfig(file: string, options: ConfigParserOptions & { onlyCheck?: boolean, forceRequire?: boolean }): ResolvedYTMP3Config | Promise<ResolvedYTMP3Config>;
+export function importConfig(file: string, options: ConfigParserOptions & { onlyCheck?: boolean, forceRequire: true }): ResolvedYTMP3Config;
+export function importConfig(file: string, options: ConfigParserOptions & { onlyCheck: true, forceRequire?: boolean }): YTMP3Config | Promise<YTMP3Config>;
+export function importConfig(file: string, options: ConfigParserOptions & { onlyCheck: true, forceRequire: true }): YTMP3Config;
+export function importConfig(
+  file: string,
+  options?: ConfigParserOptions
+): ResolvedYTMP3Config | YTMP3Config | Promise<ResolvedYTMP3Config | YTMP3Config> {
   return parseConfig(file, { forceRequire: false, ...options, onlyCheck: false });
 }
 
@@ -607,11 +620,11 @@ export async function findGlobalConfig(
  * 
  * @internal
  * @since    1.1.0
-*/
+ */
 export function parseGlobalConfig(
   globConfigPath: string,
   parserOptions?: ConfigParserOptions
-): ReturnType<typeof parseConfig> | Promise<ReturnType<typeof parseConfig>> {
+): ResolvedYTMP3Config | Promise<ResolvedYTMP3Config> {
   if (isNullOrUndefined(globConfigPath) || !isString(globConfigPath)) {
     throw new InvalidTypeError('Unknown configuration file path', {
       actualType: getType(globConfigPath),
@@ -636,7 +649,7 @@ export function parseGlobalConfig(
   }
 
   // Import the configuration file
-  let parsed: ReturnType<typeof parseConfig> | undefined;
+  let parsed: ResolvedYTMP3Config | Promise<ResolvedYTMP3Config> | undefined;
   try {
     parsed = parseConfig(globConfigPath, parserOptions);
   } catch (err) {
@@ -651,5 +664,6 @@ export function parseGlobalConfig(
     });
   }
 
+  // There's no way that the parsed config will be nullable after passed try-catch block
   return parsed as NonNullable<typeof parsed>;
 }
