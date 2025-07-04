@@ -454,7 +454,7 @@ export class LoggerConstructor implements Logger {
     prefix = prefix || this.INFO_PREFIX;
     stream = stream ?? this.stdout;
     const prefixLen = Terminal.stripANSI(prefix, stream).length;
-    const usedWidth = width ?? stream.isTTY ? ((stream as TTYWriteStream).columns - prefixLen * 2) : 80;
+    const usedWidth = width ?? (stream.isTTY ? ((stream as TTYWriteStream).columns - prefixLen * 2) : 80);
     const msg = style('C', new Array(usedWidth).fill('-').join(''));
     return this.__writeLog(stream, [msg], prefix, true);
   }
