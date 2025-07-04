@@ -172,6 +172,9 @@ class TerminalFormatter {
     stream: ConsoleStreamLike,
     preserve?: boolean
   ): string {
+    // Make sure it's a string during runtime and
+    // prevent `stripVTControlCharacters` from throwing an error
+    text = String(text);
     return preserve ? text : (
       (stream as TTYWriteStream)?.isTTY === true ? text : stripVTControlCharacters(text)
     );
