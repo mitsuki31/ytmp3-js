@@ -5,10 +5,10 @@
  * @since     5.0.0
  */
 
-import { InvalidTypeError } from '#error';
 import { Duplex, Readable, Transform, Writable } from 'node:stream';
-import { createWriteStream, createReadStream, PathLike } from 'node:fs';
+import { createWriteStream, createReadStream, type PathLike } from 'node:fs';
 import { WriteStream as TTYWriteStream } from 'node:tty';
+import { InvalidTypeError } from '#error';
 
 /**
  * Type representation for Node.js streams.
