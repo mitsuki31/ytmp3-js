@@ -100,7 +100,7 @@ export default async function cleanup(exitCode: number, forceExit?: boolean): Pr
 }
 
 /**
- * Attach hooks to Node.js termination signals (`SIGINT`, `SIGTERM`, `SIGKILL`) that
+ * Attach hooks to Node.js termination signals (`SIGINT`, `SIGTERM`) that
  * call the {@link cleanup} function with the respective exit codes before exiting.
  *
  * @remarks
@@ -117,5 +117,4 @@ export function attachToTerminationSignals(): void {
 
   process.once('SIGINT', async () => await cleanup(130));
   process.once('SIGTERM', async () => await cleanup(143));
-  process.once('SIGKILL', async () => await cleanup(137));
 }
