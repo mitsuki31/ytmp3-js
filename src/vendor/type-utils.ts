@@ -46,7 +46,7 @@ export class TypeUtils {
    * @returns `true` if the value is `null` or `undefined`, `false` otherwise.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    * @see      {@link TypeUtils.isNullOrUndefined | isNullOrUndefined}
    */
   static isNullish<T>(x: T | null | undefined): x is null | undefined {
@@ -70,7 +70,7 @@ export class TypeUtils {
    * ```
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    * @see      {@link TypeUtils.isNullOrUndefined | isNullOrUndefined}
    */
   static isNonNullish<T>(x: T | null | undefined): x is T {
@@ -84,7 +84,7 @@ export class TypeUtils {
    * @returns `true` if the value is `null`, otherwise `false`.
    *
    * @internal
-   * @since  3.0.0
+   * @since  5.0.0
    */
   static isNull(x: any): x is null {
     return (x === null);
@@ -97,7 +97,7 @@ export class TypeUtils {
    * @returns `true` if the value is `undefined`, otherwise `false`.
    *
    * @internal
-   * @since  3.0.0
+   * @since  5.0.0
    */
   static isUndefined(x: any): x is undefined {
     return typeof x === 'undefined';
@@ -137,7 +137,7 @@ export class TypeUtils {
    * ```
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    * @see      {@link TypeUtils.isNonNullish | isNonNullish} - Use this function to check if a value is "non-nullish".
    */
   static isDefined(envVar: string | undefined): envVar is string {
@@ -151,7 +151,7 @@ export class TypeUtils {
    * @returns `true` if the value is a string, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    */
   static isString(x: any): x is string {
     return typeof x === 'string';
@@ -164,7 +164,7 @@ export class TypeUtils {
    * @returns `true` if the value is a number, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    * @see      {@link isBigInt}
    */
   static isNumber(x: any): x is number {
@@ -178,7 +178,7 @@ export class TypeUtils {
    * @returns `true` if the value is a `bigint`, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    * @see      {@link isNumber}
    */
   static isBigInt(x: any): x is bigint {
@@ -192,7 +192,7 @@ export class TypeUtils {
    * @returns `true` if the value is a boolean, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    */
   static isBoolean(x: any): x is boolean {
     return typeof x === 'boolean';
@@ -261,7 +261,7 @@ export class TypeUtils {
    * @returns `true` if the value is a ES6 class, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    */
   static isClass<T extends new (...args: any[]) => any>(x: unknown): x is T {
     return (
@@ -279,7 +279,7 @@ export class TypeUtils {
    * @returns `true` if the given value is a callable, otherwise `false`.
    *
    * @internal
-   * @since    3.0.0
+   * @since    5.0.0
    */
   static isCallable<T extends (...args: any[]) => any>(x: unknown): x is T {
     return (
@@ -325,7 +325,7 @@ export class TypeUtils {
    * @returns {string} A string representing the detailed type of the value.
    *
    * @internal
-   * @since 3.0.0
+   * @since 5.0.0
    * @see {@link getType}
    */
   static typeOf(x: any): string {

@@ -17,7 +17,7 @@ import {
 
 /**
  * A type that represents a string or `URL` object.
- * @since 3.0.0
+ * @since 5.0.0
  */
 export type URLLike = string | URL;
 
