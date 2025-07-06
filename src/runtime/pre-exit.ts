@@ -19,7 +19,7 @@
 import { types } from 'node:util';
 import { getGlob } from '#runtime/env';
 import { logError, DefaultLogger } from '#/utils';
-import type { NoParamAsyncFunction, NoParamFunction } from '#/types/utils';
+import type { NoParamAsyncFunction, NoParamFunction } from '#/utils';
 
 let called = false;
 let attached = false;

@@ -8,7 +8,7 @@
 import util from 'node:util';
 import { InvalidTypeError } from '#error';
 import type { Logger } from '#utils/log';
-import type { NoParamAsyncFunction, NoParamFunction } from '#/types/utils';
+import type { NoParamAsyncFunction, NoParamFunction } from '#/utils';
 
 /**
  * Logs an error using the provided logger instance with a formatted message.

@@ -10,7 +10,7 @@
  */
 
 import type { YT } from 'youtubei.js';
-import type { Thumbnail } from '#/types/ytmp3';
+import type Thumbnail from '#/core/internal/interfaces/Thumbnail';
 import type VideoInfo from '#/core/internal/classes/VideoInfo';
 import { TypeUtils } from '#/vendor/type-utils';
 import { InvalidTypeError } from '#error';

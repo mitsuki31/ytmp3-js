@@ -1,6 +1,6 @@
 import { Innertube, type SessionOptions } from 'youtubei.js';
 
-import type { ResolvedYTMP3Config } from '#/types/config';
+import type { ResolvedYTMP3Config } from '#/core/config';
 import { type Logger, NoneLogger, DefaultLogger } from '#/utils';
 import { logError } from '#/utils/diag';
 import { merge } from '#/utils/options';

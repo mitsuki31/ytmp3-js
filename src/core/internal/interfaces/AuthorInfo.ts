@@ -1,5 +1,5 @@
 /**
- * @module    types/interfaces/AuthorInfo
+ * @module    core/internal/interfaces/AuthorInfo
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @license   MIT
  * @since     5.0.0

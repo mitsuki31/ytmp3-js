@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { PackageJSON } from '#/types/config';
+import type { PackageJSON } from '#/core/config';
 import type { ProjectMetadata } from '#/globals';
 import { type Logger, NoneLogger, DefaultLogger, CSI, style as $c, ROOTDIR } from '#/utils';
 import { getGlob, hasSetup, setGlob } from '#runtime/env';

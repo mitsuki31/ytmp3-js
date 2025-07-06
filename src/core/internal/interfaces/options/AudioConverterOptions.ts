@@ -1,5 +1,5 @@
 /**
- * @module    types/interfaces/options/AudioConverterOptions
+ * @module    core/internal/interfaces/options/AudioConverterOptions
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @license   MIT
  * @since     5.0.0

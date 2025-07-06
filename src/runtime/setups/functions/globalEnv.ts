@@ -3,8 +3,8 @@ import type { SessionOptions } from 'youtubei.js';
 import { type YTMP3GlobalState, YTMP3_SYMBOL, type Global as YTMP3Global, type ProjectMetadata } from '#globals';
 import { type Logger, DefaultLogger, NoneLogger } from '#/utils';
 import { useNoColor, getGlob, getSystemEnv, hasSetup } from '#/runtime/env';
-import type { NoParamFunction, NoParamAsyncFunction } from '#/types/utils';
-import type { ResolvedYTMP3Config } from '#/types/config';
+import type { NoParamFunction, NoParamAsyncFunction } from '#/utils';
+import type { ResolvedYTMP3Config } from '#/core/config';
 import { defaults } from '#/utils/options';
 import { getStatus, setStatus } from '../constants';
 

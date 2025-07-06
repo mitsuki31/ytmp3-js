@@ -40,8 +40,8 @@
 
 import util from 'node:util';
 
-import type { SetupPartialConfig } from '#/types/config';
-import type { NoParamAsyncFunction, NoParamFunction } from '#/types/utils';
+import type { SetupPartialConfig } from '#/core/config';
+import type { NoParamAsyncFunction, NoParamFunction } from '#/utils';
 import { TerminalFormatter } from '#/utils';
 import { LoggerConstructor, NoneLogger, type Logger } from '#utils/log';
 import { setGlob, getGlob, setInterrupted, hasInterrupted } from '#runtime/env';

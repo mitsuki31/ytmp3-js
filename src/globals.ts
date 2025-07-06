@@ -6,8 +6,8 @@
  */
 
 import type { Innertube, SessionOptions } from 'youtubei.js';
-import type { NoParamFunction, NoParamAsyncFunction } from '#/types/utils';
-import type { ResolvedYTMP3Config } from '#/types/config';
+import type { NoParamFunction, NoParamAsyncFunction } from '#/utils';
+import type { ResolvedYTMP3Config } from '#/core/config';
 import type { LogLevel, Logger } from '#utils/log/logger';
 
 /**

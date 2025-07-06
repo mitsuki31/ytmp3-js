@@ -1,12 +1,12 @@
 /**
- * @module    types/interfaces/YTMP3Config
+ * @module    core/internal/interfaces/YTMP3Config
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @license   MIT
  * @since     5.0.0
  */
 
 import type { ClientType, SessionOptions } from 'youtubei.js';
-import type { AudioConverterOptions, DeveloperOptions, DownloadOptions } from '#/types/ytmp3';
+import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './options';
 
 /**
  * An interface represents the **YTMP3-JS** configuration object which contains options to configure
@@ -45,7 +45,7 @@ export interface YTMP3Config {
    */
   innertubeConfig?: {
     // Add string literal types support for better flexibility for users
-    [K in keyof SessionOptions]?: K extends "client_type" ? (`${ClientType}` | ClientType) : SessionOptions[K];
+    [K in keyof SessionOptions]?: K extends 'client_type' ? (`${ClientType}` | ClientType) : SessionOptions[K];
   };
   /**
    * Developer options.

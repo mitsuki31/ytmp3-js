@@ -10,18 +10,50 @@
  * @since    2.0.0
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Readable } from 'node:stream';
 import { UniversalCache, ClientType, Innertube, type SessionOptions } from 'youtubei.js';
 import type { FfmpegCommandLogger, FfmpegCommandOptions } from 'fluent-ffmpeg';
 
-import type { OptionConfig, OptionTypeDefinition } from '#/types/options';
-import type { AudioConverterOptions, ClientOptions, DeveloperOptions, DownloadOptions, GetInfoOptions, YTJS_DownloadOptions } from '#/types/ytmp3';
-import type { AnyPlainObject, DropNullAndUndefined } from '#/types/utils';
+import type { ClientOptions, DownloadOptions, GetInfoOptions, DeveloperOptions, YTJS_DownloadOptions, AudioConverterOptions } from '#/core/internal/interfaces/options';
+import type { AnyClass, AnyFunction, AnyPlainObject, DropNullAndUndefined } from '#/utils';
 import { type Logger, DefaultLogger } from '#utils/log';
 import { INNERTUBE_CACHEDIR } from '#/utils/constants';
 import { getType, isCallable, isClass, isNullish, isPlainObject, isUndefined } from '#/vendor/type-utils';
 import { InvalidTypeError } from '#error';
 import { MAX_RETRIES } from '#globals';
+
+/**
+ * Type represents the expected option type.
+ * @internal
+ * @since 5.0.0
+ */
+export type OptionTypeDefinition =
+  | 'string' | 'number' | 'boolean' | 'array' | 'function' | 'object' | 'undefined' | typeof Readable | typeof Innertube
+  | ('string' | 'number' | 'boolean' | 'array' | 'function' | 'object' | 'undefined' | typeof Readable | typeof Innertube)[];
+
+/**
+ * Type represents the default value of an option.
+ * @internal
+ * @since 5.0.0
+ */
+export type OptionDefaultValue =
+  | string
+  | number
+  | boolean
+  | any[] | Record<string, any> | AnyFunction | AnyClass;
+
+/**
+ * Type represents the configuration of expected option.
+ * @internal
+ * @since 5.0.0
+ */
+export type OptionConfig =
+  | [OptionTypeDefinition, null]
+  | [OptionTypeDefinition, (OptionDefaultValue | null)?]
+  | [OptionTypeDefinition, (OptionDefaultValue[] | null)?]
+  | [OptionTypeDefinition, (OptionDefaultValue | OptionDefaultValue[] | null)?];
 
 // Declare here first, because it is referenced by `defaults.GetInfoOptions`
 const DefaultInnerTubeConfig: SessionOptions = {
@@ -348,7 +380,6 @@ export function resolve<T extends AnyPlainObject, U extends Record<NoInfer<keyof
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resolvedOptions: Partial<Record<keyof AnyPlainObject, any>> = {};
 
   // Iterate over expected options to filter and validate the input options

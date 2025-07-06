@@ -10,7 +10,7 @@ import { type WriteStream as FSWriteStream } from 'node:fs';
 import { WriteStream as TTYWriteStream } from 'node:tty';
 import { stripVTControlCharacters } from 'node:util';
 import { TypeUtils } from '#/vendor/type-utils';
-import type { NoParamFunction } from '#/types/utils';
+import type { NoParamFunction } from '#/utils';
 
 
 /**

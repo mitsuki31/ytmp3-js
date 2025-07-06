@@ -1,5 +1,5 @@
 /**
- * @module    types/interfaces/options/GetInfoOptions
+ * @module    core/internal/interfaces/options/GetInfoOptions
  * @author    Ryuu Mitsuki <https://github.com/mitsuki31>
  * @license   MIT
  * @since     5.0.0

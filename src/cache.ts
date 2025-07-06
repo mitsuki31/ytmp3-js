@@ -24,7 +24,6 @@ import { captureStderrSync, logError, prettyPrintParserError } from '#utils/diag
 import { DefaultLogger, type Logger, createLogger } from '#utils/log';
 import { generateRandomString, YTMP3_VINFO_CACHEDIR } from '#/utils';
 import VideoInfo from './core/internal/classes/VideoInfo';
-import type { GetCacheOptions, SetCacheOptions } from './types/cache';
 import { defaults } from './utils/options';
 
 const logger = getGlob('logger', DefaultLogger) as Logger;
@@ -36,6 +35,44 @@ export type CacheData = {} & {
   timestamp: Date;
   expires: Date;
 };
+
+/** @internal */
+export interface SetCacheOptions {
+  /**
+   * If set to `true`, skip compression of the cache file.
+   * The cache will be stored as uncompressed JSON.
+   * @default false
+   */
+  noCompression?: boolean;
+  /**
+   * If `true`, overwrite the existing cache file regardless of expiration time.
+   * @default false
+   */
+  force?: boolean;
+  /**
+   * A signal object that can be used to abort the operation.
+   * @default undefined
+   */
+  signal?: AbortSignal;
+}
+
+/** @internal */
+export interface GetCacheOptions {
+  /**
+   * Gets the raw cache object instead of parsed cache object (read and decompress only).
+   */
+  rawCache?: boolean;
+  /**
+   * Whether to allow the function to re-fetch if the cache has expired.
+   * @default true
+   */
+  autoFetch?: boolean;
+  /**
+   * A signal object that can be used to abort the operation.
+   * @default undefined
+   */
+  signal?: AbortSignal;
+}
 
 /**
  * Represents a serialized {@link VideoInfo} object.

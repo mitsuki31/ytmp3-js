@@ -16,7 +16,7 @@ import { style as $c, DefaultLogger, Logger, TerminalFormatter } from '#/utils';
 import { isNumber } from '#/vendor/type-utils';
 import { style } from '#/vendor/colors';
 import { getGlob, hasSetup } from '#runtime/env';
-import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/types/config';
+import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/core/config';
 import { exampleUsages, maxWidth, refineHelp, TITLES } from './cli_conf/misc';
 
 type YargsError = Error & { yargsMessage?: string };
