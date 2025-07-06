@@ -91,6 +91,7 @@ export function createLogger(level: LogLevel.INFO | 'INFO', options?: CreateLogg
 export function createLogger(level: LogLevel.WARNING | 'WARNING', options?: CreateLoggerOptions): Logger$Warning;
 export function createLogger(level: LogLevel.ERROR | 'ERROR', options?: CreateLoggerOptions): Logger$Error;
 export function createLogger(level: LogLevel.NONE | 'NONE', options?: CreateLoggerOptions): Logger$None;
+export function createLogger<L extends keyof typeof LogLevel>(level: LogLevel | L, options?: CreateLoggerOptions): Logger;
 export function createLogger<L extends keyof typeof LogLevel>(level: LogLevel | L, options?: CreateLoggerOptions): Logger {
   const stdout = options?.stdout ?? process.stdout as ConsoleStreamLike;
   const stderr = options?.stderr ?? process.stderr;
