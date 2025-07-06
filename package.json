@@ -32,7 +32,8 @@
     "test:irl": "mocha test/irl.test.mjs",
     "test:irl:no-dltest": "mocha test/irl.test.mjs -g '\\[CONVERT\\]'",
     "coverage": "nyc npm test",
-    "coverage:no-dltest": "nyc npm run test:no-dltest"
+    "coverage:no-dltest": "nyc npm run test:no-dltest",
+    "build:setup": "node scripts/build-setups.mjs"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
