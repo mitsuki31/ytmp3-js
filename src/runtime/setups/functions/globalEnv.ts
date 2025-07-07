@@ -32,7 +32,7 @@ export default function init({ logger }: { logger?: Logger }) {
     noColor,
     interrupted: false,
     env: {
-      YTMP3__DEBUG: Boolean(getSystemEnv('YTMP3__DEBUG')),
+      YTMP3__DEBUG: [getSystemEnv('YTMP3__DEBUG'), getSystemEnv('DEBUG')].some(Boolean),
       YTMP3__NO_COLOR: noColor,
       YTMP3__LOG_FILE: getGlob('logFile', undefined),
       YTMP3__LOG_LEVEL: getGlob('logLevel', 'INFO'),
