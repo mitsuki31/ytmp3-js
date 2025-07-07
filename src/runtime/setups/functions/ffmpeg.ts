@@ -37,23 +37,24 @@ export default function init({ logger }: { logger?: Logger }) {
   const FFPROBE_PATH = getSystemEnv('FFPROBE_PATH');
 
   function getVersion(execPath: string): string | null {
-    logger?.debug(`Getting the ${
-      path.basename(execPath, process.platform === 'win32' ? '.exe' : undefined)
-    } version ...`);
+    const baseFile = path.basename(execPath, process.platform === 'win32' ? '.exe' : undefined);
+    const versionRegex = new RegExp(`^${baseFile}\\sver(sion)?\\s([0-9.-]+(\\w+)?)\\s.+`);
+
+    logger?.debug(`Getting the ${baseFile} version ...`);
 
     let stdout: string | null = null;
     try {
       stdout = execFileSync(execPath, ['-version'], {
-        encoding: 'utf8', windowsHide: true, timeout: 10 * 1000  // Wait for 10s
+        encoding: 'utf8', windowsHide: true, timeout: 10 * 1000  // Wait for 5s
       });
     } catch (err) {
-      if (err instanceof Error) logger?.error(err.message);
+      if (err instanceof Error) logError(null, err, DefaultLogger);
       return null;
     }
 
     if (isString(stdout)) {
       const firstLine = stdout.split('\n')[0];
-      const match = firstLine.match(/^ffmpeg\sver(sion)?\s([0-9.-]+(\w+)?)\s.+/);
+      const match = firstLine.match(versionRegex);
       return match ? match[2] : null;
     }
 
@@ -204,6 +205,12 @@ export default function init({ logger }: { logger?: Logger }) {
     setGlob('ffmpeg', undefined);
     setGlob('ffprobe', undefined);
   }
+
+  setGlob('env', {
+    ...getGlob('env', {}),
+    FFMPEG_PATH: ffmpegPath,
+    FFPROBE_PATH: ffprobePath
+  })
 
   setStatus('ffmpeg', true);  // Mark as completed
   logger.debug('FFmpeg setup completed.');

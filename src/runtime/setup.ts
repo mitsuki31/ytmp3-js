@@ -161,7 +161,7 @@ async function consumeSetups(
     if (hasInterrupted()) {
       logger.error('Setup interrupted.');
       logger.error('Exiting application...');
-      await cleanup(Number(process.exitCode ?? 130), true);
+      await cleanup(Number(process.exitCode ?? 130), true);  // ! EXIT HERE
     }
 
     // Check if the setup has `after` to be called after setup
