@@ -6,7 +6,7 @@
  */
 
 import { Duplex, Readable, Transform, Writable } from 'node:stream';
-import { createWriteStream, createReadStream, type PathLike } from 'node:fs';
+import { createWriteStream, createReadStream, type PathLike, type WriteStream, type ReadStream } from 'node:fs';
 import { WriteStream as TTYWriteStream } from 'node:tty';
 import { InvalidTypeError } from '#error';
 
@@ -403,7 +403,7 @@ export function isTTYStream(stream: NodeJSStream): stream is TTYWriteStream {
  * @internal
  * @since 5.0.0
  */
-export function createStream<T extends CreateStreamType.Readable | 'r'>(type: T, path: PathLike, options?: ReadStreamOptions): Readable;
+export function createStream<T extends CreateStreamType.Readable | 'r'>(type: T, path: PathLike, options?: ReadStreamOptions): ReadStream;
 /**
  * Creates a Node.js writable stream to a given file path.
  *
@@ -426,8 +426,7 @@ export function createStream<T extends CreateStreamType.Readable | 'r'>(type: T,
  * @internal
  * @since 5.0.0
  */
-export function createStream<T extends CreateStreamType.Writable | 'w'>(type: T, path: PathLike, options?: WriteStreamOptions): Writable;
-
+export function createStream<T extends CreateStreamType.Writable | 'w'>(type: T, path: PathLike, options?: WriteStreamOptions): WriteStream;
 /**
  * Creates a Node.js readable or writable stream from a given file path.
  *
@@ -454,7 +453,7 @@ export function createStream<T extends CreateStreamType | 'r' | 'w'>(
   type: T,
   path: PathLike,  // Path is required for both Readable and Writable file streams
   options?: ReadStreamOptions | WriteStreamOptions
-): Readable | Writable {
+): ReadStream | WriteStream {
   options ??= {} as ReadStreamOptions | WriteStreamOptions;
 
   switch (type) {
