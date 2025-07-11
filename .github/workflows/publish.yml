@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build the project
+        run: npm run build
+
       - name: Publish to NPM registry
         run: |
           npm pkg delete devDependencies

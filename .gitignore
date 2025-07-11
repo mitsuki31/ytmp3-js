@@ -138,3 +138,6 @@ downloads.txt
 # Generated documentations
 docs/
 !docs/template/
+
+# Transpiled files
+build/
