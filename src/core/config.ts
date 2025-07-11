@@ -83,7 +83,7 @@ import util from 'node:util';
 import { ls, lsTypes } from 'lsfnd';
 
 import { YTMP3_HOMEDIR, isNullOrUndefined, isObject, isPlainObject, getType, style as $c, isString, isUndefined, createLogger, NoneLogger, style, type NonReadonly } from '#/utils';
-import { _DownloadOptions, _AudioConverterOptions, dropNullAndUndefined, resolve as resolveOptions, defaults, _InnerTubeConfig } from "#utils/options";
+import { _DownloadOptions, _AudioConverterOptions, dropNullAndUndefined, resolve as resolveOptions, defaults, _InnerTubeConfig, merge } from '#utils/options';
 import { UnknownOptionError, InvalidTypeError, ConfigParserError, GlobalConfigParserError } from '#error';
 import { KNOWN_OPTIONS, KNOWN_CONFIG_EXTS, PRIORITIZED_CONFIG_FILES } from '#globals';
 import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './internal/interfaces/options';
@@ -342,6 +342,7 @@ function resolveConfig({ config, file, useDefault = true }: {
   let downloadOptions = config.downloadOptions || {};
   let audioConverterOptions = config.audioConverterOptions || {};
   let innertubeConfig = config.innertubeConfig || {};
+  let innertubeConfig_dl = config.downloadOptions.innerTubeConfig || {};
   let developer_options = (config as ResolvedYTMP3ConfigWithDev).developer_options || {};
 
   // Drop any nullable properties
@@ -349,6 +350,7 @@ function resolveConfig({ config, file, useDefault = true }: {
   audioConverterOptions = dropNullAndUndefined<AudioConverterOptions>(audioConverterOptions);
   // This one has a special case, because the `client_type` option is different from the `SessionOptions`
   innertubeConfig = dropNullAndUndefined<typeof innertubeConfig>(innertubeConfig);
+  innertubeConfig_dl = dropNullAndUndefined<typeof innertubeConfig_dl>(innertubeConfig_dl);
   developer_options = dropNullAndUndefined<DeveloperOptions>(developer_options);
 
   try {
@@ -358,6 +360,7 @@ function resolveConfig({ config, file, useDefault = true }: {
     // fallback to undefined value instead their default value
     audioConverterOptions = resolveOptions(audioConverterOptions, _AudioConverterOptions, true, useDefault);
     innertubeConfig = resolveOptions(innertubeConfig, _InnerTubeConfig, true, useDefault);
+    innertubeConfig_dl = resolveOptions(innertubeConfig_dl, _InnerTubeConfig, true, useDefault);
   } catch (cause) {
     if (cause instanceof Error) {
       throw new ConfigParserError('An error occurred while parsing configuration file', {
@@ -384,7 +387,7 @@ function resolveConfig({ config, file, useDefault = true }: {
   return {
     downloadOptions,
     audioConverterOptions,
-    innertubeConfig,
+    ...merge(innertubeConfig, innertubeConfig_dl),
     developer_options
   } as ResolvedYTMP3ConfigWithDev;
 }
