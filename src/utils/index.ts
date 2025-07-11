@@ -22,6 +22,7 @@ export * from '#utils/connection';
 export * from '#utils/diag';
 export * from '#utils/mimetype';
 export * from '#utils/progressbar';
+export * from '#utils/thumb-utils';
 
 /**
  * Transforms an object type `T` by making all its properties both **mandatory**

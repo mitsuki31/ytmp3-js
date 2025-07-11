@@ -23,6 +23,7 @@ import { INNERTUBE_CACHEDIR } from '#/utils/constants';
 import { getType, isCallable, isClass, isNullish, isPlainObject, isUndefined } from '#/vendor/type-utils';
 import { InvalidTypeError } from '#error';
 import { MAX_RETRIES } from '#globals';
+import { defaultHandler } from '#/core/helpers/handler';
 
 /**
  * Type represents the expected option type.
@@ -111,7 +112,7 @@ const DefaultDownloadOptions: Required<
   outDir: '.',
   outFile: '%(title)s.%(ext)s',
   convertAudio: false,
-  handler: null,
+  handler: defaultHandler,
   safeMode: false,
   useCache: true,
   quiet: false,
