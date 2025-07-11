@@ -605,9 +605,6 @@ async function convertAudio(inFile, outFile, options) {
   // Set the FFmpeg path if found during setup
   if (HAS_FFMPEG && FFMPEG_PATH) {
     ffmpegChain = ffmpeg.setFfmpegPath(FFMPEG_PATH);
-
-    // Set the FFprobe path
-    if (FFPROBE_PATH) ffmpegChain.setFfprobePath(FFPROBE_PATH);
   }
 
   await new Promise((resolve, reject) => {
