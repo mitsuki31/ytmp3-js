@@ -1,8 +1,8 @@
 {
   "name": "ytmp3-js",
-  "version": "2.0.0-beta",
+  "version": "5.0.0-dev",
   "title": "YTMP3",
-  "description": "A Node.js library offers an easy and uncomplicated method for downloading YouTube audio",
+  "description": "A CLI-based application build on JavaScript offers an easy and uncomplicated method for downloading YouTube audio",
   "main": "index.js",
   "bin": {
     "ytmp3": "./bin/cli.mjs"
