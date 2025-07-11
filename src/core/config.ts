@@ -443,7 +443,7 @@ function configChecker({ config, file }: { config: YTMP3Config, file?: string })
 // #region Config Parser
 
 /**
- * Parses a configuration file and either resolves or validates its contents.
+ * Parses a configuration file and either resolves or only validates its contents.
  *
  * This function can handle both CommonJS and ES module formats for configuration files.
  * When importing an ES module, it returns a `Promise` that resolves to the configuration
@@ -475,7 +475,7 @@ function configChecker({ config, file }: { config: YTMP3Config, file?: string })
  * });
  * ```
  *
- * @internal
+ * @public
  * @since    1.0.0
  * @see      {@link resolveConfig}
  * @see      {@link importConfig}
@@ -618,7 +618,7 @@ export function importConfig(
  * - If `throwIfNotFound` is `true` and no configuration file is found. (Error code `ENOENT`).
  * - If other file system errors occur during directory checks. This will always be thrown.
  *
- * @internal
+ * @public
  * @since    1.1.0
  * @see      {@link PRIORITIZED_CONFIG_FILES}
  * @see      {@link https://npmjs.com/package/lsfnd | npm:lsfnd} - a Node.js module for finding files
