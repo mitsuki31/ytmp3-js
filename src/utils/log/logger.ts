@@ -26,7 +26,7 @@ const NO_COLOR = useNoColor();
  * @internal
  * @since 5.0.0
  */
-export const NO_PREFIX_WIDTH = 80;
+export const NO_PREFIX_WIDTH = 60;
 
 /**
  * Options for configuring a new logger instance.
