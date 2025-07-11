@@ -2,10 +2,11 @@ name: IRL Test
 description: Integration tests workflow
 
 on:
-  pull_request:
-    branches: [ master ]
-  schedule:
-    - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
+  # Temporary
+  # pull_request:
+  #   branches: [ master ]
+  # schedule:
+  #   - cron: '0 6,18 * * *'  # Every day at 06:00 and 18:00 (twice a day)
   workflow_dispatch:
     inputs:
       os:
