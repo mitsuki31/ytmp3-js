@@ -8,15 +8,24 @@
     "ytmp3": "./bin/cli.mjs"
   },
   "files": [
-    "index.js",
-    "lib/*",
+    "build/",
     "bin/*",
     "LICENSE",
-    "README.md",
-    "CHANGELOG.md"
+    "README.md"
   ],
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "types": "./build/api/main.d.ts",
+      "import": "./build/api/main.js",
+      "require": "./build/api/main.js",
+      "default": "./build/api/main.js"
+    },
+    "./helpers": {
+      "types": "./build/api/helpers.d.ts",
+      "import": "./build/api/helpers.js",
+      "require": "./build/api/helpers.js",
+      "default": "./build/api/helpers.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -33,7 +42,10 @@
     "test:irl:no-dltest": "mocha test/irl.test.mjs -g '\\[CONVERT\\]'",
     "coverage": "nyc npm test",
     "coverage:no-dltest": "nyc npm run test:no-dltest",
-    "build:setup": "node scripts/build-setups.mjs"
+    "build": "tspc",
+    "prebuild": "npm run build:options && npm run build:setup",
+    "build:setup": "node scripts/build-setups.mjs",
+    "build:options": "node scripts/build-index-options.mjs"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",
