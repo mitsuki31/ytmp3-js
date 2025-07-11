@@ -20,6 +20,7 @@ export default tseslint.config(
     ignores: [
       'docs/',
       'test/',
+      'build/',
       'coverage/',
       'config/example/**/*.{mjs,js,json}',
       'jsdoc.config.js',

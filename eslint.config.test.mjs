@@ -22,6 +22,7 @@ export default tseslint.config(
       'docs/',
       'coverage/',
       'src/',
+      'build/',
       'bin/',
       'config/example/**/*.{mjs,js,json}',
       'index.{j,t}s',
