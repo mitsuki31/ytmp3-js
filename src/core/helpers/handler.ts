@@ -11,7 +11,7 @@ import { Writable } from 'node:stream';
 import cliProgress from 'cli-progress';
 
 import type { YTMP3GlobalState } from '#globals';
-import { createDirIfNotExist, createStream, customDateFormat, isStreamClosed, isTTYStream, NoneLogger, style } from '#/utils';
+import { createDirIfNotExist, createStream, customDateFormat, isStreamClosed, isTTYStream, NoneLogger, normalizeFilename, style } from '#/utils';
 import { getGlob, isDebugMode, runBeforeExit } from '#runtime/env';
 import { defaultPreset } from '#/utils/progressbar';
 import type { DownloadHandlerFunction } from '../internal/interfaces/options/DownloadOptions';
@@ -55,7 +55,7 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
   { logger, selectedFormat, outDir, filename, quiet, signal }
 ) {
   logger = quiet ? NoneLogger : logger;
-  const file = path.join(outDir, filename);  // Join the output directory and filename
+  const file = path.join(outDir, normalizeFilename(filename));  // Join the output directory and filename
   const reader = stream.getReader();         // Get the stream reader
   const idC = style(['**', 'BM'], info.videoId);
   const isTTY = isTTYStream(logger.stdout);
@@ -100,7 +100,11 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
     valueMB = bytesWritten / (1024 ** 2);
   }
 
+  let hasCleanup = false;
   const cleanup = async () => {
+    if (hasCleanup) return;
+    hasCleanup = true;
+
     reader.releaseLock();
     bar.stop();
     if (fileStream instanceof Writable && !isStreamClosed(fileStream)) {
@@ -116,13 +120,14 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
     logger.info(`{${idC}} Starting download '${style('Y', info.title ?? '<unknown>')}'...`);
   }
 
-  let fileStream: Writable | null = null;
+  let fileStream: fs.WriteStream | null = null;
   let completed = false;
   let hookIndex = -1;
   try {
     fileStream = createStream('w', file, {
       signal, start: bytesWritten, flags: bytesWritten ? 'a' : 'w'
     });
+    console.log(fileStream.path.toString());
     const closeDownloadedFileStream = async () => {
       await cleanup();
     };
@@ -143,7 +148,7 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
     }
 
     while (true) {
-      const timeoutPromise = new Promise<never>((_, reject) => {
+      let timeoutPromise: Promise<never> | null = new Promise<never>((_, reject) => {
         setTimeout(() => {
           const err: Error & {
             bytesWritten?: number, totalBytes?: number, remainingBytes?: number
@@ -155,10 +160,13 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
         }, 5000);
       });
       const { value, done } = await Promise.race([reader.read(), timeoutPromise]);
+      timeoutPromise = null;
+
       if (done) {
         completed = true;
         break;  // ! Crucial to break this infinite loop
       }
+
       // Throw an error if the operation is aborted
       signal?.throwIfAborted();
 
@@ -180,6 +188,7 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
       });
     }
   } catch (err) {
+    await cleanup();  // Ensure this always called first when error occurred
     if (err instanceof Error) {
       const newErr: Error & { bytesWritten?: number, totalBytes?: number, remainingBytes?: number } = err;
       // Inject some extra information to the error
