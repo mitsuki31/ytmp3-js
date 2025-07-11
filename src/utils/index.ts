@@ -10,6 +10,7 @@
  */
 
 import fs, { type PathLike } from 'node:fs';
+import { ILLEGAL_CHAR_REGEX } from './constants';
 
 export * from './constants';
 export * from '#colors';
@@ -240,6 +241,35 @@ export function createDirIfNotExistSync(dirpath: PathLike): void {
 export function generateRandomString(length: number): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
   return Array.from({ length }, () => alphabet.charAt(Math.floor(Math.random() * alphabet.length))).join('');
+}
+
+
+/**
+ * Normalizes a filename by replacing illegal characters with underscores.
+ *
+ * @remarks
+ * This function uses a regular expression to identify illegal characters
+ * typically not allowed in filenames across different filesystems. Such characters
+ * include but are not limited to: `<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`.
+ *
+ * @param filename - The filename to be normalized. This is a string that may contain
+ * illegal characters that are not allowed in filenames.
+ *
+ * @returns A new string representing the normalized filename, with all illegal
+ * characters replaced by underscores (`_`).
+ *
+ * @example
+ * ```typescript
+ * const filename = 'document:report.txt';
+ * const normalized = normalizeFilename(filename);
+ * console.log(normalized);  // Output: 'document_report.txt'
+ * ```
+ *
+ * @public
+ * @since 5.0.0
+ */
+export function normalizeFilename(filename: string): string {
+  return filename.replace(ILLEGAL_CHAR_REGEX, '_');
 }
 
 // #endregion Utilities Function

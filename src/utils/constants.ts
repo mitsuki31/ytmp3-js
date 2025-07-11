@@ -77,3 +77,11 @@ export const STUB_CLASSES_DIR = path.join(YTMP3_HOMEDIR, 'stubs');
  * @since  1.0.0
  */
 export const LOGDIR = path.join(YTMP3_HOMEDIR, 'logs');
+
+/**
+ * Regex for illegal characters.
+ *
+ * @internal
+ * @since    5.0.0
+ */
+export const ILLEGAL_CHAR_REGEX = /[<>:"/\\|?*]/g;
