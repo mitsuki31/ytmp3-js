@@ -13,3 +13,11 @@ export default {
   barCompleteChar: Presets.shades_classic.barCompleteChar,
   barIncompleteChar: Presets.shades_classic.barIncompleteChar,
 } as Preset;
+
+export const audioConversionPreset: Preset = {
+  format: `|${style('G', '{bar}')}| ${style(['^', 'GR'], '{percentage}%')} `
+    + `| ${style(['^', 'BM'], 'Size:')} {targetSize}KB ({targetSize_mb}MB) `
+    + `| ${style(['^', 'BM'], 'Speed:')} {currentKbps}kbps`,
+  barCompleteChar: '\u2593',
+  barIncompleteChar: '\u2591',
+};
