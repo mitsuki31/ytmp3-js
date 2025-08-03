@@ -1,6 +1,7 @@
-export * from '#/core/ytmp3.js';
-export * as FFmpeg from '#/core/ffmpeg-cmdp.js';
-export { default as FluentFFmpeg, type FfmpegCommandLogger, type FfmpegCommandOptions } from 'fluent-ffmpeg';
+// Core
+export * from '#/core/ytmp3';
+export * as Ffmpeg from '#/core/ffmpeg-cmdp';
+export { default as FluentFfmpeg, type FfmpegCommandLogger, type FfmpegCommandOptions } from 'fluent-ffmpeg';
 
 // Interfaces
 export type { default as AudioConversionResult } from '#/core/internal/interfaces/AudioConversionResult';
