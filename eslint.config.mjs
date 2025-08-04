@@ -9,14 +9,7 @@ import tseslint from 'typescript-eslint';
 import tseslintPlugin from '@typescript-eslint/eslint-plugin';
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  tseslint.configs.strict,
-  tseslint.configs.stylistic,
   {
-    name: '@ytmp3-js/production',
-    plugins: {
-      tseslint: tseslintPlugin,
-    },
     ignores: [
       'docs/',
       'test/',
@@ -25,15 +18,22 @@ export default tseslint.config(
       'config/example/**/*.{mjs,js,json}',
       'jsdoc.config.js',
       'eslint.config.*',
-      '.mocharc.js',
+      '.mocharc.js'
     ],
-    files: [
-      'index.ts',
-      'src/**/*.ts',
-      'bin/**/*.ts',
+  },
+  {
+    name: '@ytmp3-js/production',
+    files: ['src/**/*.ts'],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.strict,
+      tseslint.configs.stylistic,
     ],
+    plugins: {
+      tseslint: tseslintPlugin,
+    },
     linterOptions: {
       reportUnusedDisableDirectives: true
     },
-  },
+  }
 );
