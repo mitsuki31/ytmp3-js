@@ -2,6 +2,11 @@
 export * from '#/core/ytmp3';
 export * as Ffmpeg from '#/core/ffmpeg-cmdp';
 export { default as FluentFfmpeg, type FfmpegCommandLogger, type FfmpegCommandOptions } from 'fluent-ffmpeg';
+// Cache
+import type { Types } from 'youtubei.js';
+/** Re-exported from `youtubei.js` */
+export type ICache = Types.ICache;
+export { UniversalCache } from 'youtubei.js';
 
 // Interfaces
 export type { default as AudioConversionResult } from '#/core/internal/interfaces/AudioConversionResult';
