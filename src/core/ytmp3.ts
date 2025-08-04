@@ -58,6 +58,7 @@ import {
   LogLevel,
   createLoadingBar,
   STUB_CLASSES_DIR,
+  ROOTDIR,
 } from '#/utils';
 import { waitForConnectivity } from '#/utils/connection';
 import { captureStderr, logError, parseParserError, prettyPrintParserError } from '#/utils/diag';
@@ -69,14 +70,49 @@ import { defaultHandler } from './helpers/handler';
 import type DownloadResult from './internal/interfaces/DownloadResult';
 import type AudioConversionResult from './internal/interfaces/AudioConversionResult';
 import { convertAudio } from './audioconv';
+import { type PackageJSON } from './config';
 
 // --- Module-scoped constants
 const defaultLogger = getGlob('logger', isDebugMode() ? createLogger('DEBUG') : DefaultLogger) as Logger;
 const defaultVInfoCache = new VInfoCache(undefined, { debug: isDebugMode() });  // Default video info cache
 const HAS_SETUP = getGlob('ready', false);
 const HAS_CONNECTIVITY = HAS_SETUP ? getGlob('hasConnectivity', false) === true : undefined;
+const pkgJson = ((): PackageJSON | null => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ROOTDIR, 'package.json'), 'utf-8'));
+  } catch (err) {
+    if (defaultLogger.levelStr === 'DEBUG' || isDebugMode())
+      defaultLogger.warn(`Failed to load package.json: ${(err as Error).message}`);
+    return null;
+  }
+})();
 let globalInnertubeSession = getGlob('innertube_session', undefined);
 
+/**
+ * The version of **YTMP3-JS**.
+ * @public
+ */
+export const version = pkgJson?.version ?? '0.0.0-dev';
+/**
+ * An object representing the version of **YTMP3-JS** in more descriptive way.
+ *
+ * This object has 3 properties:
+ * - `major`
+ * - `minor`
+ * - `patch`
+ * - `preRelease`
+ *
+ * @public
+ */
+export const version_info = (() => {
+  const versionList = version.split(/[.-]/).filter(Boolean);
+  return {
+    major: parseInt(versionList[0], 10),
+    minor: parseInt(versionList[1], 10),
+    patch: parseInt(versionList[2], 10),
+    preRelease: versionList[3] || 'stable'
+  };
+})();
 
 /**
  * Retrieves video information from YouTube using `Innertube`.
