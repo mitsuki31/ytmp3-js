@@ -45,7 +45,8 @@
     "build": "tspc",
     "prebuild": "npm run build:options && npm run build:setup",
     "build:setup": "node scripts/build-setups.mjs",
-    "build:options": "node scripts/build-index-options.mjs"
+    "build:options": "node scripts/build-index-options.mjs",
+    "prepack": "npm run build"
   },
   "author": "Ryuu Mitsuki <dhefam31@gmail.com> (https://github.com/mitsuki31)",
   "license": "MIT",

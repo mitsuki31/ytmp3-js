@@ -27,6 +27,7 @@ export function createDownloadResult({ finalPath, vInfo, acInfo, cache }: {
   acInfo: {
     inputFile: string;
     inputFfprobeData: FfprobeData;
+    inputFileDeleted: boolean;
     outputFile: string;
     outputFfprobeData: FfprobeData;
   } | null;
@@ -55,7 +56,8 @@ export function createDownloadResult({ finalPath, vInfo, acInfo, cache }: {
       input: {
         path: acInfo.inputFile,
         name: path.basename(acInfo.inputFile),
-        metadata: acInfo.inputFfprobeData
+        metadata: acInfo.inputFfprobeData,
+        deleted: acInfo.inputFileDeleted
       },
       output: {
         path: acInfo.outputFile,

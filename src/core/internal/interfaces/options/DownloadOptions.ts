@@ -10,6 +10,7 @@ import type { Logger } from '#utils/log';
 import type { ClientOptions } from './ClientOptions';
 import type { DeveloperOptions } from './DeveloperOptions';
 import type { GetInfoOptions } from './GetInfoOptions';
+import type { AudioConverterOptions } from './AudioConverterOptions';
 import type VideoInfo from '#/core/internal/classes/VideoInfo';
 
 /** Represents the download options from `youtubei.js` with only necessary properties */
@@ -101,6 +102,12 @@ export interface DownloadOptions extends ClientOptions, GetInfoOptions, YTJS_Dow
    * @default false
    */
   convertAudio?: boolean;
+  /**
+   * The options for audio conversion.
+   *
+   * Defaults to {@link "utils/options".defaults.AudioConverterOptions}.
+   */
+  converterOptions?: AudioConverterOptions;
   /**
    * The function to handle the download stream overriding the default handler.
    *

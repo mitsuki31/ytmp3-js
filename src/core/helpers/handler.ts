@@ -127,7 +127,6 @@ export const defaultHandler: DownloadHandlerFunction = async function defaultHan
     fileStream = createStream('w', file, {
       signal, start: bytesWritten, flags: bytesWritten ? 'a' : 'w'
     });
-    console.log(fileStream.path.toString());
     const closeDownloadedFileStream = async () => {
       await cleanup();
     };

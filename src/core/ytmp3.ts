@@ -39,13 +39,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { inspect } from 'node:util';
-import { ClientType, Innertube, type SessionOptions, Types, UniversalCache } from 'youtubei.js';
+import { Innertube, type SessionOptions, Types, UniversalCache } from 'youtubei.js';
+import type { FfprobeData } from 'fluent-ffmpeg';
 
 import type { GetInfoOptions, DownloadOptions } from './internal/interfaces/options';
 import { getGlob, isDebugMode, setGlob, setInterrupted } from '#runtime/env';
 import {
   type Logger,
   type URLLike,
+  type BarControl,
   DefaultLogger,
   isNullish,
   style,
@@ -55,7 +57,7 @@ import {
   getExtensionFromMime,
   LogLevel,
   createLoadingBar,
-  STUB_CLASSES_DIR
+  STUB_CLASSES_DIR,
 } from '#/utils';
 import { waitForConnectivity } from '#/utils/connection';
 import { captureStderr, logError, parseParserError, prettyPrintParserError } from '#/utils/diag';
@@ -65,6 +67,8 @@ import { VInfoCache } from '#/cache';
 import VideoInfo from './internal/classes/VideoInfo';
 import { defaultHandler } from './helpers/handler';
 import type DownloadResult from './internal/interfaces/DownloadResult';
+import type AudioConversionResult from './internal/interfaces/AudioConversionResult';
+import { convertAudio } from './audioconv';
 
 // --- Module-scoped constants
 const defaultLogger = getGlob('logger', isDebugMode() ? createLogger('DEBUG') : DefaultLogger) as Logger;
@@ -125,7 +129,7 @@ let globalInnertubeSession = getGlob('innertube_session', undefined);
  * @param target - A URL-like input or array of such inputs.
  * @param options - Optional settings, including suppressing log output, retries, cache, and session injection.
  *
- * @returns A single {@link VideoInfo} or a mapping of `videoId -> VideoInfo | null`.
+ * @returns A single {@linkcode VideoInfo} or a mapping of `videoId -> VideoInfo | null`.
  *
  * @throws If the Innertube session fails to initialize or if all retries to fetch video info fail.
  *
@@ -151,7 +155,12 @@ export async function getInfo(
     if (log.level >= LogLevel.INFO) log.line(width, prefix);
   }
 
-  const setupLoadingBar = () => {
+  const setupLoadingBar = (): BarControl => {
+    if (options.quiet) return {
+      start: () => { /* empty */ },
+      stop: () => { /* empty */ },
+    };
+
     const cols = process.stdout.columns ?? 80;
     return createLoadingBar({
       barWidth: cols < 50 ? cols - 10 : cols / 2.5,
@@ -497,7 +506,7 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
     `Audio sample rate: ${style('C', String(selectedFormat?.audio_sample_rate ?? '<unknown>') + ' Hz')}`,
     `Content size: ${style('C', ((selectedFormat?.content_length ?? 0) / 1024 ** 2).toFixed(2) + ' MiB')}`,
     `Duration: ${style('C', ((videoInfo.full.page[0].video_details?.duration ?? 0) / 60).toFixed(2) + ' mins')}`
-  ].forEach(msg => log.level < LogLevel.INFO  ? {} : log.write(` ${style('~', '--')} ${msg}\n`, null, log.stdout));
+  ].forEach(msg => log.level < LogLevel.INFO ? {} : log.write(` ${style('~', '--')} ${msg}\n`, null, log.stdout));
 
   let stream: ReadableStream<Uint8Array> | null = null;
   let outputFile: string | undefined = undefined;
@@ -545,6 +554,7 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
       });
 
       downloadError = null;
+      stream = null;  // Unset the stream
       break;
     } catch (err) {
       downloadError = err as Error;
@@ -579,12 +589,31 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
   );
   logLine();
 
-  // TODO: Add audio conversion feature
+  // -- Audio conversion
+  let conversionResult: AudioConversionResult | null = null;
+  if (options?.convertAudio) {
+    try {
+      // The function will take care the output file name pre-conversion
+      conversionResult = await convertAudio(outputFile as string, {
+        ...(options.converterOptions ?? {}),
+      });
+    } catch (err) {
+      logError('Failed to convert audio %s', err as Error, log);
+      throw err;  // Re-throw the error to caller
+    }
+  }
 
+  // -- Create the download result
   return createDownloadResult({
-    finalPath: outputFile as string,
+    finalPath: (options?.convertAudio ? (conversionResult?.output.path ?? outputFile) : outputFile) as string,
     vInfo: videoInfo as VideoInfo,
-    acInfo: null,
+    acInfo: {
+      inputFile: conversionResult?.input.path as string,
+      inputFfprobeData: conversionResult?.input.metadata as FfprobeData,
+      inputFileDeleted: conversionResult?.input.deleted as boolean,
+      outputFile: conversionResult?.output.path as string,
+      outputFfprobeData: conversionResult?.output.metadata as FfprobeData
+    },
     cache: {
       useCache: !!options?.useCache,
       innertubeCachePath: options?.useCache ? session?.session.cache?.cache_dir : undefined,

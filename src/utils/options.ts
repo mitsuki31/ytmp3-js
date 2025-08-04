@@ -90,6 +90,33 @@ const DefaultInnerTubeConfig: SessionOptions = {
   fetch: undefined,  // Use builtin fetch, if behind the proxy needs to be overriden
 };
 
+const DefaultFfmpegCommandOptions: FfmpegCommandOptions & { logger?: FfmpegCommandLogger | Logger } = {
+  logger: DefaultLogger,
+  niceness: 0,  // Ignored on Windows platform
+  priority: 0,
+  timeout: 0,
+  stdoutLines: 100,
+} as const;
+
+const DefaultAudioConverterOptions: Required<Omit<AudioConverterOptions, keyof DeveloperOptions>> = {
+  // FFmpeg command options
+  // * Do not add the `logger` option
+  niceness: DefaultFfmpegCommandOptions.niceness as number,
+  priority: DefaultFfmpegCommandOptions.priority as number,
+  timeout: DefaultFfmpegCommandOptions.timeout as number,
+  stdoutLines: DefaultFfmpegCommandOptions.stdoutLines as number,
+  // -- Audio conversion options
+  inputOptions: [] as string[],
+  outputOptions: [] as string[],
+  format: 'mp3',
+  codec: 'libmp3lame',
+  bitrate: 128,
+  frequency: 44100,
+  channels: 2,
+  deleteOld: false,
+  quiet: true,
+} as const;
+
 const DefaultClientOptions: Required<ClientOptions> = {
   maxRetries: MAX_RETRIES,
   session: null,  // Will be overriden with global session on CLI usage
@@ -112,6 +139,7 @@ const DefaultDownloadOptions: Required<
   outDir: '.',
   outFile: '%(title)s.%(ext)s',
   convertAudio: false,
+  converterOptions: DefaultAudioConverterOptions,
   handler: defaultHandler,
   safeMode: false,
   useCache: true,
@@ -119,27 +147,6 @@ const DefaultDownloadOptions: Required<
   formatOptions: { itag: 140, type: 'audio', client: 'YTMUSIC' },  // Default audio format
   // -- youtube.js download options
   range: undefined
-} as const;
-
-const DefaultFfmpegCommandOptions: FfmpegCommandOptions & { logger?: FfmpegCommandLogger | Logger } = {
-  logger: DefaultLogger,
-  niceness: 10,
-  priority: 10,  // Ignored on Windows platform
-  timeout: 0,
-  stdoutLines: 100,
-} as const;
-
-const DefaultAudioConverterOptions: Required<Omit<AudioConverterOptions, keyof DeveloperOptions>> = {
-  ...(DefaultFfmpegCommandOptions as Required<typeof DefaultFfmpegCommandOptions>),
-  inputOptions: [] as string[],
-  outputOptions: [] as string[],
-  format: 'mp3',
-  codec: 'libmp3lame',
-  bitrate: 128,
-  frequency: 44100,
-  channels: 2,
-  deleteOld: false,
-  quiet: true,
 } as const;
 
 /**
@@ -183,17 +190,17 @@ export const defaults: {
 // #region Option Metadata
 
 export const _FFmpegCommandOptions: {
-  [K in keyof FfmpegCommandOptions]: [OptionTypeDefinition, (typeof defaults.FfmpegCommandOptions)[K]];
+  [K in keyof FfmpegCommandOptions]-?: [OptionTypeDefinition, (typeof defaults.FfmpegCommandOptions)[K]];
 } = {
   logger: [['object', 'function', 'undefined'], DefaultLogger],
-  niceness: ['number', undefined],
-  priority: ['number', undefined],
-  presets: ['string', undefined],
-  preset: ['string', undefined],
-  stdoutLines: ['number', undefined],
-  timeout: ['number', undefined],
+  niceness: [['number', 'undefined'], undefined],
+  priority: [['number', 'undefined'], undefined],
+  presets: [['string', 'undefined'], undefined],
+  preset: [['string', 'undefined'], undefined],
+  stdoutLines: [['number', 'undefined'], undefined],
+  timeout: [['number', 'undefined'], undefined],
   source: [['string', Readable, 'undefined'], undefined],
-  cwd: ['string', undefined],
+  cwd: [['string', 'undefined'], undefined],
 };
 
 export const _GetInfoOptions: {
@@ -218,6 +225,7 @@ export const _DownloadOptions: {
   outDir: ['string', defaults.DownloadOptions.outDir],
   outFile: [['string', 'undefined'], defaults.DownloadOptions.outFile],
   convertAudio: ['boolean', defaults.DownloadOptions.convertAudio],
+  converterOptions: [['object', 'undefined'], defaults.DownloadOptions.converterOptions],
   useCache: ['boolean', defaults.DownloadOptions.useCache],
   quiet: [['boolean', 'string'], defaults.DownloadOptions.quiet],
   handler: ['function', defaults.DownloadOptions.handler],
