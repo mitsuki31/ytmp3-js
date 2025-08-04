@@ -10,14 +10,7 @@ import tseslintPlugin from '@typescript-eslint/eslint-plugin';
 import mochaPlugin from 'eslint-plugin-mocha';
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  tseslint.configs.strict,
-  tseslint.configs.stylistic,
   {
-    plugins: {
-      tseslint: tseslintPlugin,
-      mocha: mochaPlugin,
-    },
     ignores: [
       'docs/',
       'coverage/',
@@ -30,9 +23,19 @@ export default tseslint.config(
       'eslint.config.*',
       '.mocharc.js',
     ],
-    files: [
-      'test/**/*.{ts,js}',
+  },
+  {
+    name: '@ytmp3-js/test',
+    files: ['test/**/*.ts'],
+    extends: [
+      eslint.configs.recommended,
+      tseslint.configs.strict,
+      tseslint.configs.stylistic,
     ],
+    plugins: {
+      tseslint: tseslintPlugin,
+      mocha: mochaPlugin,
+    },
     languageOptions: {
       sourceType: 'module',
     },

@@ -31,8 +31,8 @@
   "scripts": {
     "docs": "jsdoc -c jsdoc.config.js",
     "lint": "npm run lint:prod && npm run lint:test",
-    "lint:prod": "eslint . -c eslint.config.js",
-    "lint:test": "eslint . -c eslint.config.test.js",
+    "lint:prod": "eslint . --config eslint.config.mjs",
+    "lint:test": "eslint . --config eslint.config.test.mjs",
     "test": "npm run test:unit && npm run test:irl",
     "test:no-dltest": "npm run test:unit && npm run test:irl:no-dltest",
     "test:nyan": "mocha --recursive --reporter nyan",
