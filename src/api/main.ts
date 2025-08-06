@@ -1,7 +1,13 @@
 // Core
 export * from '#/core/ytmp3';
-export * as Ffmpeg from '#/core/ffmpeg-cmdp';
+// Core (FFmpeg)
 export { default as FluentFfmpeg, type FfmpegCommandLogger, type FfmpegCommandOptions } from 'fluent-ffmpeg';
+import * as ffmpegCmdp from '#/core/ffmpeg-cmdp';
+import * as audioconv from '#/core/audioconv';
+export const Ffmpeg = {
+  ...audioconv,
+  ...ffmpegCmdp
+};
 // Cache
 import type { Types } from 'youtubei.js';
 /** Re-exported from `youtubei.js` */
