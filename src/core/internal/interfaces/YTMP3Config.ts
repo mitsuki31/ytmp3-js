@@ -6,7 +6,7 @@
  */
 
 import type { ClientType, SessionOptions } from 'youtubei.js';
-import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './options';
+import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './options/index.js';
 
 /**
  * An interface represents the **YTMP3-JS** configuration object which contains options to configure

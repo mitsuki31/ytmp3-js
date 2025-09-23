@@ -3,7 +3,7 @@
   "version": "5.0.0-dev",
   "title": "YTMP3",
   "description": "A CLI-based application build on JavaScript offers an easy and uncomplicated method for downloading YouTube audio",
-  "main": "index.js",
+  "type": "module",
   "bin": {
     "ytmp3": "./bin/cli.mjs"
   },

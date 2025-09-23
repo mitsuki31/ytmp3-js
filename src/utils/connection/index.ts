@@ -3,14 +3,14 @@ import dns from 'node:dns';
 
 import { style as $c } from '#colors';
 import type { YTMP3GlobalState } from '#globals';
-import { getGlob } from '#runtime/env';
-import { logError } from '#utils/diag';
-import { Logger, LogLevel } from '#utils/log';
-import { dnsLookup } from './dns';
-import { checkInternetViaTCP, ipToNumber } from './tcp-ip';
+import { getGlob } from '#runtime/env.js';
+import { logError } from '#utils/diag/index.js';
+import { Logger, LogLevel } from '#utils/log/index.js';
+import { dnsLookup } from './dns.js';
+import { checkInternetViaTCP, ipToNumber } from './tcp-ip.js';
 
-export * from './dns';
-export * from './tcp-ip';
+export * from './dns.js';
+export * from './tcp-ip.js';
 
 export async function hasConnectivity({ logger, onlyDnsCheck = true }: {
   logger: Logger,

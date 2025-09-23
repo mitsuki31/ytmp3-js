@@ -10,8 +10,8 @@ import childProcess from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import which from 'which';
-import { createLogger, isDefined, isNullish, isString, NoneLogger } from '#/utils';
-import { getSystemEnv, isDebugMode } from '#/runtime/env';
+import { createLogger, isDefined, isNullish, isString, NoneLogger } from '#/utils/index.js';
+import { getSystemEnv, isDebugMode } from '#/runtime/env.js';
 
 const logger = isDebugMode() ? createLogger('DEBUG') : NoneLogger;
 

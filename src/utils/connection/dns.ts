@@ -149,7 +149,7 @@ export async function waitForConnectivity({
       if (err instanceof Error) {
         if (err instanceof DNSLookupTimeoutError) {
           if (logger) {
-            const prefix = customDateFormat(new Date(), true) + style('~', '::') + logger.WARNING_PREFIX;
+            const prefix = cusStreateFormat(new Date(), true) + style('~', '::') + logger.WARNING_PREFIX;
             logger.write('No internet connection. Retrying...', prefix, logger.stderr);
           }
           // Wait for the specified interval before retrying

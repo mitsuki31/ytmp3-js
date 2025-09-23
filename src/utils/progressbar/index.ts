@@ -1,3 +1,3 @@
-export { default as defaultPreset } from './preset';
-export * from './preset';
-export * from './loadingBar';
+export { default as defaultPreset } from './preset.js';
+export * from './preset.js';
+export * from './loadingBar.js';

@@ -6,7 +6,7 @@
  */
 
 import type { FfmpegCommandOptions } from 'fluent-ffmpeg';
-import type { DeveloperOptions } from './DeveloperOptions';
+import type { DeveloperOptions } from './DeveloperOptions.js';
 
 /**
  * An interface for audio conversion options.

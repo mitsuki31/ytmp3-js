@@ -7,11 +7,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { getGlob } from '#/runtime/env';
-import { STUB_CLASSES_DIR } from '#/utils/constants';
-import { DefaultLogger, type Logger } from '#/utils/log';
-import { calculateSHA256 } from '#/utils/hash';
-import { createDirIfNotExist, logError, style } from '#/utils';
+import { getGlob } from '#/runtime/env.js';
+import { STUB_CLASSES_DIR } from '#/utils/constants.js';
+import { DefaultLogger, type Logger } from '#/utils/log/index.js';
+import { calculateSHA256 } from '#/utils/hash.js';
+import { createDirIfNotExist, logError, style } from '#/utils/index.js';
 
 /**
  * Mapping of template placeholders to their corresponding property names.

@@ -6,8 +6,8 @@
  */
 
 import { style } from '#colors';
-import { isDebugMode } from '#runtime/env';
-import { Logger } from '#utils/log';
+import { isDebugMode } from '#runtime/env.js';
+import { Logger } from '#utils/log/index.js';
 
 /**
  * Parses the output of an `InnertubeError` and returns an object containing the class

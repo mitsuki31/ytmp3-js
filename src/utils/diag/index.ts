@@ -1,2 +1,2 @@
-export * from './diagTools';
-export * from './parser';
+export * from './diagTools.js';
+export * from './parser.js';

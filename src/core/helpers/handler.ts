@@ -11,10 +11,10 @@ import { Writable } from 'node:stream';
 import cliProgress from 'cli-progress';
 
 import type { YTMP3GlobalState } from '#globals';
-import { createDirIfNotExist, createStream, customDateFormat, isStreamClosed, isTTYStream, NoneLogger, normalizeFilename, style } from '#/utils';
-import { getGlob, isDebugMode, runBeforeExit } from '#runtime/env';
-import { defaultPreset } from '#/utils/progressbar';
-import type { DownloadHandlerFunction } from '../internal/interfaces/options/DownloadOptions';
+import { createDirIfNotExist, createStream, customDateFormat, isStreamClosed, isTTYStream, NoneLogger, normalizeFilename, style } from '#/utils/index.js';
+import { getGlob, isDebugMode, runBeforeExit } from '#runtime/env.js';
+import { defaultPreset } from '#/utils/progressbar/index.js';
+import type { DownloadHandlerFunction } from '../internal/interfaces/options/DownloadOptions.js';
 
 /**
  * Default download handler function for streaming content to a file.

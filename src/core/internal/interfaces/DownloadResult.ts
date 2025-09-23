@@ -5,8 +5,8 @@
  * @since     5.0.0
  */
 
-import type AudioConversionResult from './AudioConversionResult';
-import type VideoMetadata from './VideoMetadata';
+import type AudioConversionResult from './AudioConversionResult.js';
+import type VideoMetadata from './VideoMetadata.js';
 
 /**
  * Represents the result of the download process.

@@ -6,12 +6,12 @@
  */
 
 import type { Types } from 'youtubei.js';
-import type { Logger } from '#utils/log';
-import type { ClientOptions } from './ClientOptions';
-import type { DeveloperOptions } from './DeveloperOptions';
-import type { GetInfoOptions } from './GetInfoOptions';
-import type { AudioConverterOptions } from './AudioConverterOptions';
-import type VideoInfo from '#/core/internal/classes/VideoInfo';
+import type { Logger } from '#utils/log/index.js';
+import type { ClientOptions } from './ClientOptions.js';
+import type { DeveloperOptions } from './DeveloperOptions.js';
+import type { GetInfoOptions } from './GetInfoOptions.js';
+import type { AudioConverterOptions } from './AudioConverterOptions.js';
+import type VideoInfo from '#/core/internal/classes/VideoInfo.js';
 
 /** Represents the download options from `youtubei.js` with only necessary properties */
 export type YTJS_DownloadOptions = Omit<Types.DownloadOptions, keyof Types.FormatOptions>;

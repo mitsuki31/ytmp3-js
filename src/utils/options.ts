@@ -16,14 +16,14 @@ import { Readable } from 'node:stream';
 import { UniversalCache, ClientType, Innertube, type SessionOptions } from 'youtubei.js';
 import type { FfmpegCommandLogger, FfmpegCommandOptions } from 'fluent-ffmpeg';
 
-import type { ClientOptions, DownloadOptions, GetInfoOptions, DeveloperOptions, YTJS_DownloadOptions, AudioConverterOptions } from '#/core/internal/interfaces/options';
-import type { AnyClass, AnyFunction, AnyPlainObject, DropNullAndUndefined } from '#/utils';
-import { type Logger, DefaultLogger } from '#utils/log';
-import { INNERTUBE_CACHEDIR } from '#/utils/constants';
-import { getType, isCallable, isClass, isNullish, isPlainObject, isUndefined } from '#/vendor/type-utils';
+import type { ClientOptions, DownloadOptions, GetInfoOptions, DeveloperOptions, YTJS_DownloadOptions, AudioConverterOptions } from '#/core/internal/interfaces/options/index.js';
+import type { AnyClass, AnyFunction, AnyPlainObject, DropNullAndUndefined } from '#/utils/index.js';
+import { type Logger, DefaultLogger } from '#utils/log/index.js';
+import { INNERTUBE_CACHEDIR } from '#/utils/constants.js';
+import { getType, isCallable, isClass, isNullish, isPlainObject, isUndefined } from '#/vendor/type-utils.js';
 import { InvalidTypeError } from '#error';
 import { MAX_RETRIES } from '#globals';
-import { defaultHandler } from '#/core/helpers/handler';
+import { defaultHandler } from '#/core/helpers/handler.js';
 
 /**
  * Type represents the expected option type.

@@ -7,8 +7,8 @@
 
 import path from 'node:path';
 import type { FfprobeData } from 'fluent-ffmpeg';
-import type DownloadResult from './interfaces/DownloadResult';
-import type VideoInfo from './classes/VideoInfo';
+import type DownloadResult from './interfaces/DownloadResult.js';
+import type VideoInfo from './classes/VideoInfo.js';
 
 /**
  * Creates a download result object.
