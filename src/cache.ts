@@ -16,15 +16,15 @@ import zlib from 'node:zlib';
 import { type Actions, type ApiResponse, Parser, type Types, YT } from 'youtubei.js';
 
 import { InvalidTypeError, IDValidationError } from '#error';
-import { getGlob, isDebugMode } from '#runtime/env';
-import { TypeUtils } from '#/vendor/type-utils'
-import { style as $c } from '#/vendor/colors'
-import { URLUtils } from '#utils/url-utils'
-import { captureStderrSync, logError, prettyPrintParserError } from '#utils/diag';
-import { DefaultLogger, type Logger, createLogger } from '#utils/log';
-import { generateRandomString, YTMP3_VINFO_CACHEDIR } from '#/utils';
-import VideoInfo from './core/internal/classes/VideoInfo';
-import { defaults } from './utils/options';
+import { getGlob, isDebugMode } from '#runtime/env.js';
+import { TypeUtils } from '#/vendor/type-utils.js'
+import { style as $c } from '#/vendor/colors.js'
+import { URLUtils } from '#utils/url-utils.js'
+import { captureStderrSync, logError, prettyPrintParserError } from '#utils/diag/index.js';
+import { DefaultLogger, type Logger, createLogger } from '#utils/log/index.js';
+import { generateRandomString, YTMP3_VINFO_CACHEDIR } from '#/utils/index.js';
+import VideoInfo from './core/internal/classes/VideoInfo.js';
+import { defaults } from './utils/options.js';
 
 const logger = getGlob('logger', DefaultLogger) as Logger;
 

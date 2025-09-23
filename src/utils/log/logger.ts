@@ -11,10 +11,10 @@ import { stripVTControlCharacters } from 'node:util';
 import { Writable } from 'node:stream';
 import { WriteStream as TTYWriteStream } from 'node:tty';
 import { style } from '#colors';
-import { TerminalFormatter as Terminal, type ConsoleStreamLike } from '#utils/terminal';
-import { isWriteSafe, isStreamClosed, isTTYStream } from '#utils/stream';
+import { TerminalFormatter as Terminal, type ConsoleStreamLike } from '#utils/terminal.js';
+import { isWriteSafe, isStreamClosed, isTTYStream } from '#utils/stream.js';
 import { InvalidTypeError } from '#error';
-import { useNoColor } from '#runtime/env';
+import { useNoColor } from '#runtime/env.js';
 
 const NO_COLOR = useNoColor();
 

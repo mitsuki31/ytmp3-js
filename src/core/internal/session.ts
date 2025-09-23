@@ -6,7 +6,7 @@
  */
 
 import { Innertube } from 'youtubei.js';
-import { type Logger, isNullish } from '#/utils';
+import { type Logger, isNullish } from '#/utils/index.js';
 
 /**
  * Resolves an Innertube session to use from the provided session or the global one.

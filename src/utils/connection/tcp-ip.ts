@@ -9,8 +9,8 @@ import net from 'node:net';
 import http from 'node:http';
 
 import { style as $c } from '#colors';
-import { getGlob, setInterrupted } from '#runtime/env';
-import type { Logger } from '#utils/log';
+import { getGlob, setInterrupted } from '#runtime/env.js';
+import type { Logger } from '#utils/log/index.js';
 
 /**
  * Converts an IP address in string format to a numerical representation.

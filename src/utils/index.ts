@@ -10,20 +10,20 @@
  */
 
 import fs, { type PathLike } from 'node:fs';
-import { ILLEGAL_CHAR_REGEX } from './constants';
+import { ILLEGAL_CHAR_REGEX } from './constants.js';
 
-export * from './constants';
+export * from './constants.js';
 export * from '#colors';
-export * from '#utils/log';
-export * from '#utils/url-utils';
-export * from '#utils/terminal';
-export * from '#utils/stream';
-export * from '#/vendor/type-utils';
-export * from '#utils/connection';
-export * from '#utils/diag';
-export * from '#utils/mimetype';
-export * from '#utils/progressbar';
-export * from '#utils/thumb-utils';
+export * from '#utils/log/index.js';
+export * from '#utils/url-utils.js';
+export * from '#utils/terminal.js';
+export * from '#utils/stream.js';
+export * from '#/vendor/type-utils.js';
+export * from '#utils/connection/index.js';
+export * from '#utils/diag/index.js';
+export * from '#utils/mimetype.js';
+export * from '#utils/progressbar/index.js';
+export * from '#utils/thumb-utils.js';
 
 /**
  * Transforms an object type `T` by making all its properties both **mandatory**

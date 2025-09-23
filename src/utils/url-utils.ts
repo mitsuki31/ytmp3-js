@@ -7,7 +7,7 @@
  * @since     1.1.0
  */
 
-import { TypeUtils } from "#/vendor/type-utils";
+import { TypeUtils } from "#/vendor/type-utils.js";
 import {
   IDExtractorError,
   InvalidTypeError,

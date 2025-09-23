@@ -6,8 +6,8 @@
  */
 
 import type { SessionOptions } from 'youtubei.js';
-import type { ClientOptions } from './ClientOptions';
-import type { DeveloperOptions } from './DeveloperOptions';
+import type { ClientOptions } from './ClientOptions.js';
+import type { DeveloperOptions } from './DeveloperOptions.js';
 
 /**
  * An interface for get info options.

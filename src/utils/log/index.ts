@@ -7,10 +7,10 @@
  * @since     5.0.0
  */
 
-import { TypeUtils } from '#/vendor/type-utils';
+import { TypeUtils } from '#/vendor/type-utils.js';
 import { InvalidTypeError } from '#error';
-import { isWritableStream } from '#utils/stream';
-import { type ConsoleStreamLike } from '#utils/terminal';
+import { isWritableStream } from '#utils/stream.js';
+import { type ConsoleStreamLike } from '#utils/terminal.js';
 import {
   NO_PREFIX_WIDTH,
   type CreateLoggerOptions,
@@ -24,7 +24,7 @@ import {
   Logger$Warning,
   Logger$Error,
   Logger$None
-} from './logger';
+} from './logger.js';
 
 export {
   NO_PREFIX_WIDTH,

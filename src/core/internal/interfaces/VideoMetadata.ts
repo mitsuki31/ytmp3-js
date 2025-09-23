@@ -5,8 +5,8 @@
  * @since     5.0.0
  */
 
-import type AuthorInfo from './AuthorInfo';
-import type Thumbnail from './Thumbnail';
+import type AuthorInfo from './AuthorInfo.js';
+import type Thumbnail from './Thumbnail.js';
 import type { YT } from 'youtubei.js';
 
 type BasicInfo = YT.VideoInfo["basic_info"];

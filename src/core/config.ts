@@ -82,12 +82,12 @@ import path from 'node:path';
 import util from 'node:util';
 import { ls, lsTypes } from 'lsfnd';
 
-import { YTMP3_HOMEDIR, isNullOrUndefined, isObject, isPlainObject, getType, style as $c, isString, isUndefined, createLogger, NoneLogger, style, type NonReadonly } from '#/utils';
-import { _DownloadOptions, _AudioConverterOptions, dropNullAndUndefined, resolve as resolveOptions, defaults, _InnerTubeConfig, merge } from '#utils/options';
+import { YTMP3_HOMEDIR, isNullOrUndefined, isObject, isPlainObject, getType, style as $c, isString, isUndefined, createLogger, NoneLogger, style, type NonReadonly } from '#/utils/index.js';
+import { _DownloadOptions, _AudioConverterOptions, dropNullAndUndefined, resolve as resolveOptions, defaults, _InnerTubeConfig, merge } from '#utils/options.js';
 import { UnknownOptionError, InvalidTypeError, ConfigParserError, GlobalConfigParserError } from '#error';
 import { KNOWN_OPTIONS, KNOWN_CONFIG_EXTS, PRIORITIZED_CONFIG_FILES } from '#globals';
-import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './internal/interfaces/options';
-import type { YTMP3Config } from './internal/interfaces/YTMP3Config';
+import type { DownloadOptions, AudioConverterOptions, DeveloperOptions } from './internal/interfaces/options/index.js';
+import type { YTMP3Config } from './internal/interfaces/YTMP3Config.js';
 
 
 /** Represents the resolved configuration for YTMP3-JS */

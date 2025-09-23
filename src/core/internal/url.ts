@@ -6,7 +6,7 @@
  */
 
 import { InvalidTypeError, URLValidationError, IDValidationError } from '#error';
-import { isString, TypeUtils, type URLLike, URLUtils } from '#/utils';
+import { isString, TypeUtils, type URLLike, URLUtils } from '#/utils/index.js';
 
 const BASE_URL = 'https://www.youtube.com/';  // Web-based URL
 

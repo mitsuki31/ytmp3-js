@@ -12,7 +12,7 @@
  */
 
 import { YTMP3_SYMBOL, type YTMP3GlobalState, type Global as AugmentedGlobal } from "#globals";
-import type { NoParamFunction, NoParamAsyncFunction } from "#/utils";
+import type { NoParamFunction, NoParamAsyncFunction } from "#/utils/index.js";
 
 /**
  * Checks whether the program has run setup.

@@ -16,15 +16,15 @@ import path from 'node:path';
 import ffmpeg from 'fluent-ffmpeg';
 import cliProgress from 'cli-progress';
 
-import { DefaultLogger, NoneLogger, getType, isPlainObject, isUndefined, isString, createLogger } from '#/utils';
-import { _AudioConverterOptions, _FFmpegCommandOptions, defaults, resolve as resolveOptions } from '#/utils/options';
+import { DefaultLogger, NoneLogger, getType, isPlainObject, isUndefined, isString, createLogger } from '#/utils/index.js';
+import { _AudioConverterOptions, _FFmpegCommandOptions, defaults, resolve as resolveOptions } from '#/utils/options.js';
 import { style as $c } from '#colors';
-import { getGlob, isDebugMode } from '#runtime/env';
+import { getGlob, isDebugMode } from '#runtime/env.js';
 import { InvalidTypeError } from '#error';
-import type { AudioConverterOptions } from '#/core/internal/interfaces/options/AudioConverterOptions';
-import type AudioConversionResult from '#/core/internal/interfaces/AudioConversionResult';
-import { getContainerFromEncoder, getEncoderFromExtension, getFfmpeg, getFfprobe, splitFfmpegOptions } from './ffmpeg-cmdp';
-import { audioConversionPreset } from '#/utils/progressbar';
+import type { AudioConverterOptions } from '#/core/internal/interfaces/options/AudioConverterOptions.js';
+import type AudioConversionResult from '#/core/internal/interfaces/AudioConversionResult.js';
+import { getContainerFromEncoder, getEncoderFromExtension, getFfmpeg, getFfprobe, splitFfmpegOptions } from './ffmpeg-cmdp.js';
+import { audioConversionPreset } from '#/utils/progressbar/index.js';
 
 /**
  * An object representing the information data when FFmpeg emits the `'progress'` event.

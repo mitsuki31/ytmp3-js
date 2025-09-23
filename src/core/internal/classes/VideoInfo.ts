@@ -6,9 +6,9 @@
  */
 
 import type { YT } from 'youtubei.js';
-import type AuthorInfo from '#/core/internal/interfaces/AuthorInfo';
-import type Thumbnail from '#/core/internal/interfaces/Thumbnail';
-import type VideoMetadata from '#/core/internal/interfaces/VideoMetadata';
+import type AuthorInfo from '#/core/internal/interfaces/AuthorInfo.js';
+import type Thumbnail from '#/core/internal/interfaces/Thumbnail.js';
+import type VideoMetadata from '#/core/internal/interfaces/VideoMetadata.js';
 
 /**
  * Represents detailed information about a YouTube video.

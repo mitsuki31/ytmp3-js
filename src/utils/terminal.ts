@@ -9,8 +9,8 @@ import { Writable } from 'node:stream';
 import { type WriteStream as FSWriteStream } from 'node:fs';
 import { WriteStream as TTYWriteStream } from 'node:tty';
 import { stripVTControlCharacters } from 'node:util';
-import { TypeUtils } from '#/vendor/type-utils';
-import type { NoParamFunction } from '#/utils';
+import { TypeUtils } from '#/vendor/type-utils.js';
+import type { NoParamFunction } from '#/utils/index.js';
 
 
 /**

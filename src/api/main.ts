@@ -1,9 +1,9 @@
 // Core
-export * from '#/core/ytmp3';
+export * from '#/core/ytmp3.js';
 // Core (FFmpeg)
 export { default as FluentFfmpeg, type FfmpegCommandLogger, type FfmpegCommandOptions } from 'fluent-ffmpeg';
-import * as ffmpegCmdp from '#/core/ffmpeg-cmdp';
-import * as audioconv from '#/core/audioconv';
+import * as ffmpegCmdp from '#/core/ffmpeg-cmdp.js';
+import * as audioconv from '#/core/audioconv.js';
 export const Ffmpeg = {
   ...audioconv,
   ...ffmpegCmdp
@@ -15,17 +15,17 @@ export type ICache = Types.ICache;
 export { UniversalCache } from 'youtubei.js';
 
 // Interfaces
-export type { default as AudioConversionResult } from '#/core/internal/interfaces/AudioConversionResult';
-export type { default as AuthorInfo } from '#/core/internal/interfaces/AuthorInfo';
-export type { default as DownloadResult } from '#/core/internal/interfaces/DownloadResult';
-export type { default as Thumbnail } from '#/core/internal/interfaces/Thumbnail';
-export type { default as VideoMetadata } from '#/core/internal/interfaces/VideoMetadata';
-export type { YTMP3Config } from '#/core/internal/interfaces/YTMP3Config';
+export type { default as AudioConversionResult } from '#/core/internal/interfaces/AudioConversionResult.js';
+export type { default as AuthorInfo } from '#/core/internal/interfaces/AuthorInfo.js';
+export type { default as DownloadResult } from '#/core/internal/interfaces/DownloadResult.js';
+export type { default as Thumbnail } from '#/core/internal/interfaces/Thumbnail.js';
+export type { default as VideoMetadata } from '#/core/internal/interfaces/VideoMetadata.js';
+export type { YTMP3Config } from '#/core/internal/interfaces/YTMP3Config.js';
 
-export type * from '#/core/internal/interfaces/options'
+export type * from '#/core/internal/interfaces/options/index.js'
 
 // Defaults
-export { defaults } from '#utils/options';
+export { defaults } from '#utils/options.js';
 
 // Errors
 export {
