@@ -9,11 +9,11 @@ import dns from 'node:dns';
 import { inspect } from 'node:util';
 import type { WriteStream as TTYWriteStream } from 'node:tty';
 
-import { getGlob, setInterrupted } from '#runtime/env';
-import { customDateFormat, type Logger } from '#utils/log';
+import { getGlob, setInterrupted } from '#runtime/env.js';
+import { customDateFormat, type Logger } from '#utils/log/index.js';
 import { DNSLookupTimeoutError } from '#error';
-import { style } from '#/vendor/colors';
-import { ipToNumber } from './tcp-ip';
+import { style } from '#/vendor/colors.js';
+import { ipToNumber } from './tcp-ip.js';
 
 /**
  * Performs a DNS lookup for a given hostname with a specified timeout.
@@ -149,7 +149,7 @@ export async function waitForConnectivity({
       if (err instanceof Error) {
         if (err instanceof DNSLookupTimeoutError) {
           if (logger) {
-            const prefix = cusStreateFormat(new Date(), true) + style('~', '::') + logger.WARNING_PREFIX;
+            const prefix = customDateFormat(new Date(), true) + style('~', '::') + logger.WARNING_PREFIX;
             logger.write('No internet connection. Retrying...', prefix, logger.stderr);
           }
           // Wait for the specified interval before retrying
