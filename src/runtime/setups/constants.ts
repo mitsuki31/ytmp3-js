@@ -8,7 +8,7 @@
  */
 
 import { YTMP3GlobalState } from '#globals';
-import { getGlob } from '#runtime/env';
+import { getGlob } from '#runtime/env.js';
 
 /** @private */
 export const MAX_LINE_LENGTH = 40;  // The maximum length of a log line

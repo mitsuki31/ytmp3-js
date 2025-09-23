@@ -1,11 +1,11 @@
 import path from 'node:path';
 
-import { findGlobalConfig, parseGlobalConfig } from '#/core/config';
-import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/core/config';
-import { createLogger, DefaultLogger, type Logger, NoneLogger, YTMP3_HOMEDIR } from '#/utils';
-import { defaults, merge } from '#utils/options';
-import { getGlob, setGlob, hasSetup } from '#runtime/env';
-import { setStatus, getStatus } from '../constants';
+import { findGlobalConfig, parseGlobalConfig } from '#/core/config.js';
+import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/core/config.js';
+import { createLogger, DefaultLogger, type Logger, NoneLogger, YTMP3_HOMEDIR } from '#/utils/index.js';
+import { defaults, merge } from '#utils/options.js';
+import { getGlob, setGlob, hasSetup } from '#runtime/env.js';
+import { setStatus, getStatus } from '../constants.js';
 
 export default async function init({ logger }: { logger?: Logger }) {
   // * Setup guard

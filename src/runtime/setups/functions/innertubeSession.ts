@@ -1,11 +1,11 @@
 import { Innertube, type SessionOptions } from 'youtubei.js';
 
-import type { ResolvedYTMP3Config } from '#/core/config';
-import { type Logger, NoneLogger, DefaultLogger } from '#/utils';
-import { logError } from '#/utils/diag';
-import { merge } from '#/utils/options';
-import { getGlob, hasSetup, setGlob } from '#runtime/env';
-import { getStatus, setStatus } from '../constants';
+import type { ResolvedYTMP3Config } from '#/core/config.js';
+import { type Logger, NoneLogger, DefaultLogger } from '#/utils/index.js';
+import { logError } from '#/utils/diag/index.js';
+import { merge } from '#/utils/options.js';
+import { getGlob, hasSetup, setGlob } from '#runtime/env.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default async function init({ logger, config }: { logger?: Logger, config?: SessionOptions }) {
   // * Setup guard

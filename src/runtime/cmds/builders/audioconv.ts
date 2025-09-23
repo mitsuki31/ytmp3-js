@@ -1,7 +1,7 @@
 import type { Argv } from 'yargs';
 
-import { splitFfmpegOptions } from '#/core/ffmpeg-cmdp';
-import { TITLES } from '#/runtime/cli_conf/misc';
+import { splitFfmpegOptions } from '#/core/ffmpeg-cmdp.js';
+import { TITLES } from '#/runtime/cli_conf/misc.js';
 
 export default function builder(yargs: Argv): Argv {
   yargs

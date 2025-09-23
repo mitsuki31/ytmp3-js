@@ -3,10 +3,10 @@ import path from 'node:path';
 import util from 'node:util';
 
 import type { YTMP3Env } from '#globals';
-import { type Logger, LogLevel, isDefined, createLogger, DefaultLogger, isStreamClosed } from '#/utils';
-import { logError } from '#/utils/diag';
-import { getSystemEnv, setGlob, runBeforeExit, hasSetup, getGlob, isDebugMode } from '#runtime/env';
-import { getStatus, setStatus } from '../constants';
+import { type Logger, LogLevel, isDefined, createLogger, DefaultLogger, isStreamClosed } from '#/utils/index.js';
+import { logError } from '#/utils/diag/index.js';
+import { getSystemEnv, setGlob, runBeforeExit, hasSetup, getGlob, isDebugMode } from '#runtime/env.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default function init() {
   // * Setup guard

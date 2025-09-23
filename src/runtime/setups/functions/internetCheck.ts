@@ -1,8 +1,8 @@
-import { type Logger, NoneLogger, DefaultLogger } from '#/utils';
-import { hasConnectivity } from '#/utils/connection';
-import { logError } from '#/utils/diag';
-import { getGlob, hasSetup, setGlob } from '#runtime/env';
-import { getStatus, setStatus } from '../constants';
+import { type Logger, NoneLogger, DefaultLogger } from '#/utils/index.js';
+import { hasConnectivity } from '#/utils/connection/index.js';
+import { logError } from '#/utils/diag/index.js';
+import { getGlob, hasSetup, setGlob } from '#runtime/env.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default async function init({ logger, onlyDnsCheck = true }: { logger?: Logger, onlyDnsCheck?: boolean }) {
   // * Setup guard

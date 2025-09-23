@@ -6,9 +6,9 @@
  */
 
 import type { Innertube, SessionOptions } from 'youtubei.js';
-import type { NoParamFunction, NoParamAsyncFunction } from '#/utils';
-import type { ResolvedYTMP3Config } from '#/core/config';
-import type { LogLevel, Logger } from '#utils/log/logger';
+import type { NoParamFunction, NoParamAsyncFunction } from '#/utils/index.js';
+import type { ResolvedYTMP3Config } from '#/core/config.js';
+import type { LogLevel, Logger } from '#utils/log/logger.js';
 
 /**
  * A unique `Symbol` used to namespace all internal global state.

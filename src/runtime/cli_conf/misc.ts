@@ -7,13 +7,13 @@
  */
 
 import { stripVTControlCharacters } from 'node:util';
-import Yargs from 'yargs';
+import * as Yargs from 'yargs';
 
 import { style, type ColorFormat } from '#colors';
-import { useNoColor } from '#runtime/env';
-import { captureStdoutSync } from '#/utils/diag';
+import { useNoColor } from '#runtime/env.js';
+import { captureStdoutSync } from '#/utils/diag/index.js';
 import type { ProjectMetadata } from '#globals';
-import { TerminalFormatter } from '#/utils/terminal';
+import { TerminalFormatter } from '#/utils/terminal.js';
 
 let $c = style;
 if (useNoColor()) {

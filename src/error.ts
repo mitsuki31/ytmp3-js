@@ -11,7 +11,7 @@
  */
 
 import { constants } from 'node:os';
-import { TypeUtils } from '#/vendor/type-utils';
+import { TypeUtils } from '#/vendor/type-utils.js';
 
 /**
  * Represents options for creating an `Error` object.

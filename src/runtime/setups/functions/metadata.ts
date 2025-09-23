@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { PackageJSON } from '#/core/config';
-import type { ProjectMetadata } from '#/globals';
-import { type Logger, NoneLogger, DefaultLogger, CSI, style as $c, ROOTDIR } from '#/utils';
-import { getGlob, hasSetup, setGlob } from '#runtime/env';
-import { getStatus, setStatus } from '../constants';
+import type { PackageJSON } from '#/core/config.js';
+import type { ProjectMetadata } from '#/globals.js';
+import { type Logger, NoneLogger, DefaultLogger, CSI, style as $c, ROOTDIR } from '#/utils/index.js';
+import { getGlob, hasSetup, setGlob } from '#runtime/env.js';
+import { getStatus, setStatus } from '../constants.js';
 
 const pkgJsonPath = path.join(ROOTDIR, 'package.json');
 

@@ -7,17 +7,17 @@
  */
 
 import util from 'node:util';
-import Yargs from 'yargs';
+import * as Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import { YTMP3_SYMBOL, type ProjectMetadata } from '#globals';
 import { ArgumentParserError } from '#error';
-import { style as $c, DefaultLogger, Logger, TerminalFormatter } from '#/utils';
-import { isNumber } from '#/vendor/type-utils';
-import { style } from '#/vendor/colors';
-import { getGlob, hasSetup } from '#runtime/env';
-import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/core/config';
-import { exampleUsages, maxWidth, refineHelp, TITLES } from './cli_conf/misc';
+import { style as $c, DefaultLogger, Logger, TerminalFormatter } from '#/utils/index.js';
+import { isNumber } from '#/vendor/type-utils.js';
+import { style } from '#/vendor/colors.js';
+import { getGlob, hasSetup } from '#runtime/env.js';
+import type { ResolvedYTMP3Config, ResolvedYTMP3ConfigWithDev } from '#/core/config.js';
+import { exampleUsages, maxWidth, refineHelp, TITLES } from './cli_conf/misc.js';
 
 type YargsError = Error & { yargsMessage?: string };
 export interface ConsumedArgvResult {
@@ -244,7 +244,7 @@ export function runSetup(options?: ConsumeArgvOptions & {
   logger?.debug('Building up argument parser...');
 
   // Initialize Yargs instance with specified configurations
-  const yargs = Yargs(argv)
+  const yargs = Yargs.default(argv)
     .scriptName(metadata.scriptName)
     .help(false)     // Disable default --help option
     .version(false)  // Disable default --version option

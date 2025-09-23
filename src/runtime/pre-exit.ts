@@ -17,9 +17,9 @@
  */
 
 import { types } from 'node:util';
-import { getGlob } from '#runtime/env';
-import { logError, DefaultLogger } from '#/utils';
-import type { NoParamAsyncFunction, NoParamFunction } from '#/utils';
+import { getGlob } from '#runtime/env.js';
+import { logError, DefaultLogger } from '#/utils/index.js';
+import type { NoParamAsyncFunction, NoParamFunction } from '#/utils/index.js';
 
 let called = false;
 let attached = false;
