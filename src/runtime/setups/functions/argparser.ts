@@ -1,6 +1,6 @@
-import type { Logger } from '#utils/log';
-import { runSetup } from '#runtime/argparser';
-import { getStatus, setStatus } from '../constants';
+import type { Logger } from '#utils/log/index.js';
+import { runSetup } from '#runtime/argparser.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default function init({ logger }: { logger?: Logger }) {
   if (getStatus('argparser')) return undefined;

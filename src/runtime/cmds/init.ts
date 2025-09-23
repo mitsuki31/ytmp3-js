@@ -1,12 +1,12 @@
 import { type Argv } from 'yargs';
 
-import { URLUtils } from '#/utils';
-import { isNonNullish } from '#/vendor/type-utils';
+import { URLUtils } from '#/utils/index.js';
+import { isNonNullish } from '#/vendor/type-utils.js';
 import { ArgumentParserError, IDValidationError, URLValidationError } from '#error';
-import { TITLES, help, version, copyright, printConfig } from '#runtime/cli_conf/misc';
+import { TITLES, help, version, copyright, printConfig } from '#runtime/cli_conf/misc.js';
 
 // Other builders
-import audioConvBuilder from './builders/audioconv';
+import audioConvBuilder from './builders/audioconv.js';
 
 export const command = '$0 [target..]';
 export const describe = 'Download YouTube audio from specified URLs or IDs, or from a file';

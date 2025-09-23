@@ -4,10 +4,10 @@ import util from 'node:util';
 import { execFileSync } from 'node:child_process';
 import which from 'which';
 
-import { type Logger, NoneLogger, DefaultLogger, LogLevel, isDefined, isString, style as $c } from '#/utils';
-import { logError } from '#/utils/diag';
-import { getGlob, getSystemEnv, setGlob, hasSetup } from '#runtime/env';
-import { getStatus, setStatus } from '../constants';
+import { type Logger, NoneLogger, DefaultLogger, LogLevel, isDefined, isString, style as $c } from '#/utils/index.js';
+import { logError } from '#/utils/diag/index.js';
+import { getGlob, getSystemEnv, setGlob, hasSetup } from '#runtime/env.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default function init({ logger }: { logger?: Logger }) {
   // * Setup guard

@@ -1,12 +1,12 @@
 import type { SessionOptions } from 'youtubei.js';
 
 import { type YTMP3GlobalState, YTMP3_SYMBOL, type Global as YTMP3Global, type ProjectMetadata } from '#globals';
-import { type Logger, DefaultLogger, NoneLogger } from '#/utils';
-import { useNoColor, getGlob, getSystemEnv, hasSetup } from '#/runtime/env';
-import type { NoParamFunction, NoParamAsyncFunction } from '#/utils';
-import type { ResolvedYTMP3Config } from '#/core/config';
-import { defaults } from '#/utils/options';
-import { getStatus, setStatus } from '../constants';
+import { type Logger, DefaultLogger, NoneLogger } from '#/utils/index.js';
+import { useNoColor, getGlob, getSystemEnv, hasSetup } from '#/runtime/env.js';
+import type { NoParamFunction, NoParamAsyncFunction } from '#/utils/index.js';
+import type { ResolvedYTMP3Config } from '#/core/config.js';
+import { defaults } from '#/utils/options.js';
+import { getStatus, setStatus } from '../constants.js';
 
 export default function init({ logger }: { logger?: Logger }) {
   if (getStatus('globalEnv')) return;

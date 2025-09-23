@@ -40,14 +40,14 @@
 
 import util from 'node:util';
 
-import type { SetupPartialConfig } from '#/core/config';
-import type { NoParamAsyncFunction, NoParamFunction } from '#/utils';
-import { TerminalFormatter } from '#/utils';
-import { LoggerConstructor, NoneLogger, type Logger } from '#utils/log';
-import { setGlob, getGlob, setInterrupted, hasInterrupted } from '#runtime/env';
+import type { SetupPartialConfig } from '#/core/config.js';
+import type { NoParamAsyncFunction, NoParamFunction } from '#/utils/index.js';
+import { TerminalFormatter } from '#/utils/index.js';
+import { LoggerConstructor, NoneLogger, type Logger } from '#utils/log/index.js';
+import { setGlob, getGlob, setInterrupted, hasInterrupted } from '#runtime/env.js';
 import { style as $c } from '#colors';
 import { YTMP3_SYMBOL, YTMP3GlobalState, type Global as YTMP3Global } from '#globals';
-import { getStatus, MAX_LINE_LENGTH } from './setups/constants';
+import { getStatus, MAX_LINE_LENGTH } from './setups/constants.js';
 import {
   setupLog,
   setupGlobalEnv,
@@ -57,8 +57,8 @@ import {
   setupInnertubeSession,
   setupConfig,
   setupArgparser,
-} from './setups';
-import cleanup, { attachToTerminationSignals } from './pre-exit';
+} from './setups/index.js';
+import cleanup, { attachToTerminationSignals } from './pre-exit.js';
 
 // Safely create a prototype of YTMP3-JS global state using `Object.assign`
 Object.assign(global, { [YTMP3_SYMBOL]: {} });
