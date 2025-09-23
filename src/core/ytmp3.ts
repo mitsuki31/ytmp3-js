@@ -42,8 +42,8 @@ import { inspect } from 'node:util';
 import { Innertube, type SessionOptions, Types, UniversalCache } from 'youtubei.js';
 import type { FfprobeData } from 'fluent-ffmpeg';
 
-import type { GetInfoOptions, DownloadOptions } from './internal/interfaces/options';
-import { getGlob, isDebugMode, setGlob, setInterrupted } from '#runtime/env';
+import type { GetInfoOptions, DownloadOptions } from './internal/interfaces/options/index.js';
+import { getGlob, isDebugMode, setGlob, setInterrupted } from '#runtime/env.js';
 import {
   type Logger,
   type URLLike,
@@ -57,20 +57,26 @@ import {
   getExtensionFromMime,
   LogLevel,
   createLoadingBar,
+  waitForConnectivity,
   STUB_CLASSES_DIR,
   ROOTDIR,
-} from '#/utils';
-import { waitForConnectivity } from '#/utils/connection';
-import { captureStderr, logError, parseParserError, prettyPrintParserError } from '#/utils/diag';
-import { defaults, merge, resolveInnertubeConfig } from '#/utils/options';
-import { createDownloadResult, extractAndValidateURL, generateStubClass, parseOutFile, resolveSession } from '#/core/internal';
-import { VInfoCache } from '#/cache';
-import VideoInfo from './internal/classes/VideoInfo';
-import { defaultHandler } from './helpers/handler';
-import type DownloadResult from './internal/interfaces/DownloadResult';
-import type AudioConversionResult from './internal/interfaces/AudioConversionResult';
-import { convertAudio } from './audioconv';
-import { type PackageJSON } from './config';
+} from '#/utils/index.js';
+import { captureStderr, logError, parseParserError, prettyPrintParserError } from '#/utils/diag/index.js';
+import { defaults, merge, resolveInnertubeConfig } from '#/utils/options.js';
+import { createDownloadResult, extractAndValidateURL, generateStubClass, parseOutFile, resolveSession } from '#/core/internal/index.js';
+import { VInfoCache } from '#/cache.js';
+import VideoInfo from './internal/classes/VideoInfo.js';
+import { defaultHandler } from './helpers/handler.js';
+import type DownloadResult from './internal/interfaces/DownloadResult.js';
+import type AudioConversionResult from './internal/interfaces/AudioConversionResult.js';
+import { convertAudio } from './audioconv.js';
+import { type PackageJSON } from './config.js';
+
+/**
+ * Represents a single video format. Re-exported from `youtubei.js`.
+ * @public
+ */
+export type Format = ReturnType<VideoInfo['full']['chooseFormat']>;
 
 // --- Module-scoped constants
 const defaultLogger = getGlob('logger', isDebugMode() ? createLogger('DEBUG') : DefaultLogger) as Logger;
@@ -113,6 +119,30 @@ export const version_info = (() => {
     preRelease: versionList[3] || 'stable'
   };
 })();
+
+// #region Internal Utils
+
+function resolveLogger(options: DownloadOptions): Logger {
+  return options.quiet
+    ? createLogger('ERROR')
+    : ([options.debug, isDebugMode()].find(Boolean)
+      ? defaultLogger.levelStr === 'DEBUG' ? defaultLogger : createLogger('DEBUG', {
+          stdout: defaultLogger.stdout, stderr: defaultLogger.stderr
+        })
+      : defaultLogger);
+}
+
+function resolveSessionConfig(options: DownloadOptions) {
+  const globalInnertubeConfig = getGlob('__globalInnertubeConfig', defaults.InnerTubeConfig) as SessionOptions;
+  return resolveInnertubeConfig(globalInnertubeConfig, [ options.innerTubeConfig ?? {} ]);
+}
+
+function resolveOutDir(options: DownloadOptions): string {
+  return path.isAbsolute(options.outDir ?? '.')
+    ? (options.outDir ?? path.resolve('.')) : path.resolve(options.cwd ?? '.', options.outDir ?? '.');
+}
+
+// #region Info Getters
 
 /**
  * Retrieves video information from YouTube using `Innertube`.
@@ -388,7 +418,7 @@ export async function getInfo(
       try {
         // Capture the parser error from stderr (if any)
         const parserError = await captureStderr(async () => {
-          videoInfo = new VideoInfo(await thisSession.getInfo(videoId, usedClient), { videoId });
+          videoInfo = new VideoInfo(await thisSession.getInfo(videoId, { client: usedClient }), { videoId });
         });
         loadingBar.stop();  // Stop the loading bar on success
         prettyPrintParserError(parserError, log);
@@ -457,68 +487,17 @@ export async function getInfo(
   return isTargetArray ? videoInfos : videoInfos[videoIds[0]];
 }
 
-export async function download(target: URLLike, options?: DownloadOptions): Promise<DownloadResult> {
-  if (!isPlainObject(options)) options = defaults.DownloadOptions;
+// #region Downloaders
 
-  const log: Logger = options.quiet
-    ? createLogger('ERROR')  // Only log errors in quiet mode
-    : ([options.debug, isDebugMode()].find(Boolean)
-      ? defaultLogger.levelStr === 'DEBUG' ? defaultLogger : createLogger('DEBUG', {
-          stdout: defaultLogger.stdout, stderr: defaultLogger.stderr
-        })
-      : defaultLogger);
-  const logLine = (width?: number, prefix?: string) => {
-    if (log.level >= LogLevel.INFO) log.line(width, prefix);
-  }
-
-  const downloadHandler = options.handler ?? defaultHandler;
-  const maxRetries = [options.maxRetries, defaults.GetInfoOptions.maxRetries].find(isNonNullish) as number;
-  const globalInnertubeConfig = getGlob('__globalInnertubeConfig', defaults.InnerTubeConfig) as SessionOptions;
-  const innerTubeConfig = resolveInnertubeConfig(globalInnertubeConfig, [ options.innerTubeConfig ?? {} ]);
-  let session = resolveSession(globalInnertubeSession ?? null, options?.session ?? null, log);
-
-  // -- Resolve the output file --
-  const outDir: string = path.isAbsolute(options.outDir ?? '.')
-    ? (options.outDir ?? path.resolve('.')) : path.resolve(options.cwd ?? '.', options.outDir ?? '.');
-
-  // -- Retrieve video info --
-  const videoInfo = await getInfo(target, {
-    ...options,
-    innerTubeConfig,
-  });
-  if (isNullish(videoInfo)) {
-    const msg = 'Failed to fetch the video info: '
-      + (target instanceof URL ? target.href : target);
-    log.error(msg);
-    throw new TypeError(msg);  // TODO: Add better error type
-  }
-  const [, videoId] = extractAndValidateURL(target);
-  const videoId_C = style('BM', videoId);
-
-  logLine();
-
-  // Get the global session from previous step if needed
-  if (isNullish(session)) {
-    session = getGlob('innertube_session', session) || (globalInnertubeSession ?? null);
-    if (session) log.debug('Using global Innertube session.');
-  }
-
-  const thisSession = session as Innertube;
-  // Retrieve session from global or use from options
-  if (thisSession.session.player) {
-    log.info(`Using player with ID: ${style('Y', thisSession.session.player.player_id)}`);
-  }
-
-  // -- Select format
+function selectFormat(videoInfo: VideoInfo, options: DownloadOptions, log: Logger): Format | null {
   const formatOptions = isPlainObject(options.formatOptions)
     ? options.formatOptions
     : defaults.DownloadOptions.formatOptions;
   log.debug('Using format options:', inspect(formatOptions, {
     colors: true, depth: 1, compact: false
   }));
-  let selectedFormat: ReturnType<VideoInfo["full"]["chooseFormat"]> | null = null;
   try {
-    selectedFormat = videoInfo.full.chooseFormat(formatOptions);
+    return videoInfo.full.chooseFormat(formatOptions);
   } catch (fmtErr) {
     if (fmtErr instanceof Error) {
       fmtErr.name = 'InnertubeError';
@@ -526,12 +505,10 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
       throw fmtErr;
     }
   }
-  const range = {
-    start: options?.range?.start ?? 0,
-    end: options?.range?.end ?? selectedFormat?.content_length as number,  // Use the content length
-  };
+  return null;
+}
 
-  // Log some information about the selected format
+function logFormatInfo(selectedFormat: Format, videoInfo: VideoInfo, log: Logger) {
   log.info(`Using the selected format with itag ${style('C', String(selectedFormat?.itag))}`);
   [
     `Audio bitrate: ${style('C', (selectedFormat?.bitrate as number / 1e3).toFixed(2) + ' kbps')}`,
@@ -543,20 +520,25 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
     `Content size: ${style('C', ((selectedFormat?.content_length ?? 0) / 1024 ** 2).toFixed(2) + ' MiB')}`,
     `Duration: ${style('C', ((videoInfo.full.page[0].video_details?.duration ?? 0) / 60).toFixed(2) + ' mins')}`
   ].forEach(msg => log.level < LogLevel.INFO ? {} : log.write(` ${style('~', '--')} ${msg}\n`, null, log.stdout));
+}
 
+async function handleDownload(
+  session: Innertube,
+  videoId: string,
+  range: { start: number, end: number },
+  outDir: string,
+  filename: string,
+  downloadHandler: typeof defaultHandler,
+  videoInfo: VideoInfo,
+  selectedFormat: Format,
+  log: Logger,
+  controller: AbortController,
+  maxRetries: number
+): Promise<string> {
   let stream: ReadableStream<Uint8Array> | null = null;
   let outputFile: string | undefined = undefined;
-  const filename = parseOutFile(options.outFile ?? defaults.DownloadOptions.outFile, {
-    title: videoInfo?.title ?? '<unknown>',
-    author: videoInfo?.author.name?.replace(/\s-\sTopic$/, '') ?? '',
-    url: videoInfo?.videoUrl as string,
-    id: videoInfo?.videoId as string,
-    ext: getExtensionFromMime(selectedFormat?.mime_type as string).replace('.', '')
-  });
-
   let retries = 0;
   let downloadError: Error | null = null;
-  const controller = new AbortController();
   const sigintHandler = () => {
     log.error('Received SIGINT. Aborting download...');
     controller.abort();
@@ -565,32 +547,25 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
 
   do {
     try {
-      // Update the start of the range if the file already exists
       if (fs.existsSync(path.join(outDir, filename))) {
         const stat = await fs.promises.stat(path.join(outDir, filename));
         if (stat.size < range.end) range.start = stat.size;
       }
-
-      // Attach once
       process.once('SIGINT', sigintHandler);
-
-      // -- Download the content
-      stream = await thisSession.download(videoId, {
+      stream = await session.download(videoId, {
         ...defaults.DownloadOptions.formatOptions,
         range,
       });
-
       outputFile = await downloadHandler(stream, videoInfo, {
         outDir,
         filename,
-        selectedFormat: selectedFormat as ReturnType<VideoInfo["full"]["chooseFormat"]>,
+        selectedFormat,
         quiet: false,
         logger: log,
         signal: controller.signal,
       });
-
       downloadError = null;
-      stream = null;  // Unset the stream
+      stream = null;
       break;
     } catch (err) {
       downloadError = err as Error;
@@ -598,7 +573,6 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
         ?? (fs.existsSync(path.join(outDir, filename))
           ? (await fs.promises.stat(path.join(outDir, filename))).size : undefined);
       if (bytesWritten) range.start = bytesWritten;
-
       if ((err as Error).name === 'AbortError') break;
       if (retries++ < maxRetries) {
         log.warn(`Failed to download content. Retrying [${retries}/${maxRetries}]...`);
@@ -611,9 +585,18 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
 
   if (downloadError instanceof Error) {
     logError('Failed to download content %s', downloadError, log);
-    throw downloadError;  // Re-throw the error to caller
+    throw downloadError;
   }
+  return outputFile as string;
+}
 
+function logDownloadSummary(
+  videoId_C: string,
+  videoInfo: VideoInfo,
+  outputFile: string,
+  log: Logger,
+  logLine: (width?: number, prefix?: string) => void
+) {
   log.done(`{${videoId_C}} \u2714 Successfully downloaded content.`);
   [
     `Title: ${style('C', videoInfo?.title as string)}`,
@@ -624,31 +607,102 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
     ` ${style('~', '--')} ${msg}\n`, null, log.stdout)
   );
   logLine();
+}
 
-  // -- Audio conversion
-  let conversionResult: AudioConversionResult | null = null;
+async function handleAudioConversion(
+  outputFile: string,
+  options: DownloadOptions,
+  log: Logger
+): Promise<AudioConversionResult | null> {
   if (options?.convertAudio) {
     try {
-      // The function will take care the output file name pre-conversion
-      conversionResult = await convertAudio(outputFile as string, {
+      return await convertAudio(outputFile, {
         ...(options.converterOptions ?? {}),
       });
     } catch (err) {
       logError('Failed to convert audio %s', err as Error, log);
-      throw err;  // Re-throw the error to caller
+      throw err as Error;
     }
   }
+  return null;
+}
 
-  // -- Create the download result
+export async function download(target: URLLike, options?: DownloadOptions): Promise<DownloadResult> {
+  if (!isPlainObject(options)) options = defaults.DownloadOptions;
+  const log = resolveLogger(options);
+  const logLine = (width?: number, prefix?: string) => {
+    if (log.level >= LogLevel.INFO) log.line(width, prefix);
+  };
+  const downloadHandler = options.handler ?? defaultHandler;
+  const maxRetries = [options.maxRetries, defaults.GetInfoOptions.maxRetries].find(isNonNullish) as number;
+  const innerTubeConfig = resolveSessionConfig(options);
+  let session = resolveSession(globalInnertubeSession ?? null, options?.session ?? null, log);
+  const outDir = resolveOutDir(options);
+
+  const videoInfo = await getInfo(target, { ...options, innerTubeConfig });
+  if (isNullish(videoInfo)) {
+    const msg = 'Failed to fetch the video info: ' + (target instanceof URL ? target.href : target);
+    log.error(msg);
+    throw new TypeError(msg);
+  }
+  const [, videoId] = extractAndValidateURL(target);
+  const videoId_C = style('BM', videoId);
+
+  logLine();
+
+  if (isNullish(session)) {
+    session = getGlob('innertube_session', session) || (globalInnertubeSession ?? null);
+    if (session) log.debug('Using global Innertube session.');
+  }
+  const thisSession = session as Innertube;
+  if (thisSession.session.player) {
+    log.info(`Using player with ID: ${style('Y', thisSession.session.player.player_id)}`);
+  }
+
+  const selectedFormat = selectFormat(videoInfo, options, log);
+  const range = {
+    start: options?.range?.start ?? 0,
+    end: options?.range?.end ?? selectedFormat?.content_length as number,
+  };
+
+  if (isNullish(selectedFormat)) {
+    const msg = `Failed to select a format: ${(target instanceof URL
+      ? target.href : target)}. No such format available: ${options.formatOptions}`;
+    log.error(msg);
+    // TODO: Add a better error type
+    throw new TypeError(msg);
+  }
+
+  logFormatInfo(selectedFormat, videoInfo, log);
+
+  const filename = parseOutFile(options.outFile ?? defaults.DownloadOptions.outFile, {
+    title: videoInfo?.title ?? '<unknown>',
+    author: videoInfo?.author.name?.replace(/\s-\sTopic$/, '') ?? '',
+    url: videoInfo?.videoUrl as string,
+    id: videoInfo?.videoId as string,
+    ext: getExtensionFromMime(selectedFormat?.mime_type as string).replace('.', '')
+  });
+
+  // TODO: Add support for initiating abort controller from outside function
+  const controller = new AbortController();
+  const outputFile = await handleDownload(
+    thisSession, videoId, range, outDir, filename,
+    downloadHandler, videoInfo, selectedFormat, log, controller, maxRetries
+  );
+
+  logDownloadSummary(videoId_C, videoInfo, outputFile, log, logLine);
+
+  const conversionResult = await handleAudioConversion(outputFile, options, log);
+
   return createDownloadResult({
     finalPath: (options?.convertAudio ? (conversionResult?.output.path ?? outputFile) : outputFile) as string,
     vInfo: videoInfo as VideoInfo,
-    acInfo: {
-      inputFile: conversionResult?.input.path as string,
-      inputFfprobeData: conversionResult?.input.metadata as FfprobeData,
-      inputFileDeleted: conversionResult?.input.deleted as boolean,
-      outputFile: conversionResult?.output.path as string,
-      outputFfprobeData: conversionResult?.output.metadata as FfprobeData
+    acInfo: isNullish(conversionResult) ? null : {
+      inputFile: conversionResult.input.path,
+      inputFfprobeData: conversionResult.input.metadata as FfprobeData,
+      inputFileDeleted: conversionResult.input.deleted,
+      outputFile: conversionResult.output.path,
+      outputFfprobeData: conversionResult.output.metadata as FfprobeData
     },
     cache: {
       useCache: !!options?.useCache,
@@ -657,3 +711,16 @@ export async function download(target: URLLike, options?: DownloadOptions): Prom
     }
   });
 }
+
+
+download('https://www.youtube.com/watch?v=Soy4jGPHr3g', {
+  quiet: false,
+  debug: true,
+  maxRetries: 0,
+  useCache: false,
+  outDir: 'tmp/downloads',
+  noInternetCheck: false,
+  innerTubeConfig: {
+    cookie: process.env.YT_COOKIES,
+  }
+}).then(console.log);
