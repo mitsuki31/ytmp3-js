@@ -128,7 +128,7 @@ jobs:
         FFMPEG_PATH: ${{ steps.post-ffmpeg-cache-restore.outputs.ffmpeg-path }}
 
     - name: Upload coverage to artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         path: ./coverage
         name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
