@@ -152,7 +152,7 @@ jobs:
 
     steps:
     - name: Download coverage from artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         path: ./coverage
         name: coverage-${{ matrix.os }}-${{ matrix.node-version }}
